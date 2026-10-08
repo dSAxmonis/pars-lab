@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 3 - Lab Practical File</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #222222;
+            line-height: 1.5;
+            font-size: 11pt;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #003366;
+            font-size: 18pt;
+            text-align: center;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: #003366;
+            font-size: 14pt;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 4px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #004d40;
+            font-size: 12pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+        .header-sub {
+            text-align: center;
+            color: #555555;
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .meta-bar {
+            text-align: center;
+            font-size: 10pt;
+            background-color: #f0f4f8;
+            padding: 8px;
+            border: 1px solid #d0dbe5;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        table, th, td {
+            border: 1px solid #cccccc;
+        }
+        th {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 8px 6px;
+            text-align: left;
+        }
+        td {
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .formula-box {
+            background-color: #f7f9fa;
+            border-left: 4px solid #003366;
+            padding: 8px 14px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 12px 0 18px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 96%;
+            border: 1px solid #999999;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+        }
+        .screenshot-caption {
+            font-size: 9pt;
+            color: #555555;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #181717;
+            color: #ffffff !important;
+            padding: 5px 12px;
+            font-size: 9.5pt;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        a {
+            color: #0044cc;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #002288;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            font-size: 9.5pt;
+            font-family: monospace;
+        }
+        .link-card {
+            background-color: #f8faff;
+            border: 1px solid #cce0ff;
+            border-left: 4px solid #0055ff;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <b>Experiment No.:</b> 03 &nbsp;|&nbsp; 
+        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
+        <b>Framework:</b> Python 3.14 / Flask &nbsp;|&nbsp;
+        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Multimodal Feature Extraction from Audio Across Multiple Timestamps Using Flask</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To prepare an informative web page using Flask in Python to extract features from an audio recording across at least 10 timestamps, extracting at least 3 distinct features (RMS Energy, Zero Crossing Rate, and Spectral Centroid), justify their objectives for real-world applications, and embed the playable audio directly into the page.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. Temporal Short-Time Windowing</h3>
+    <p>
+        Audio waveforms are non-stationary over extended temporal sequences. To observe localized frequency and energy characteristics, short-time windowing ($N = 50\text{ ms}$) is applied around specific timestamps $t_i$:
+    </p>
+    <div class="formula-box">
+        x_{t_i}[n] = x[n] &times; w[n - n_i]
+    </div>
+
+    <h3>2. Extracted Audio Features &amp; Mathematical Formulas</h3>
+
+    <div class="formula-box">
+        <b>1. Root Mean Square (RMS) Energy:</b><br>
+        RMS_t = sqrt( (1 / N) * &sum; [x_t[n]^2] )<br>
+        <i>Application Objective:</i> Voice Activity Detection (VAD), silence removal, loudness metering, and acoustic event onset detection.
+    </div>
+
+    <div class="formula-box">
+        <b>2. Zero Crossing Rate (ZCR):</b><br>
+        ZCR_t = (1 / 2N) * &sum; | sgn(x_t[n]) - sgn(x_t[n-1]) |<br>
+        <i>Application Objective:</i> Distinguishing voiced harmonic speech (vowels) from unvoiced fricatives (/s/, /sh/) and percussion noise.
+    </div>
+
+    <div class="formula-box">
+        <b>3. Spectral Centroid (Frequency Center of Mass):</b><br>
+        C_t = &sum; [f_k * |X_t[k]|] / &sum; |X_t[k]|<br>
+        <i>Application Objective:</i> Acoustic timbre classification, sound brightness evaluation, musical genre recognition, and speaker profiling.
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup &amp; Directory Structure</h3>
+    <p>Configured <code>exp 3/</code> containing <code>app.py</code>, <code>static/</code>, <code>templates/</code>, and verified dependencies (Flask, numpy, pandas, scipy, matplotlib).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
+        <div class="screenshot-caption">Figure 1.1: Environment verification and project directory listing.</div>
+    </div>
+
+    <h3>Step 2: Audio Ingestion &amp; Signal Properties</h3>
+    <p>Verified the 16-bit PCM Mono audio file at 16,000 Hz with 80,000 samples spanning 5.0 seconds.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step2_audio_gen.png" alt="Step 2 Audio Verification">
+        <div class="screenshot-caption">Figure 1.2: Terminal output validating wave file header and sampling rate.</div>
+    </div>
+
+    <h3>Step 3: Multi-Timestamp Feature Extraction Execution</h3>
+    <p>Executed extraction logic across 10 timestamps ($t = 0.5s, 1.0s, \dots, 5.0s$) calculating RMS Energy, ZCR, and Spectral Centroid.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step3_extraction.png" alt="Step 3 Extraction">
+        <div class="screenshot-caption">Figure 1.3: Verification of 10-timestamp feature extraction.</div>
+    </div>
+
+    <h3>Step 4: Web Application Launch on Port 5005</h3>
+    <p>Launched the Flask web server on <a href="http://127.0.0.1:5005" target="_blank">http://127.0.0.1:5005</a> to render the interactive dashboard with playable audio.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step4_running.png" alt="Step 4 Running">
+        <div class="screenshot-caption">Figure 1.4: Flask development server active on port 5005.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>OUTPUT / DASHBOARD RESULTS</h2>
+
+    <h3>Output 1: Embedded Audio Player &amp; Signal Specifications</h3>
+    <p>The web page embeds a native HTML5 playable audio player alongside digital sampling attributes.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out1_audio_player_specs.png" alt="Output 1 Audio Player & Specs">
+        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Playable audio player and signal metadata table.</div>
+    </div>
+
+    <h3>Output 2: Feature Extraction Across 10 Timestamps</h3>
+    <p>Extracted numerical features (RMS Energy, ZCR, Spectral Centroid) for all 10 timestamp samples.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out2_timestamps_features.png" alt="Output 2 Timestamps Features">
+        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; 10 timestamps feature extraction table with inferred acoustic state.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 3: Temporal Feature Trajectory Multi-Plot</h3>
+    <p>Time-series multi-plot displaying the variations of RMS Energy, ZCR, and Spectral Centroid.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out3_feature_plot.png" alt="Output 3 Feature Plot">
+        <div class="screenshot-caption">Figure 2.3: Section 3 &mdash; Multi-panel Matplotlib plot across timestamps.</div>
+    </div>
+
+    <h3>Output 4: Application Objective Justification Table</h3>
+    <p>Detailed engineering justifications for applying each extracted metric to practical systems.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out4_justifications.png" alt="Output 4 Justifications">
+        <div class="screenshot-caption">Figure 2.4: Section 4 &mdash; Application objectives and mathematical definitions.</div>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 3/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 3/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 3/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Lab Manual (Markdown):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/LAB_PRACTICAL_FILE.md" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 3/LAB_PRACTICAL_FILE.md</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, an informative web application was developed using Flask in Python to perform temporal feature extraction on an audio signal. Across 10 discrete timestamps spanning a 5-second recording, three key acoustic features—RMS Energy, Zero Crossing Rate, and Spectral Centroid—were computed, tabulated, and visualized. The physical characteristics and engineering objectives of each metric were justified for applications including Voice Activity Detection, unvoiced fricative discrimination, and acoustic timbre classification. Finally, the playable audio source was embedded into the dashboard.
+    </p>
+
+</body>
+</html>

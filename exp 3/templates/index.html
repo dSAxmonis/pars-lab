@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 3: Feature Extraction from Audio Across Timestamps</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 3</font></h1>
+        <h3><font color="#555555">Audio Feature Extraction Across Multiple Timestamps & Application Justification</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask (Python)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- SECTION 1: EMBEDDED AUDIO SOURCE & SPECIFICATIONS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">SECTION 1: EMBEDDED AUDIO FILE & SIGNAL SPECIFICATIONS</font></th>
+        </tr>
+        <tr>
+            <td width="40%" align="center" bgcolor="#f9fbfd">
+                <b>Embedded Playable Audio File:</b><br><br>
+                <audio controls src="/static/sample_audio.wav">
+                    Your browser does not support the audio element.
+                </audio>
+                <br><br>
+                <font size="2" color="#666666">File: <code>exp 3/static/sample_audio.wav</code></font>
+            </td>
+            <td width="60%" valign="top">
+                <b>Signal Attributes:</b>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e6f0fa">
+                        <th>Property</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><b>Sampling Rate</b></td>
+                        <td>{{ sample_rate }} Hz</td>
+                        <td>Discrete digital samples recorded per second</td>
+                    </tr>
+                    <tr bgcolor="#f9f9f9">
+                        <td><b>Duration</b></td>
+                        <td>{{ duration }} seconds</td>
+                        <td>Total temporal length of the audio recording</td>
+                    </tr>
+                    <tr>
+                        <td><b>Channels</b></td>
+                        <td>1 (Mono)</td>
+                        <td>Single audio channel for focused feature extraction</td>
+                    </tr>
+                    <tr bgcolor="#f9f9f9">
+                        <td><b>Quantization</b></td>
+                        <td>16-bit Signed PCM</td>
+                        <td>Dynamic range represented in [-32768, 32767]</td>
+                    </tr>
+                    <tr>
+                        <td><b>Analysis Window</b></td>
+                        <td>50 ms (800 samples)</td>
+                        <td>Window duration centered at each timestamp</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: 10 TIMESTAMPS EXTRACTED FEATURES TABLE -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="7"><font color="#ffffff">SECTION 2: EXTRACTED FEATURES ACROSS 10 TIMESTAMPS (10 SAMPLES)</font></th>
+        </tr>
+        <tr bgcolor="#e0f2f1" align="center">
+            <th>Sample #</th>
+            <th>Timestamp (s)</th>
+            <th>Temporal Window</th>
+            <th>RMS Energy</th>
+            <th>Zero Crossing Rate (ZCR)</th>
+            <th>Spectral Centroid (Hz)</th>
+            <th>Inferred Acoustic State</th>
+        </tr>
+        {% for row in features %}
+        <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td><b>{{ row.sample_id }}</b></td>
+            <td><b>{{ row.timestamp_sec }} s</b></td>
+            <td><code>{{ row.window_range }}</code></td>
+            <td><font color="#1b5e20"><b>{{ row.rms_energy }}</b></font></td>
+            <td><font color="#d84315"><b>{{ row.zcr }}</b></font></td>
+            <td><font color="#0d47a1"><b>{{ row.spectral_centroid_hz }} Hz</b></font></td>
+            <td align="left">
+                {% if 'Silence' in row.inferred_state %}
+                <font color="#888888">&#9679; {{ row.inferred_state }}</font>
+                {% elif 'High Pitch' in row.inferred_state %}
+                <font color="#0055ff">&#9679; {{ row.inferred_state }}</font>
+                {% elif 'Unvoiced' in row.inferred_state %}
+                <font color="#cc6600">&#9679; {{ row.inferred_state }}</font>
+                {% else %}
+                <font color="#008800">&#9679; {{ row.inferred_state }}</font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: FEATURE VARIATION PLOT -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th><font color="#ffffff">SECTION 3: TEMPORAL FEATURE VARIATION PLOT (RMS ENERGY, ZCR, SPECTRAL CENTROID)</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="95%" alt="Feature Variation Across Timestamps" border="1">
+                <br><br>
+                <font size="2" color="#555555">
+                <b>Plot Explanation:</b> Displays the distinct trajectories of signal energy (top), sign transitions (middle), and spectral brightness (bottom) over the 10 timestamps.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: FEATURE OBJECTIVE JUSTIFICATION FOR APPLICATIONS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th colspan="4"><font color="#ffffff">SECTION 4: JUSTIFICATION OF EXTRACTED FEATURES FOR ENGINEERING APPLICATIONS</font></th>
+        </tr>
+        <tr bgcolor="#e9ecef" align="center">
+            <th width="20%">Extracted Feature</th>
+            <th width="25%">Mathematical Formula</th>
+            <th width="25%">Acoustic / Physical Interpretation</th>
+            <th width="30%">Application Objective Justification</th>
+        </tr>
+        {% for j in justifications %}
+        <tr>
+            <td align="left"><b>{{ j.feature }}</b></td>
+            <td><code>{{ j.formula }}</code></td>
+            <td>{{ j.meaning }}</td>
+            <td bgcolor="#f8f9fa"><b>{{ j.objective }}</b></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 3 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; Python Flask Feature Extraction Dashboard</font></p>
+    </center>
+
+</body>
+</html>
