@@ -17,3 +17,9 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 - **Code:** [`exp 3/app.py`](./exp%203/app.py) &amp; [`exp 3/templates/index.html`](./exp%203/templates/index.html)
 - **Manual Report:** [`exp 3/LAB_PRACTICAL_FILE.md`](./exp%203/LAB_PRACTICAL_FILE.md)
 - **Print-Ready PDF:** [`Experiment_3_Lab_Practical.pdf`](./Experiment_3_Lab_Practical.pdf)
+
+### 3. [Experiment 4: Bayesian Classification for Single Feature & Multiple Features Multiple Class](./exp%204/)
+- **Description:** Interactive Flask web application implementing Bayesian pattern classification under univariate and multivariate Gaussian models, calculating prior, likelihood, and posterior probabilities with real-time decision plots.
+- **Code:** [`exp 4/app.py`](./exp%204/app.py) &amp; [`exp 4/templates/index.html`](./exp%204/templates/index.html)
+- **Manual Report:** [`exp 4/LAB_PRACTICAL_FILE.md`](./exp%204/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_4_Lab_Practical.pdf`](./Experiment_4_Lab_Practical.pdf)

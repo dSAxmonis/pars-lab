@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 4: Bayesian Classification (Single & Multiple Features)</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 4</font></h1>
+        <h3><font color="#555555">Bayesian Classification: Single Feature &amp; Multiple Features Multiple Class</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask (Python)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- SECTION 1: TRAINED MODEL PARAMETERS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="5"><font color="#ffffff">SECTION 1: LEARNED GAUSSIAN PARAMETERS &amp; CLASS PRIORS</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" align="center">
+            <th>Class Label (&omega;<sub>i</sub>)</th>
+            <th>Prior P(&omega;<sub>i</sub>)</th>
+            <th>Single Feature (Petal Length): Mean &mu; &plusmn; &sigma;</th>
+            <th>Multi-Feature (Petal &times; Sepal Length): Mean Vector [&mu;<sub>1</sub>, &mu;<sub>2</sub>]</th>
+            <th>Covariance Matrix &Sigma;</th>
+        </tr>
+        {% for c in classes %}
+        <tr align="center">
+            <td><b>{{ c }}</b></td>
+            <td><b>{{ "%.4f"|format(priors[c]) }}</b></td>
+            <td>&mu; = {{ "%.2f"|format(single_params[c]['mean']) }} cm, &sigma; = {{ "%.2f"|format(single_params[c]['std']) }} cm</td>
+            <td>[{{ "%.2f"|format(multi_params[c]['mean'][0]) }}, {{ "%.2f"|format(multi_params[c]['mean'][1]) }}]</td>
+            <td>
+                <code>
+                [[{{ "%.3f"|format(multi_params[c]['cov'][0][0]) }}, {{ "%.3f"|format(multi_params[c]['cov'][0][1]) }}],<br>
+                 [{{ "%.3f"|format(multi_params[c]['cov'][1][0]) }}, {{ "%.3f"|format(multi_params[c]['cov'][1][1]) }}]]
+                </code>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: INTERACTIVE TEST SAMPLE FORM -->
+    <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th><font color="#ffffff">SECTION 2: INTERACTIVE TEST SAMPLE INPUT &amp; PRESET BENCHMARKS</font></th>
+        </tr>
+        <tr>
+            <td>
+                <form method="POST" action="/">
+                    <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="35%">
+                                <b>Feature 1 (Petal Length in cm):</b><br>
+                                <input type="number" step="0.1" name="petal_length" value="{{ test_x1 }}" style="font-size: 14pt; padding: 4px; width: 140px;" required>
+                                <br><font size="2" color="#666666">Domain: [1.0 - 7.0 cm]</font>
+                            </td>
+                            <td width="35%">
+                                <b>Feature 2 (Sepal Length in cm):</b><br>
+                                <input type="number" step="0.1" name="sepal_length" value="{{ test_x2 }}" style="font-size: 14pt; padding: 4px; width: 140px;" required>
+                                <br><font size="2" color="#666666">Domain: [4.0 - 8.0 cm]</font>
+                            </td>
+                            <td width="30%" align="center" valign="middle">
+                                <input type="submit" value="Classify Test Sample (Bayesian Decision)" style="font-size: 11pt; font-weight: bold; padding: 8px 16px; background-color: #003366; color: #ffffff; cursor: pointer;">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <hr color="#e0e0e0">
+                <b>Quick-Select Benchmark Samples:</b><br>
+                <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#f9f9f9">
+                    <tr bgcolor="#e8f5e9" align="center">
+                        <th>Benchmark Case</th>
+                        <th>Petal Length</th>
+                        <th>Sepal Length</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for p in presets %}
+                    <tr align="center">
+                        <td align="left"><b>{{ p.name }}</b></td>
+                        <td>{{ p.petal_len }} cm</td>
+                        <td>{{ p.sepal_len }} cm</td>
+                        <td>
+                            <form method="POST" action="/" style="margin: 0;">
+                                <input type="hidden" name="petal_length" value="{{ p.petal_len }}">
+                                <input type="hidden" name="sepal_length" value="{{ p.sepal_len }}">
+                                <input type="submit" value="Test This Sample" style="font-size: 9pt; cursor: pointer;">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: CLASSIFICATION RESULTS TABLE -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="2"><font color="#ffffff">SECTION 3: BAYESIAN CLASSIFICATION RESULTS &amp; POSTERIOR PROBABILITIES</font></th>
+        </tr>
+        <tr>
+            <!-- Left: Single Feature Results -->
+            <td width="50%" valign="top">
+                <center><b><font color="#003366" size="3">Part A: Single Feature Multiple Class</font></b></center>
+                <p><b>Input Feature:</b> Petal Length = <code>{{ test_x1 }} cm</code></p>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#fdfdfd">
+                    <tr bgcolor="#e6f0fa" align="center">
+                        <th>Class (&omega;<sub>i</sub>)</th>
+                        <th>Likelihood p(x|&omega;<sub>i</sub>)</th>
+                        <th>Prior P(&omega;<sub>i</sub>)</th>
+                        <th>Posterior P(&omega;<sub>i</sub>|x)</th>
+                    </tr>
+                    {% for c in classes %}
+                    <tr align="center" {% if c == single_res.predicted_class %}bgcolor="#e8f5e9"{% endif %}>
+                        <td align="left"><b>{{ c }}</b></td>
+                        <td>{{ "%.5f"|format(single_res.likelihoods[c]) }}</td>
+                        <td>{{ "%.3f"|format(priors[c]) }}</td>
+                        <td><b>{{ "%.4f"|format(single_res.posteriors[c]) }}</b> ({{ "%.1f"|format(single_res.posteriors[c] * 100) }}%)</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <div style="background-color: #f1f8e9; border: 1px solid #c5e1a5; padding: 8px;">
+                    <b>Single Feature Decision:</b> <font color="#2e7d32" size="3"><b>{{ single_res.predicted_class }}</b></font><br>
+                    Confidence: <b>{{ "%.2f"|format(single_res.confidence) }}%</b> (Evidence p(x) = {{ "%.5f"|format(single_res.evidence) }})
+                </div>
+            </td>
+
+            <!-- Right: Multi-Feature Results -->
+            <td width="50%" valign="top">
+                <center><b><font color="#003366" size="3">Part B: Multiple Features Multiple Class</font></b></center>
+                <p><b>Input Vector:</b> [Petal Length: <code>{{ test_x1 }} cm</code>, Sepal Length: <code>{{ test_x2 }} cm</code>]</p>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#fdfdfd">
+                    <tr bgcolor="#e6f0fa" align="center">
+                        <th>Class (&omega;<sub>i</sub>)</th>
+                        <th>Likelihood p(<b>x</b>|&omega;<sub>i</sub>)</th>
+                        <th>Prior P(&omega;<sub>i</sub>)</th>
+                        <th>Posterior P(&omega;<sub>i</sub>|<b>x</b>)</th>
+                    </tr>
+                    {% for c in classes %}
+                    <tr align="center" {% if c == multi_res.predicted_class %}bgcolor="#e8f5e9"{% endif %}>
+                        <td align="left"><b>{{ c }}</b></td>
+                        <td>{{ "%.5f"|format(multi_res.likelihoods[c]) }}</td>
+                        <td>{{ "%.3f"|format(priors[c]) }}</td>
+                        <td><b>{{ "%.4f"|format(multi_res.posteriors[c]) }}</b> ({{ "%.1f"|format(multi_res.posteriors[c] * 100) }}%)</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <div style="background-color: #f1f8e9; border: 1px solid #c5e1a5; padding: 8px;">
+                    <b>Multi-Feature Decision:</b> <font color="#2e7d32" size="3"><b>{{ multi_res.predicted_class }}</b></font><br>
+                    Confidence: <b>{{ "%.2f"|format(multi_res.confidence) }}%</b> (Evidence p(<b>x</b>) = {{ "%.5f"|format(multi_res.evidence) }})
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: VISUALIZATION PLOTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th><font color="#ffffff">SECTION 4: BAYESIAN DECISION PLOTS &amp; PROBABILITY DENSITY CURVES</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="96%" alt="Bayesian Decision Curves and Scatter Plot" border="1">
+                <br><br>
+                <font size="2" color="#555555">
+                <b>Visual Inspection:</b> Left panel illustrates 1D class-conditional Gaussian probability densities p(x|&omega;) with the test value marked by dashed line. Right panel portrays 2D feature distribution scatter with class centroids (X) and the evaluated test sample (star).
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 4 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; Python Flask Bayesian Classifier</font></p>
+    </center>
+
+</body>
+</html>
