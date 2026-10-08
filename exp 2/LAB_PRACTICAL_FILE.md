@@ -108,10 +108,10 @@ To prepare an interactive web application using Flask in Python to extract and s
 ![Output 4 Iris Features & Statistics](screenshots/ss5_iris_features_stats.png)
 
 #### 5. Iris Dataset — Classifier Performance Comparison & Confusion Matrix
-> *[Awaiting 6th screenshot upload from user]*
+![Output 5 Iris Classifier Performance](screenshots/ss6_iris_performance.png)
 
 #### 6. Local Storage Directory Verification
-> *[Awaiting 7th screenshot upload from user]*
+![Output 6 Storage Verification Table](screenshots/ss7_storage_verification.png)
 
 ---
 
