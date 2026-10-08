@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 5 - Lab Practical File</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #222222;
+            line-height: 1.5;
+            font-size: 11pt;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #003366;
+            font-size: 18pt;
+            text-align: center;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: #003366;
+            font-size: 14pt;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 4px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #004d40;
+            font-size: 12pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+        .header-sub {
+            text-align: center;
+            color: #555555;
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .meta-bar {
+            text-align: center;
+            font-size: 10pt;
+            background-color: #f0f4f8;
+            padding: 8px;
+            border: 1px solid #d0dbe5;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        table, th, td {
+            border: 1px solid #cccccc;
+        }
+        th {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 8px 6px;
+            text-align: left;
+        }
+        td {
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .formula-box {
+            background-color: #f7f9fa;
+            border-left: 4px solid #003366;
+            padding: 8px 14px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 12px 0 18px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 96%;
+            border: 1px solid #999999;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+        }
+        .screenshot-caption {
+            font-size: 9pt;
+            color: #555555;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #181717;
+            color: #ffffff !important;
+            padding: 5px 12px;
+            font-size: 9.5pt;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        a {
+            color: #0044cc;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #002288;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            font-size: 9.5pt;
+            font-family: monospace;
+        }
+        .link-card {
+            background-color: #f8faff;
+            border: 1px solid #cce0ff;
+            border-left: 4px solid #0055ff;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <b>Experiment No.:</b> 05 &nbsp;|&nbsp; 
+        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
+        <b>Framework:</b> Python 3.14 / Flask / NLTK &nbsp;|&nbsp;
+        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Text Paragraph Segmentation, Stop Words Removal, Stemming, Lemmatization, and Bayesian Classification Using Flask</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To prepare an interactive web application using Flask in Python to extract a text paragraph, separate it into individual sentences, filter out English stop words, apply stemming and lemmatization, and classify the processed text into domain categories using a Multinomial Naive Bayes classifier.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. Sentence Segmentation &amp; Tokenization</h3>
+    <p>
+        Sentence segmentation separates continuous text into distinct grammatical sentences. Word tokenization further isolates individual lexical tokens while removing punctuation marks.
+    </p>
+
+    <h3>2. Stop Words Filtering</h3>
+    <p>
+        Stop words represent ubiquitous syntactic connectors (e.g., <i>the, is, in, at, which, for</i>) that lack domain discriminating information. Filtering reduces noise and computational complexity:
+    </p>
+    <div class="formula-box">
+        T_filtered = { w &isin; T | w &notin; W_stop }
+    </div>
+
+    <h3>3. Stemming vs. Lemmatization</h3>
+    <ul>
+        <li><b>Porter Stemmer (Stemming):</b> Employs heuristic suffix-stripping rules to reduce inflectional forms (e.g., <i>algorithms</i> &rarr; <i>algorithm</i>, <i>computing</i> &rarr; <i>comput</i>).</li>
+        <li><b>WordNet Lemmatizer (Lemmatization):</b> Utilizes full morphological vocabulary parsing to return canonical dictionary headwords (lemmas).</li>
+    </ul>
+
+    <h3>4. Multinomial Naive Bayes Mathematical Formulas</h3>
+
+    <div class="formula-box">
+        <b>1. Bayes Rule for Documents:</b><br>
+        P(c | d) = [ P(c) &times; &prod; P(w_j | c) ] / P(d)
+    </div>
+
+    <div class="formula-box">
+        <b>2. Class Prior Probability:</b><br>
+        P(c) = N_c / N
+    </div>
+
+    <div class="formula-box">
+        <b>3. Laplace (Add-1) Smoothed Word Likelihood:</b><br>
+        P(w_j | c) = ( count(w_j, c) + 1 ) / ( &sum; count(w, c) + |V| )
+    </div>
+
+    <div class="formula-box">
+        <b>4. MAP Decision Rule (Log-Space):</b><br>
+        c_hat = argmax_c [ ln P(c) + &sum; ln P(w_j | c) ]
+    </div>
+
+    <div class="formula-box">
+        <b>5. Normalized Posterior Probability (Softmax):</b><br>
+        P(c | d) = exp( ln P(c | d) ) / &sum; [ exp( ln P(c' | d) ) ]
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup &amp; NLTK Resource Verification</h3>
+    <p>Configured <code>exp 5/</code> directory and validated NLTK packages (punkt, punkt_tab, stopwords, wordnet).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
+        <div class="screenshot-caption">Figure 1.1: Environment verification and package loading log.</div>
+    </div>
+
+    <h3>Step 2: Sentence Segmentation &amp; Word Tokenization</h3>
+    <p>Parsed paragraph using <code>sent_tokenize()</code> and <code>word_tokenize()</code> to establish lexical boundary units.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step2_segmentation.png" alt="Step 2 Segmentation">
+        <div class="screenshot-caption">Figure 1.2: Terminal log showing sentence tokenization execution.</div>
+    </div>
+
+    <h3>Step 3: Stop Words Filtering, Stemming &amp; Lemmatization</h3>
+    <p>Applied stop word exclusion, Porter Stemmer, and WordNet Lemmatizer across all extracted tokens.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step3_stem_lemma.png" alt="Step 3 Stem Lemma">
+        <div class="screenshot-caption">Figure 1.3: Terminal verification of morphological normalization pipeline.</div>
+    </div>
+
+    <h3>Step 4: Interactive Web Server Launch on Port 5007</h3>
+    <p>Launched interactive Flask web server on <a href="http://127.0.0.1:5007" target="_blank">http://127.0.0.1:5007</a> for real-time text analysis and Bayesian inference.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step4_running.png" alt="Step 4 Running">
+        <div class="screenshot-caption">Figure 1.4: Flask development server active on port 5007.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>OUTPUT / DASHBOARD RESULTS</h2>
+
+    <h3>Output 1: Paragraph Input Form &amp; Presets</h3>
+    <p>Web interface accepting custom text paragraphs and benchmark testing presets.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out1_input_form.png" alt="Output 1 Input Form">
+        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Interactive text input form and quick benchmark selections.</div>
+    </div>
+
+    <h3>Output 2: Sentence-by-Sentence NLP Preprocessing Pipeline Table</h3>
+    <p>Complete transformation breakdown showing original sentences, filtered stop words, stemmed tokens, and lemmatized lemmas.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out2_nlp_pipeline_table.png" alt="Output 2 NLP Table">
+        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; Step-by-step lexical preprocessing table per sentence.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 3: Multinomial Naive Bayes Classification Results</h3>
+    <p>Calculated prior probabilities, log-likelihood sums, normalized posteriors, and MAP winner identification.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out3_bayesian_classification.png" alt="Output 3 Classification">
+        <div class="screenshot-caption">Figure 2.3: Section 3 &mdash; Bayesian text classification probability results table.</div>
+    </div>
+
+    <h3>Output 4: Bayesian Posterior Distribution &amp; Salient Keywords Plot</h3>
+    <p>Visualizing posterior probabilities alongside top informative keywords extracted from the test paragraph.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out4_posterior_word_plots.png" alt="Output 4 Plots">
+        <div class="screenshot-caption">Figure 2.4: Section 4 &mdash; Posterior probability bar chart and salient keyword frequencies.</div>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%205/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 5/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%205/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 5/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%205/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 5/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Lab Manual (Markdown):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%205/LAB_PRACTICAL_FILE.md" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 5/LAB_PRACTICAL_FILE.md</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, an end-to-end natural language processing and text categorization pipeline was successfully implemented using Flask and NLTK in Python. The workflow demonstrated sentence boundary segmentation, token cleaning, stop words removal, Porter stemming, and WordNet lemmatization. Finally, a Multinomial Naive Bayes classifier with Laplace smoothing accurately predicted the topical domain of test paragraphs based on word likelihoods and prior probabilities, displaying the entire transformation and probability distribution on an interactive web page.
+    </p>
+
+</body>
+</html>

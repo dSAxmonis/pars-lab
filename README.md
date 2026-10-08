@@ -23,3 +23,9 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 - **Code:** [`exp 4/app.py`](./exp%204/app.py) &amp; [`exp 4/templates/index.html`](./exp%204/templates/index.html)
 - **Manual Report:** [`exp 4/LAB_PRACTICAL_FILE.md`](./exp%204/LAB_PRACTICAL_FILE.md)
 - **Print-Ready PDF:** [`Experiment_4_Lab_Practical.pdf`](./Experiment_4_Lab_Practical.pdf)
+
+### 4. [Experiment 5: NLP Text Paragraph Preprocessing & Bayesian Classification](./exp%205/)
+- **Description:** Interactive Flask web application performing sentence segmentation, lexical tokenization, stop words removal, Porter stemming, WordNet lemmatization, and domain classification via Multinomial Naive Bayes.
+- **Code:** [`exp 5/app.py`](./exp%205/app.py) &amp; [`exp 5/templates/index.html`](./exp%205/templates/index.html)
+- **Manual Report:** [`exp 5/LAB_PRACTICAL_FILE.md`](./exp%205/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_5_Lab_Practical.pdf`](./Experiment_5_Lab_Practical.pdf)

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 5: NLP Text Preprocessing & Bayesian Classification</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 5</font></h1>
+        <h3><font color="#555555">Text Segmentation, Stop Word Removal, Stemming, Lemmatization &amp; Bayesian Classification</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask / NLTK (Python)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- SECTION 1: INTERACTIVE PARAGRAPH INPUT FORM -->
+    <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th><font color="#ffffff">SECTION 1: INPUT TEXT PARAGRAPH &amp; BENCHMARK PRESETS</font></th>
+        </tr>
+        <tr>
+            <td>
+                <form method="POST" action="/">
+                    <b>Enter or Paste Custom Paragraph:</b><br>
+                    <textarea name="paragraph" rows="4" style="width: 98%; font-size: 11pt; padding: 6px; font-family: sans-serif;" required>{{ paragraph }}</textarea>
+                    <br><br>
+                    <center>
+                        <input type="submit" value="Execute NLP Pipeline &amp; Classify (Bayesian Inference)" style="font-size: 11pt; font-weight: bold; padding: 8px 18px; background-color: #003366; color: #ffffff; cursor: pointer;">
+                    </center>
+                </form>
+                <hr color="#e0e0e0">
+                <b>Quick-Select Benchmark Paragraph Presets:</b>
+                <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#f9f9f9">
+                    <tr bgcolor="#e8f5e9" align="center">
+                        <th width="30%">Domain</th>
+                        <th width="55%">Sample Snippet</th>
+                        <th width="15%">Action</th>
+                    </tr>
+                    {% for p in presets %}
+                    <tr>
+                        <td><b>{{ p.title }}</b></td>
+                        <td><font size="2">{{ p.text[:95] }}...</font></td>
+                        <td align="center">
+                            <form method="POST" action="/" style="margin: 0;">
+                                <input type="hidden" name="paragraph" value="{{ p.text }}">
+                                <input type="submit" value="Load &amp; Classify" style="font-size: 9pt; cursor: pointer;">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: SENTENCE-BY-SENTENCE NLP PIPELINE TABLE -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="6"><font color="#ffffff">SECTION 2: STEP-BY-STEP NLP PIPELINE (SEGMENTATION &rarr; STOP WORDS &rarr; STEMMING &rarr; LEMMATIZATION)</font></th>
+        </tr>
+        <tr bgcolor="#e0f2f1" align="center">
+            <th width="5%">Sentence #</th>
+            <th width="30%">Separated Sentence</th>
+            <th width="15%">Removed Stop Words</th>
+            <th width="15%">Filtered Tokens</th>
+            <th width="15%">Stemmed (Porter)</th>
+            <th width="20%">Lemmatized (WordNet)</th>
+        </tr>
+        {% for r in sentence_records %}
+        <tr valign="top" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="center"><b>{{ r.sentence_num }}</b></td>
+            <td>{{ r.original_sentence }}</td>
+            <td>
+                <font color="#c62828" size="2">
+                {% if r.removed_stop_words %}
+                    {{ r.removed_stop_words | join(', ') }}
+                {% else %}
+                    <i>None</i>
+                {% endif %}
+                </font>
+            </td>
+            <td>
+                <font color="#0277bd" size="2">
+                    {{ r.kept_tokens | join(', ') }}
+                </font>
+            </td>
+            <td>
+                <font color="#e65100" size="2">
+                    {{ r.stemmed_tokens | join(', ') }}
+                </font>
+            </td>
+            <td>
+                <font color="#2e7d32" size="2">
+                    <b>{{ r.lemmatized_tokens | join(', ') }}</b>
+                </font>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <center>
+        <font size="2" color="#555555">
+        <b>Pipeline Summary:</b> Extracted <b>{{ total_sentences }}</b> sentences &bull; Filtered into <b>{{ total_tokens }}</b> total tokens &bull; <b>{{ unique_tokens }}</b> unique feature vocabulary terms &bull; Global trained vocabulary size |V| = <b>{{ vocab_size }}</b> terms.
+        </font>
+    </center>
+
+    <br><br>
+
+    <!-- SECTION 3: BAYESIAN CLASSIFICATION RESULTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="5"><font color="#ffffff">SECTION 3: MULTINOMIAL NAIVE BAYES TEXT CLASSIFICATION</font></th>
+        </tr>
+        <tr bgcolor="#fbe9e7" align="center">
+            <th>Category / Domain (c)</th>
+            <th>Class Prior P(c)</th>
+            <th>Log-Likelihood Score &sum; log P(w|c)</th>
+            <th>Posterior Probability P(c|d)</th>
+            <th>Confidence / Status</th>
+        </tr>
+        {% for b in bayes_results %}
+        <tr align="center" {% if b.is_winner %}bgcolor="#e8f5e9"{% endif %}>
+            <td align="left"><b>{{ b.category }}</b></td>
+            <td>{{ b.prior }}</td>
+            <td><code>{{ b.log_score }}</code></td>
+            <td><b>{{ b.posterior_prob }}</b></td>
+            <td>
+                {% if b.is_winner %}
+                <font color="#2e7d32"><b>&#9733; Predicted Winner ({{ b.percentage }}%)</b></font>
+                {% else %}
+                <font color="#777777">{{ b.percentage }}%</font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        <tr bgcolor="#f9fbe7">
+            <td colspan="5" align="center">
+                <b>Final Bayesian Decision:</b> Categorized as <font color="#1b5e20" size="3"><b>{{ predicted_category }}</b></font> with <b>{{ "%.2f"|format(confidence) }}%</b> confidence.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: VISUALIZATION PLOTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th><font color="#ffffff">SECTION 4: BAYESIAN POSTERIOR DISTRIBUTION &amp; SALIENT KEYWORDS PLOT</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="96%" alt="Posterior Probabilities & Word Distribution" border="1">
+                <br><br>
+                <font size="2" color="#555555">
+                <b>Visual Inspection:</b> Left panel illustrates normalized Bayesian posterior probabilities across target domains. Right panel exhibits the frequency distribution of salient preprocessed feature keywords extracted from the test paragraph.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 5 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; NLP Preprocessing &amp; Bayesian Classifier</font></p>
+    </center>
+
+</body>
+</html>
