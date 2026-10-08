@@ -66,14 +66,30 @@ The orthogonal reconstruction residual is $\|\mathbf{x} - \hat{\mathbf{x}}\|_2$.
   - [Flask Server (`exp 10/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/app.py)
   - [HTML Template (`exp 10/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/templates/index.html)
   - [Dependencies (`exp 10/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/requirements.txt)
-  - [Full Page Screenshot (`exp 10/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/full_page.png)
+  - [PCA Parameters Screenshot (`exp 10/screenshots/ss1_pca_parameters.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss1_pca_parameters.png)
+  - [Test Controls Screenshot (`exp 10/screenshots/ss2_test_controls.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss2_test_controls.png)
+  - [Projected Line Plot Screenshot (`exp 10/screenshots/ss3_projection_plot.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss3_projection_plot.png)
+  - [Sample Mapping Table Screenshot (`exp 10/screenshots/ss4_sample_reduction_table.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss4_sample_reduction_table.png)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 10/screenshots/full_page.png`  
-> ![Experiment 10 Full Dashboard](screenshots/full_page.png)
+#### 1. Section 1: Learned PCA Parameters & Eigen-Decomposition Summary
+> **File:** `exp 10/screenshots/ss1_pca_parameters.png`  
+![Section 1 PCA Parameters](screenshots/ss1_pca_parameters.png)
+
+#### 2. Section 2: Test Sample Projection & Reconstruction Controls
+> **File:** `exp 10/screenshots/ss2_test_controls.png`  
+![Section 2 Test Controls](screenshots/ss2_test_controls.png)
+
+#### 3. Section 3: PCA 2D Projected Line & 1D Reduced Feature Mapping Plots
+> **File:** `exp 10/screenshots/ss3_projection_plot.png`  
+![Section 3 Projected Line and 1D Subspace](screenshots/ss3_projection_plot.png)
+
+#### 4. Section 4: Original Samples vs. 1D Reduced Features & Reconstruction Residuals
+> **File:** `exp 10/screenshots/ss4_sample_reduction_table.png`  
+![Section 4 Sample Reduction Table](screenshots/ss4_sample_reduction_table.png)
 
 ---
 

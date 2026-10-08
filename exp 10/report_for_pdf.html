@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
             @bottom-right {
                 content: "Page " counter(page) " of " counter(pages);
                 font-size: 9pt;
@@ -16,14 +16,14 @@
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10.5pt;
-            line-height: 1.45;
+            font-size: 10pt;
+            line-height: 1.42;
             color: #111;
             margin: 0;
             padding: 0;
         }
         h1 {
-            font-size: 19pt;
+            font-size: 18pt;
             color: #1a365d;
             text-align: center;
             margin: 0 0 4px 0;
@@ -31,57 +31,57 @@
             letter-spacing: 0.5px;
         }
         h2 {
-            font-size: 13pt;
+            font-size: 12.5pt;
             color: #1a365d;
             border-bottom: 2px solid #1a365d;
             padding-bottom: 3px;
-            margin-top: 18px;
-            margin-bottom: 8px;
+            margin-top: 14px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
         h3 {
-            font-size: 11pt;
+            font-size: 10.5pt;
             color: #2b6cb0;
-            margin-top: 12px;
+            margin-top: 10px;
             margin-bottom: 4px;
         }
         p, li {
             text-align: justify;
-            margin-top: 4px;
-            margin-bottom: 6px;
+            margin-top: 3px;
+            margin-bottom: 5px;
         }
         ul, ol {
-            margin-top: 4px;
-            margin-bottom: 8px;
-            padding-left: 22px;
+            margin-top: 3px;
+            margin-bottom: 6px;
+            padding-left: 20px;
         }
         .header-sub {
             text-align: center;
-            font-size: 11pt;
+            font-size: 10.5pt;
             color: #4a5568;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .meta-bar {
             background-color: #f7fafc;
             border: 1px solid #cbd5e0;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 9.5pt;
-            margin-bottom: 16px;
+            padding: 6px 12px;
+            font-size: 9pt;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
         }
         .formula-box {
             background-color: #edf2f7;
             border-left: 4px solid #2b6cb0;
-            padding: 8px 14px;
-            margin: 8px 0;
+            padding: 6px 12px;
+            margin: 6px 0;
             font-family: "Courier New", Courier, monospace;
-            font-size: 9.5pt;
+            font-size: 9pt;
         }
         .screenshot-container {
             text-align: center;
-            margin: 14px 0;
+            margin: 10px 0;
             page-break-inside: avoid;
         }
         .screenshot-container img {
@@ -90,18 +90,18 @@
             border-radius: 3px;
         }
         .screenshot-caption {
-            font-size: 8.5pt;
+            font-size: 8pt;
             color: #4a5568;
-            margin-top: 4px;
+            margin-top: 3px;
             font-style: italic;
         }
         .link-card {
             background-color: #ebf8ff;
             border: 1px solid #bee3f8;
             border-left: 4px solid #3182ce;
-            padding: 10px 14px;
-            margin: 12px 0;
-            font-size: 9.5pt;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 9pt;
         }
         .link-card a {
             color: #2b6cb0;
@@ -204,11 +204,38 @@
     <h3>Step 5: Testing &amp; Web Deployment on Port 5012</h3>
     <p>Launched interactive Flask web server on <a href="http://127.0.0.1:5012" target="_blank">http://127.0.0.1:5012</a> accepting test coordinates, rendering the 2D projected line and 1D reduced subspace distribution.</p>
 
-    <h2>OUTPUT / ATTACHED SCREENSHOT</h2>
-    <p>The full-page capture of the deployed Flask web application is embedded below:</p>
+    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
+
+    <h3>Output 1: Learned PCA Parameters &amp; Eigen-Decomposition Summary</h3>
+    <p>Displays data centroid vector &mu;, sample covariance matrix &Sigma;, dominant eigenvalue &lambda;<sub>1</sub> (preserving 94.95% variance), residual eigenvalue &lambda;<sub>2</sub>, and 1st principal component eigenvector v<sub>1</sub>.</p>
     <div class="screenshot-container">
-        <img src="screenshots/full_page.png" alt="Experiment 10 Full Dashboard Screenshot">
-        <div class="screenshot-caption">Figure 10.1: Web dashboard displaying learned PCA parameters, interactive test sample projection controls, 2D projected line with mapped 1D features, and reconstruction residual table.</div>
+        <img src="screenshots/ss1_pca_parameters.png" alt="Output 1 Learned PCA Parameters">
+        <div class="screenshot-caption">Figure 10.1: Section 1 &mdash; Learned PCA parameters and mathematical eigen-decomposition summary.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 2: Test Sample Projection &amp; Reconstruction Controls</h3>
+    <p>Interactive input controls for test vector coordinates x<sub>test</sub>, displaying the computed 1D scalar coordinate z<sub>test</sub> = (x<sub>test</sub> - &mu;) &middot; v<sub>1</sub>, reconstructed 2D position on the line x&#770;<sub>test</sub>, and orthogonal reconstruction residual error.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_test_controls.png" alt="Output 2 Test Projection Controls">
+        <div class="screenshot-caption">Figure 10.2: Section 2 &mdash; Test sample projection and reconstruction controls with quick benchmark presets.</div>
+    </div>
+
+    <h3>Output 3: PCA 2D Projected Line &amp; 1D Reduced Feature Mapping Plots</h3>
+    <p>Dual-panel visualization: Left panel exhibits original 2D bivariate training data, centroid &mu;, the 1st PC projected line, orthogonal projection segments, and the projected test sample. Right panel shows the collapsed 1D subspace confirming 94.95% preserved variance.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_projection_plot.png" alt="Output 3 PCA 2D Projected Line and 1D Subspace">
+        <div class="screenshot-caption">Figure 10.3: Section 3 &mdash; Bivariate 2D feature space with 1st PC projected line and mapped 1D reduced subspace.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 4: Original Samples vs. 1D Reduced Features &amp; Reconstruction Residuals</h3>
+    <p>Detailed mapping table comparing original bivariate training vectors [x<sub>1</sub>, x<sub>2</sub>], mapped 1D scalar coordinates z, mapped points on the line [x&#770;<sub>1</sub>, x&#770;<sub>2</sub>], and orthogonal reconstruction residuals for training samples and active test queries.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_sample_reduction_table.png" alt="Output 4 Sample Reduction and Residual Table">
+        <div class="screenshot-caption">Figure 10.4: Section 4 &mdash; Tabular mapping of original samples to 1D reduced coordinates and reconstruction residual errors.</div>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
@@ -236,8 +263,20 @@
                 <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/requirements.txt</a>
             </li>
             <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/full_page.png</a>
+                <b>PCA Parameters Screenshot (Section 1):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss1_pca_parameters.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss1_pca_parameters.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Test Controls Screenshot (Section 2):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss2_test_controls.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss2_test_controls.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Projected Line &amp; Subspace Screenshot (Section 3):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss3_projection_plot.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss3_projection_plot.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Sample Mapping &amp; Residuals Table Screenshot (Section 4):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss4_sample_reduction_table.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss4_sample_reduction_table.png</a>
             </li>
         </ul>
     </div>
