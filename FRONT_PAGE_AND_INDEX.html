@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cover Page &amp; Index - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm 14mm 10mm 14mm;
+            @bottom-right {
+                content: counter(page);
+                font-size: 9pt;
+                font-family: Arial, sans-serif;
+                color: #555;
+            }
+        }
+        body {
+            font-family: "Times New Roman", Times, Georgia, serif;
+            color: #111;
+            margin: 0;
+            padding: 0;
+            line-height: 1.35;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* ---------------- COVER PAGE STYLING ---------------- */
+        .cover-border {
+            border: 4px double #1a365d;
+            padding: 20px 18px;
+            box-sizing: border-box;
+            min-height: 250mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .univ-title {
+            font-size: 19pt;
+            font-weight: bold;
+            color: #1a365d;
+            letter-spacing: 1px;
+            margin: 0 0 3px 0;
+            text-transform: uppercase;
+        }
+        .univ-sub {
+            font-size: 9.5pt;
+            color: #4a5568;
+            margin: 0 0 8px 0;
+            font-style: italic;
+        }
+        .dept-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #0f2d59;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 4px;
+            display: inline-block;
+        }
+        .emblem-container {
+            margin: 8px auto;
+        }
+        .file-title-box {
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin: 10px 10px;
+        }
+        .file-main-title {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 0 0 4px 0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .file-subject {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #0d3b66;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        .meta-grid {
+            width: 100%;
+            margin-top: 14px;
+            border-collapse: collapse;
+            font-size: 10.5pt;
+            text-align: left;
+            font-family: Arial, sans-serif;
+        }
+        .meta-card {
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            padding: 10px 14px;
+            vertical-align: top;
+            width: 50%;
+        }
+        .meta-card h4 {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            color: #1a365d;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 3px;
+            text-transform: uppercase;
+        }
+        .meta-card p {
+            margin: 3px 0;
+            line-height: 1.4;
+        }
+        .meta-card b {
+            color: #1e293b;
+            display: inline-block;
+            width: 115px;
+        }
+        .session-text {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------------- INDEX PAGE STYLING ---------------- */
+        .index-container {
+            font-family: Arial, sans-serif;
+            padding: 0;
+        }
+        .index-header {
+            text-align: center;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .index-header h2 {
+            font-size: 16pt;
+            color: #1a365d;
+            margin: 0 0 3px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .index-header p {
+            font-size: 9.5pt;
+            color: #4a5568;
+            margin: 0;
+        }
+        .index-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.2pt;
+        }
+        .index-table th {
+            background-color: #1a365d;
+            color: #ffffff;
+            padding: 5px 4px;
+            border: 1px solid #0f2d59;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8pt;
+        }
+        .index-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 5px;
+            vertical-align: middle;
+        }
+        .index-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        .exp-title {
+            font-weight: bold;
+            color: #1e3a8a;
+            display: block;
+            margin-bottom: 1px;
+            font-size: 8.3pt;
+        }
+        .exp-desc {
+            font-size: 7.4pt;
+            color: #475569;
+            line-height: 1.2;
+        }
+        .repo-banner {
+            margin-top: 8px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #2563eb;
+            padding: 5px 10px;
+            font-size: 8.5pt;
+            text-align: center;
+        }
+        .repo-banner a {
+            color: #1d4ed8;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 1: COVER PAGE                                           -->
+    <!-- ============================================================ -->
+    <div class="cover-border">
+        <div>
+            <!-- University & Department Headers -->
+            <div class="univ-title">Netaji Subhas University of Technology</div>
+            <div class="univ-sub">(A State University under Govt. of NCT of Delhi &bull; Established under Delhi Act 06 of 2018)</div>
+            <div class="dept-title">Department of Information Technology</div>
+
+            <!-- University Insignia Emblem (SVG) -->
+            <div class="emblem-container">
+                <svg width="115" height="115" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer Ring -->
+                    <circle cx="100" cy="100" r="94" fill="#ffffff" stroke="#1a365d" stroke-width="7" />
+                    <circle cx="100" cy="100" r="82" fill="#ffffff" stroke="#b45309" stroke-width="2.5" stroke-dasharray="4,3" />
+                    <!-- Shield Background -->
+                    <path d="M55,60 L145,60 L145,115 C145,150 100,172 100,172 C100,172 55,150 55,115 Z" fill="#f0f7ff" stroke="#1a365d" stroke-width="4" />
+                    <!-- Technical Gear Wheel -->
+                    <circle cx="100" cy="98" r="28" fill="none" stroke="#1a365d" stroke-width="5" />
+                    <circle cx="100" cy="98" r="16" fill="#1a365d" />
+                    <circle cx="100" cy="98" r="7" fill="#ffffff" />
+                    <!-- Cog Teeth -->
+                    <line x1="100" y1="64" x2="100" y2="70" stroke="#1a365d" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="100" y1="126" x2="100" y2="132" stroke="#1a365d" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="66" y1="98" x2="72" y2="98" stroke="#1a365d" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="128" y1="98" x2="134" y2="98" stroke="#1a365d" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="76" y1="74" x2="81" y2="79" stroke="#1a365d" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="119" y1="117" x2="124" y2="122" stroke="#1a365d" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="76" y1="122" x2="81" y2="117" stroke="#1a365d" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="119" y1="79" x2="124" y2="74" stroke="#1a365d" stroke-width="5" stroke-linecap="round"/>
+                    <!-- Open Book of Knowledge -->
+                    <path d="M72,138 C86,133 97,135 100,140 C103,135 114,133 128,138 L128,150 C114,145 103,147 100,152 C97,147 86,145 72,150 Z" fill="#b45309" stroke="#78350f" stroke-width="1.5" />
+                    <!-- Flame of Wisdom -->
+                    <path d="M100,38 C94,48 94,54 100,58 C106,54 106,48 100,38 Z" fill="#b45309" stroke="#78350f" stroke-width="1" />
+                </svg>
+            </div>
+
+            <!-- Subject & Document Title Box -->
+            <div class="file-title-box">
+                <div class="file-main-title">Lab Practical Record File</div>
+                <div class="file-subject">Pattern Analysis &amp; Recommender Systems (PARS)</div>
+            </div>
+        </div>
+
+        <!-- Student & Faculty Submission Grid -->
+        <div>
+            <table class="meta-grid">
+                <tr>
+                    <!-- Submitted By -->
+                    <td class="meta-card" style="border-right: none;">
+                        <h4>Submitted By:</h4>
+                        <p><b>Student Name:</b> <span style="font-size: 11.5pt; font-weight: bold; color: #1e3a8a;">Monis</span></p>
+                        <p><b>Roll Number:</b> <span style="font-weight: bold; color: #0f172a;">2023UIT3027</span></p>
+                        <p><b>Batch &amp; Group:</b> Batch 1 / Group 1</p>
+                        <p><b>Course / Branch:</b> B.Tech Information Technology</p>
+                    </td>
+                    <!-- Submitted To -->
+                    <td class="meta-card">
+                        <h4>Submitted To:</h4>
+                        <p><b>Lab Instructor:</b> <span style="font-size: 11.5pt; font-weight: bold; color: #1e3a8a;">Dr. Vishal Maheshkar</span></p>
+                        <p><b>Department:</b> Department of Information Technology</p>
+                        <p><b>Institution:</b> Netaji Subhas University of Technology</p>
+                        <p><b>Campus:</b> Dwarka, Sector-3, New Delhi</p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Academic Session -->
+            <div class="session-text">Academic Session: 2026&ndash;2027</div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 2: INDEX OF EXPERIMENTS                                 -->
+    <!-- ============================================================ -->
+    <div class="page-break"></div>
+
+    <div class="index-container">
+        <div class="index-header">
+            <h2>Index of Practical Experiments</h2>
+            <p>Course: <b>Pattern Analysis &amp; Recommender Systems (PARS) Lab</b> &nbsp;|&nbsp; Student: <b>Monis (2023UIT3027)</b></p>
+        </div>
+
+        <table class="index-table">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">Exp. #</th>
+                    <th style="width: 11%;">Date</th>
+                    <th style="width: 52%; text-align: left; padding-left: 10px;">Experiment Title &amp; Technical Scope</th>
+                    <th style="width: 14%;">Domain / Tool</th>
+                    <th style="width: 7%;">Page</th>
+                    <th style="width: 11%;">Teacher's Sign.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">01</td>
+                    <td style="text-align: center;">01/08/2026</td>
+                    <td>
+                        <span class="exp-title">Study of Datasets Across Different Domains (CIFAR-10 &amp; Iris)</span>
+                        <span class="exp-desc">Comparative analysis of purpose, source, feature structures ($d=3072$ vs $d=4$), author performance surveys, and formal citations.</span>
+                    </td>
+                    <td style="text-align: center;">CV / Tabular<br>Flask &bull; Port 5004</td>
+                    <td style="text-align: center; font-weight: bold;">01&ndash;06</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">02</td>
+                    <td style="text-align: center;">08/08/2026</td>
+                    <td>
+                        <span class="exp-title">Dataset Extraction, Storage, Feature Analysis &amp; Performance Visualization</span>
+                        <span class="exp-desc">Interactive web ingestion and storage of CIFAR-10 images and Iris dataset with multi-metric evaluation (Accuracy, F1, Log Loss).</span>
+                    </td>
+                    <td style="text-align: center;">Data Ingestion<br>Flask &bull; Port 5000</td>
+                    <td style="text-align: center; font-weight: bold;">07&ndash;11</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">03</td>
+                    <td style="text-align: center;">15/08/2026</td>
+                    <td>
+                        <span class="exp-title">Multimodal Feature Extraction from Audio Across Timestamps</span>
+                        <span class="exp-desc">Extracted RMS Energy, Zero Crossing Rate (ZCR), and Spectral Centroid across 10 temporal frames from playable browser audio.</span>
+                    </td>
+                    <td style="text-align: center;">Audio Signal Proc.<br>Flask &bull; Port 5005</td>
+                    <td style="text-align: center; font-weight: bold;">12&ndash;15</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">04</td>
+                    <td style="text-align: center;">22/08/2026</td>
+                    <td>
+                        <span class="exp-title">Bayesian Classification: Single Feature &amp; Multiple Features Multiple Class</span>
+                        <span class="exp-desc">Gaussian generative modeling computing Prior, Likelihood, and Posterior distributions with real-time decision boundary plots.</span>
+                    </td>
+                    <td style="text-align: center;">Bayesian Theory<br>Flask &bull; Port 5006</td>
+                    <td style="text-align: center; font-weight: bold;">16&ndash;19</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">05</td>
+                    <td style="text-align: center;">29/08/2026</td>
+                    <td>
+                        <span class="exp-title">NLP Paragraph Preprocessing &amp; Bayesian Domain Classification</span>
+                        <span class="exp-desc">Text pipeline implementing tokenization, stop word removal, Porter stemming, WordNet lemmatization, and Multinomial Naive Bayes.</span>
+                    </td>
+                    <td style="text-align: center;">NLP / Text<br>Flask &bull; Port 5007</td>
+                    <td style="text-align: center; font-weight: bold;">20&ndash;23</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">06</td>
+                    <td style="text-align: center;">05/09/2026</td>
+                    <td>
+                        <span class="exp-title">Bayesian Risk Minimization for Three Classes and Three Actions</span>
+                        <span class="exp-desc">Conditional risk formulation $R(\alpha_i | \mathbf{x}) = \sum \lambda_{ij} P(\omega_j | \mathbf{x})$ given an asymmetric operational loss matrix.</span>
+                    </td>
+                    <td style="text-align: center;">Decision Theory<br>Flask &bull; Port 5008</td>
+                    <td style="text-align: center; font-weight: bold;">24&ndash;27</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">07</td>
+                    <td style="text-align: center;">12/09/2026</td>
+                    <td>
+                        <span class="exp-title">Linear Regression from Scratch Using Gradient Descent</span>
+                        <span class="exp-desc">Analytical derivation and manual vectorized update rules ($\Delta w, \Delta b$) predicting housing prices with MSE cost decay curves.</span>
+                    </td>
+                    <td style="text-align: center;">NumPy / Regression<br>Flask &bull; Port 5009</td>
+                    <td style="text-align: center; font-weight: bold;">28&ndash;31</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">08</td>
+                    <td style="text-align: center;">19/09/2026</td>
+                    <td>
+                        <span class="exp-title">Logistic Regression (Binary &amp; Multiclass from Scratch)</span>
+                        <span class="exp-desc">Sigmoid binary and Softmax multiclass classification from first principles with cross-entropy loss tracking and decision contours.</span>
+                    </td>
+                    <td style="text-align: center;">Classification<br>Flask &bull; Port 5010</td>
+                    <td style="text-align: center; font-weight: bold;">32&ndash;35</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">09</td>
+                    <td style="text-align: center;">26/09/2026</td>
+                    <td>
+                        <span class="exp-title">Implementation of Regularization (L1 Lasso &amp; L2 Ridge)</span>
+                        <span class="exp-desc">Demonstrated shrinkage mechanisms, decision boundary smoothing, and quantitative performance bars before and after regularization.</span>
+                    </td>
+                    <td style="text-align: center;">Regularization<br>Flask &bull; Port 5011</td>
+                    <td style="text-align: center; font-weight: bold;">36&ndash;39</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">10</td>
+                    <td style="text-align: center;">03/10/2026</td>
+                    <td>
+                        <span class="exp-title">Principal Component Analysis (PCA) with Testing &amp; Reconstruction</span>
+                        <span class="exp-desc">Derived dominant eigenvector $\mathbf{v}_1$, plotted 1st PC projected line, mapped 1D features, and evaluated test reconstruction errors.</span>
+                    </td>
+                    <td style="text-align: center;">Dim. Reduction<br>Flask &bull; Port 5012</td>
+                    <td style="text-align: center; font-weight: bold;">40&ndash;43</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; font-weight: bold;">11</td>
+                    <td style="text-align: center;">08/10/2026</td>
+                    <td>
+                        <span class="exp-title">Linear Discriminant Analysis (LDA) with Testing &amp; Class Separation</span>
+                        <span class="exp-desc">Maximization of between-class to within-class scatter $\mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$ with projected line, 1D separation, and threshold testing.</span>
+                    </td>
+                    <td style="text-align: center;">Supervised Projection<br>Flask &bull; Port 5013</td>
+                    <td style="text-align: center; font-weight: bold;">44&ndash;47</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Active GitHub Repository Link Banner -->
+        <div class="repo-banner">
+            <b>Complete Practical Source Code &amp; Interactive Applications:</b> &nbsp;
+            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a>
+        </div>
+    </div>
+
+</body>
+</html>
