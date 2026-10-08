@@ -69,14 +69,30 @@ A test sample is categorized as Class 1 if its projected score falls on the side
   - [Flask Server (`exp 11/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/app.py)
   - [HTML Template (`exp 11/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/templates/index.html)
   - [Dependencies (`exp 11/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/requirements.txt)
-  - [Full Page Screenshot (`exp 11/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/full_page.png)
+  - [Fisher Parameters Screenshot (`exp 11/screenshots/ss1_fisher_parameters.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss1_fisher_parameters.png)
+  - [Test Controls Screenshot (`exp 11/screenshots/ss2_test_controls.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss2_test_controls.png)
+  - [Projected Line Plot Screenshot (`exp 11/screenshots/ss3_projection_plot.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss3_projection_plot.png)
+  - [Sample Verification Table Screenshot (`exp 11/screenshots/ss4_sample_reduction_table.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss4_sample_reduction_table.png)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 11/screenshots/full_page.png`  
-> ![Experiment 11 Full Dashboard](screenshots/full_page.png)
+#### 1. Section 1: Fisher's Criterion & Scatter Matrices Summary
+> **File:** `exp 11/screenshots/ss1_fisher_parameters.png`  
+![Section 1 Fisher Parameters](screenshots/ss1_fisher_parameters.png)
+
+#### 2. Section 2: Test Sample Classification & Projection Controls
+> **File:** `exp 11/screenshots/ss2_test_controls.png`  
+![Section 2 Test Controls](screenshots/ss2_test_controls.png)
+
+#### 3. Section 3: Fisher LDA 2D Projected Line & 1D Separation Plots
+> **File:** `exp 11/screenshots/ss3_projection_plot.png`  
+![Section 3 Projected Line and 1D Subspace](screenshots/ss3_projection_plot.png)
+
+#### 4. Section 4: Reduced 1D Feature Mappings & Classification Verification
+> **File:** `exp 11/screenshots/ss4_sample_reduction_table.png`  
+![Section 4 Sample Verification Table](screenshots/ss4_sample_reduction_table.png)
 
 ---
 

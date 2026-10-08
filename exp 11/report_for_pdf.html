@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
             @bottom-right {
                 content: "Page " counter(page) " of " counter(pages);
                 font-size: 9pt;
@@ -16,14 +16,14 @@
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10.5pt;
-            line-height: 1.45;
+            font-size: 10pt;
+            line-height: 1.42;
             color: #111;
             margin: 0;
             padding: 0;
         }
         h1 {
-            font-size: 19pt;
+            font-size: 18pt;
             color: #1a365d;
             text-align: center;
             margin: 0 0 4px 0;
@@ -31,57 +31,57 @@
             letter-spacing: 0.5px;
         }
         h2 {
-            font-size: 13pt;
+            font-size: 12.5pt;
             color: #1a365d;
             border-bottom: 2px solid #1a365d;
             padding-bottom: 3px;
-            margin-top: 18px;
-            margin-bottom: 8px;
+            margin-top: 14px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
         h3 {
-            font-size: 11pt;
+            font-size: 10.5pt;
             color: #2b6cb0;
-            margin-top: 12px;
+            margin-top: 10px;
             margin-bottom: 4px;
         }
         p, li {
             text-align: justify;
-            margin-top: 4px;
-            margin-bottom: 6px;
+            margin-top: 3px;
+            margin-bottom: 5px;
         }
         ul, ol {
-            margin-top: 4px;
-            margin-bottom: 8px;
-            padding-left: 22px;
+            margin-top: 3px;
+            margin-bottom: 6px;
+            padding-left: 20px;
         }
         .header-sub {
             text-align: center;
-            font-size: 11pt;
+            font-size: 10.5pt;
             color: #4a5568;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .meta-bar {
             background-color: #f7fafc;
             border: 1px solid #cbd5e0;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 9.5pt;
-            margin-bottom: 16px;
+            padding: 6px 12px;
+            font-size: 9pt;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
         }
         .formula-box {
             background-color: #edf2f7;
             border-left: 4px solid #2b6cb0;
-            padding: 8px 14px;
-            margin: 8px 0;
+            padding: 6px 12px;
+            margin: 6px 0;
             font-family: "Courier New", Courier, monospace;
-            font-size: 9.5pt;
+            font-size: 9pt;
         }
         .screenshot-container {
             text-align: center;
-            margin: 14px 0;
+            margin: 10px 0;
             page-break-inside: avoid;
         }
         .screenshot-container img {
@@ -90,18 +90,18 @@
             border-radius: 3px;
         }
         .screenshot-caption {
-            font-size: 8.5pt;
+            font-size: 8pt;
             color: #4a5568;
-            margin-top: 4px;
+            margin-top: 3px;
             font-style: italic;
         }
         .link-card {
             background-color: #ebf8ff;
             border: 1px solid #bee3f8;
             border-left: 4px solid #3182ce;
-            padding: 10px 14px;
-            margin: 12px 0;
-            font-size: 9.5pt;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 9pt;
         }
         .link-card a {
             color: #2b6cb0;
@@ -199,11 +199,38 @@
     <h3>Step 5: Interactive Testing &amp; Web Deployment on Port 5013</h3>
     <p>Launched interactive Flask web dashboard on <a href="http://127.0.0.1:5013" target="_blank">http://127.0.0.1:5013</a> supporting real-time patient test coordinates and visual classification.</p>
 
-    <h2>OUTPUT / ATTACHED SCREENSHOT</h2>
-    <p>The full-page capture of the deployed Flask web application is embedded below:</p>
+    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
+
+    <h3>Output 1: Fisher's Criterion &amp; Scatter Matrices Summary</h3>
+    <p>Displays class mean vectors &mu;<sub>1</sub>, &mu;<sub>2</sub>, within-class scatter matrix $\mathbf{S}_W$, optimal Fisher direction vector $\hat{\mathbf{w}}$, and optimal 1D decision threshold $y^*$.</p>
     <div class="screenshot-container">
-        <img src="screenshots/full_page.png" alt="Experiment 11 Full Dashboard Screenshot">
-        <div class="screenshot-caption">Figure 11.1: Web dashboard displaying Fisher scatter matrices, interactive test sample classification controls, 2D discriminant projected line with mapped class points, and 1D separation distribution.</div>
+        <img src="screenshots/ss1_fisher_parameters.png" alt="Output 1 Fisher Parameters">
+        <div class="screenshot-caption">Figure 11.1: Section 1 &mdash; Fisher's criterion parameters and scatter matrices summary.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 2: Test Sample Classification &amp; Projection Controls</h3>
+    <p>Interactive test patient measurement inputs ($x_1$: Fasting Glucose, $x_2$: Postprandial Glucose), displaying projected 1D coordinate $y_{\text{test}}$, reconstructed 2D position on the line, and automated diagnostic classification.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_test_controls.png" alt="Output 2 Test Controls">
+        <div class="screenshot-caption">Figure 11.2: Section 2 &mdash; Test sample classification and projection controls with preset benchmarks.</div>
+    </div>
+
+    <h3>Output 3: Fisher LDA 2D Projected Line &amp; 1D Separation Plots</h3>
+    <p>Dual-panel visualization: Left panel exhibits 2D patient observations, global centroid &mu;, Fisher optimal discriminant line, orthogonal projection segments, decision threshold point, and active test sample. Right panel displays 1D projected subspace demonstrating optimal class separation.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_projection_plot.png" alt="Output 3 Fisher LDA Projected Line and 1D Subspace">
+        <div class="screenshot-caption">Figure 11.3: Section 3 &mdash; 2D feature space with Fisher projected line and 1D separated feature distribution.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 4: Reduced 1D Feature Mappings &amp; Classification Verification</h3>
+    <p>Tabular verification comparing true classes, original patient vectors [$x_1, x_2$], projected 1D coordinates $y$, mapped points on the line, and diagnostic decision statuses for baseline samples and active test queries.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_sample_reduction_table.png" alt="Output 4 Sample Reduction and Verification Table">
+        <div class="screenshot-caption">Figure 11.4: Section 4 &mdash; Tabular verification of mapped 1D features and classification correctness.</div>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
@@ -231,8 +258,20 @@
                 <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/requirements.txt</a>
             </li>
             <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/full_page.png</a>
+                <b>Fisher Parameters Screenshot (Section 1):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss1_fisher_parameters.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss1_fisher_parameters.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Test Controls Screenshot (Section 2):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss2_test_controls.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss2_test_controls.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Projected Line &amp; Separation Plot Screenshot (Section 3):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss3_projection_plot.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss3_projection_plot.png</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Sample Reduction &amp; Verification Table Screenshot (Section 4):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss4_sample_reduction_table.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss4_sample_reduction_table.png</a>
             </li>
         </ul>
     </div>
