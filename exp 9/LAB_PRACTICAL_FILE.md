@@ -66,8 +66,17 @@ Forces non-contributing polynomial weights strictly to zero, effectively selecti
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 9/screenshots/full_page.png`  
-> ![Experiment 9 Full Dashboard](screenshots/full_page.png)
+#### 1. Hyperparameter Controls & Preset Benchmarks
+![Output 1 Hyperparameters](screenshots/ss1_hyperparameters_presets.png)
+
+#### 2. Quantitative Performance Evaluation Table
+![Output 2 Metrics Table](screenshots/ss2_performance_metrics_table.png)
+
+#### 3. Decision Boundary Plot (Before vs. After Regularization)
+![Output 3 Decision Boundary](screenshots/ss3_decision_boundary_plot.png)
+
+#### 4. Performance Comparison Plot (Accuracy & Loss Bar Charts)
+![Output 4 Performance Comparison Plot](screenshots/ss4_performance_comparison_plot.png)
 
 ---
 

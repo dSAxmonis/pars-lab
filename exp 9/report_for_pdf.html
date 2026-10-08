@@ -195,12 +195,36 @@
 
     <h3>Step 5: Web Application Deployment on Port 5011</h3>
     <p>Launched interactive Flask web dashboard on <a href="http://127.0.0.1:5011" target="_blank">http://127.0.0.1:5011</a> to compare decision boundaries, accuracy bars, and cross-entropy metrics in real time.</p>
+    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
 
-    <h2>OUTPUT / ATTACHED SCREENSHOT</h2>
-    <p>The complete full-page capture of the deployed Flask web application is embedded below:</p>
+    <h3>Output 1: Regularization Hyperparameter Controls &amp; Preset Benchmarks</h3>
+    <p>Displays selectable penalty type (L2 Ridge vs L1 Lasso), penalty coefficient &lambda;, and quick-select benchmark scenarios.</p>
     <div class="screenshot-container">
-        <img src="screenshots/full_page.png" alt="Experiment 9 Full Dashboard Screenshot">
-        <div class="screenshot-caption">Figure 9.1: Web dashboard displaying hyperparameter tuning, quantitative performance comparison table, decision boundary before/after regularization, and performance bar charts.</div>
+        <img src="screenshots/ss1_hyperparameters_presets.png" alt="Output 1 Hyperparameters">
+        <div class="screenshot-caption">Figure 9.1: Section 1 &mdash; Regularization controls and preset benchmark configurations.</div>
+    </div>
+
+    <h3>Output 2: Quantitative Performance Evaluation Table (Before vs. After)</h3>
+    <p>Comprehensive evaluation comparing Training/Test Accuracies, Cross-Entropy Losses, and Weight Vector L2 Norm ||w|| before and after regularization.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_performance_metrics_table.png" alt="Output 2 Metrics Table">
+        <div class="screenshot-caption">Figure 9.2: Section 2 &mdash; Quantitative metrics table demonstrating weight shrinkage and generalization gain.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 3: Decision Boundary Plot (Before vs. After Regularization)</h3>
+    <p>Side-by-side decision contour visualization: Left panel illustrates severe overfitting (&lambda;=0) with erratic boundaries; Right panel illustrates smooth, generalized decision boundary (&lambda;=1.0).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_decision_boundary_plot.png" alt="Output 3 Decision Boundary">
+        <div class="screenshot-caption">Figure 9.3: Section 3 &mdash; Decision boundary comparison illustrating overfitted vs. regularized model.</div>
+    </div>
+
+    <h3>Output 4: Performance Comparison Plot (Accuracy &amp; Loss Bar Charts)</h3>
+    <p>Comparative bar charts showing Training vs. Test Accuracy and Cross-Entropy Generalization Loss before and after applying regularization.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_performance_comparison_plot.png" alt="Output 4 Performance Comparison Plot">
+        <div class="screenshot-caption">Figure 9.4: Section 3 (Part 2) &mdash; Accuracy and cross-entropy loss comparison before and after regularization.</div>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
