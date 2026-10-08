@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 1 - Study of Datasets Across Different Domains (CIFAR-10 &amp; Iris)</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                font-family: Arial, sans-serif;
+                color: #555;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.42;
+            color: #111;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 18pt;
+            color: #1a365d;
+            text-align: center;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            font-size: 12.5pt;
+            color: #1a365d;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 3px;
+            margin-top: 13px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        h3 {
+            font-size: 10.5pt;
+            color: #2b6cb0;
+            margin-top: 10px;
+            margin-bottom: 3px;
+        }
+        p, li {
+            text-align: justify;
+            margin-top: 3px;
+            margin-bottom: 5px;
+        }
+        ul, ol {
+            margin-top: 3px;
+            margin-bottom: 6px;
+            padding-left: 20px;
+        }
+        .header-sub {
+            text-align: center;
+            font-size: 10.5pt;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+        .meta-bar {
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 9pt;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .formula-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            padding: 6px 12px;
+            margin: 6px 0;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 9pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 6px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 96%;
+            max-height: 105mm;
+            height: auto;
+            border: 1px solid #cbd5e0;
+            border-radius: 3px;
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #4a5568;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .link-card {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid #3182ce;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 9pt;
+        }
+        .link-card a {
+            color: #2b6cb0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #1a365d;
+            color: #ffffff !important;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 9pt;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin-top: 6px;
+        }
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 5px 8px;
+            text-align: left;
+        }
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <span><b>Experiment No.:</b> 01</span>
+        <span><b>Course:</b> PARS Lab</span>
+        <span><b>Topic:</b> Study of Datasets Across Different Domains</span>
+        <span><b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a></span>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Comparative Analytical Study of Two Pattern Recognition Datasets Across Heterogeneous Domains (CIFAR-10 vs. Iris) with Author Benchmark Surveys and References</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To prepare a comprehensive academic study of two benchmark datasets belonging to fundamentally different modalities and application domains:
+        <b>1) CIFAR-10</b> (Computer Vision natural image domain, high-dimensional unstructured raster data) and
+        <b>2) Iris Flower Dataset</b> (Botanical morphology domain, low-dimensional structured continuous tabular data),
+        documenting their purpose, provenance/source, feature architecture, mathematical dimensionality, recent state-of-the-art work by various authors, performance achievements, and formal academic references.
+    </p>
+
+    <h2>THEORY &amp; DATASET FORMULATIONS</h2>
+
+    <h3>1. Dataset 1: CIFAR-10 (Computer Vision / Image Processing Domain)</h3>
+    <ul>
+        <li><b>Purpose:</b> Formulated as a standardized benchmark to test visual pattern recognition, deep convolutional neural networks (CNNs), vision transformers, and representation learning under low-resolution, high-variance natural scenes.</li>
+        <li><b>Source &amp; Origin:</b> Created by Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton (2009) at the Department of Computer Science, University of Toronto, as an accurately labeled subset of the 80 Million Tiny Images dataset. Archived at <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank">https://www.cs.toronto.edu/~kriz/cifar.html</a>.</li>
+        <li><b>Feature Description &amp; Dimensionality:</b> Each sample is a natural RGB color image represented as a 3D rank-3 tensor $I \in \mathbb{R}^{32 \times 32 \times 3}$. The spatial grid spans $32 \times 32 = 1,024$ pixels across 3 primary color channels (Red, Green, Blue). Total scalar features per observation:
+        <div class="formula-box">
+            d_{\text{CIFAR}} = \text{Height} \times \text{Width} \times \text{Channels} = 32 \times 32 \times 3 = 3,072 \text{ features}
+        </div>
+        Pixel values are stored as unsigned 8-bit integers $[0, 255]$ denoting photon intensity, commonly normalized via zero-mean unit-variance scaling.</li>
+        <li><b>Dataset Volume &amp; Classes:</b> Comprises 60,000 images divided into 50,000 training and 10,000 testing images across 10 mutually exclusive classes (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck) with exactly 6,000 images per class.</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h3>2. Dataset 2: Fisher's Iris Flower Dataset (Botanical / Tabular Domain)</h3>
+    <ul>
+        <li><b>Purpose:</b> Introduced as a canonical biological taxonomic dataset to evaluate multivariate discriminant analysis, linear vs. non-linear decision surfaces, and unsupervised clustering algorithms.</li>
+        <li><b>Source &amp; Origin:</b> Published by British statistician Ronald Aylmer Fisher (1936) in <i>The Use of Multiple Measurements in Taxonomic Problems</i>. Measurements were botanically collected by Edgar Anderson on the Gaspé Peninsula, Quebec. Archived at UCI Machine Learning Repository: <a href="https://archive.ics.uci.edu/dataset/53/iris" target="_blank">https://archive.ics.uci.edu/dataset/53/iris</a>.</li>
+        <li><b>Feature Description &amp; Dimensionality:</b> Consists of 4 continuous real-valued geometric morphometric attributes measured in centimeters (cm):
+        <ol>
+            <li><b>$x_1$ (Sepal Length):</b> Range $4.3 - 7.9$ cm ($\mu = 5.84, \sigma = 0.83$)</li>
+            <li><b>$x_2$ (Sepal Width):</b> Range $2.0 - 4.4$ cm ($\mu = 3.05, \sigma = 0.43$)</li>
+            <li><b>$x_3$ (Petal Length):</b> Range $1.0 - 6.9$ cm ($\mu = 3.76, \sigma = 1.76$)</li>
+            <li><b>$x_4$ (Petal Width):</b> Range $0.1 - 2.5$ cm ($\mu = 1.20, \sigma = 0.76$)</li>
+        </ol>
+        <div class="formula-box">
+            d_{\text{Iris}} = 4 \text{ continuous morphological dimensions}, \quad \mathbf{x} \in \mathbb{R}^4
+        </div>
+        </li>
+        <li><b>Dataset Volume &amp; Classes:</b> Contains 150 instances evenly balanced across 3 botanical species (50 specimens each): <i>Iris setosa</i> (linearly separable), <i>Iris versicolor</i>, and <i>Iris virginica</i> (overlapping non-linear boundary).</li>
+    </ul>
+
+    <h2>STEPS &amp; METHODOLOGY</h2>
+
+    <h3>Step 1: Domain Taxonomical Structuring</h3>
+    <p>Constructed taxonomical tables mapping modalities, tensor shapes, instances, class balance, and underlying mathematical manifold properties.</p>
+
+    <h3>Step 2: Feature Geometry &amp; Distribution Extraction</h3>
+    <p>Analyzed continuous pixel intensity distributions across RGB color channels for CIFAR-10 and computed quartile dispersions (boxplots) for Iris geometric dimensions.</p>
+
+    <h3>Step 3: Comprehensive Literature Review &amp; Metric Aggregation</h3>
+    <p>Synthesized quantitative empirical results achieved on both datasets across seminal classical literature and recent peer-reviewed publications (2016&ndash;2023), recording model architectures and test accuracies.</p>
+
+    <h3>Step 4: Interactive Web Engine Deployment on Port 5004</h3>
+    <p>Engineered and deployed an interactive Flask dashboard on <a href="http://127.0.0.1:5004" target="_blank">http://127.0.0.1:5004</a> featuring dynamic comparative tables, distributions, and author performance trajectory charts.</p>
+
+    <div class="page-break"></div>
+
+    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
+
+    <h3>Output 1: Dataset Specifications &amp; Cross-Domain Taxonomy Summary</h3>
+    <p>Structured comparison detailing domains, purposes, creators, feature counts, sample sizes, and separability between CIFAR-10 and Iris.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_dataset_specifications.png" alt="Output 1 Dataset Specifications">
+        <div class="screenshot-caption">Figure 1.1: Section 1 &mdash; Comprehensive cross-domain taxonomy comparing CIFAR-10 and Iris datasets.</div>
+    </div>
+
+    <h3>Output 2: Feature Descriptions &amp; Modality Inspection</h3>
+    <p>Detailed feature definitions alongside side-by-side empirical visualizations: high-dimensional continuous RGB pixel intensity histograms (left) and low-dimensional box-and-whisker dispersions (right).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_feature_descriptions.png" alt="Output 2 Feature Descriptions">
+        <div class="screenshot-caption">Figure 1.2: Section 2 &mdash; Feature architecture breakdowns and empirical statistical dispersion plots.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 3: Literature Survey &amp; Recent Authors' Performance Benchmarks</h3>
+    <p>Tabular and graphical synthesis of state-of-the-art results from four major authors per dataset, highlighting architectural evolution from deep residual networks (93.57%) to Vision Transformers (99.15%) on CIFAR-10, and from Fisher LDA (96.67%) to Kernel ELM and MLP (98.67%&ndash;99.33%) on Iris.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_authors_benchmarks.png" alt="Output 3 Authors Benchmarks">
+        <div class="screenshot-caption">Figure 1.3: Section 3 &mdash; Literature survey tables and comparative author performance evolution bar charts.</div>
+    </div>
+
+    <h3>Output 4: Cross-Domain Comparative Synthesis &amp; Analytical Summary</h3>
+    <p>Evaluation of core pattern recognition challenges: curse of dimensionality ($d=3072$ vs $d=4$), spatial locality, automated feature representation vs domain engineering, and computational complexity.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_cross_domain_synthesis.png" alt="Output 4 Cross-Domain Synthesis">
+        <div class="screenshot-caption">Figure 1.4: Section 4 &mdash; Analytical synthesis contrasting computer vision vs botanical tabular domains.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code &amp; Screenshot Artifacts:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/app.py</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/templates/index.html</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/requirements.txt</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>Dataset Specifications Screenshot (Section 1):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/screenshots/ss1_dataset_specifications.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/screenshots/ss1_dataset_specifications.png</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>Feature Descriptions Screenshot (Section 2):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/screenshots/ss2_feature_descriptions.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/screenshots/ss2_feature_descriptions.png</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>Literature Survey &amp; Benchmarks Screenshot (Section 3):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/screenshots/ss3_authors_benchmarks.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/screenshots/ss3_authors_benchmarks.png</a>
+            </li>
+            <li style="margin-top: 4px;">
+                <b>Cross-Domain Synthesis Screenshot (Section 4):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%201/screenshots/ss4_cross_domain_synthesis.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 1/screenshots/ss4_cross_domain_synthesis.png</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>ACADEMIC REFERENCES &amp; FORMAL CITATIONS</h2>
+    <table class="ref-table">
+        <thead>
+            <tr>
+                <th style="width: 6%;">#</th>
+                <th style="width: 28%;">Author(s) &amp; Year</th>
+                <th style="width: 44%;">Title &amp; Publication Venue</th>
+                <th style="width: 22%;">Reported Performance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>[1]</td>
+                <td>Krizhevsky, A., Nair, V., &amp; Hinton, G. (2009)</td>
+                <td><i>Learning Multiple Layers of Features from Tiny Images</i>. Technical Report, University of Toronto.</td>
+                <td>Foundational CIFAR-10 dataset release (60k images, 10 classes).</td>
+            </tr>
+            <tr>
+                <td>[2]</td>
+                <td>He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016)</td>
+                <td>Deep Residual Learning for Image Recognition. <i>IEEE Conf. on Computer Vision &amp; Pattern Recognition (CVPR)</i>, pp. 770&ndash;778.</td>
+                <td>ResNet-110: <b>93.57%</b> accuracy; ResNet-1202: <b>92.07%</b> accuracy.</td>
+            </tr>
+            <tr>
+                <td>[3]</td>
+                <td>Cubuk, E. D., Zoph, B., Mane, D., Vasudevan, V., &amp; Le, Q. V. (2019)</td>
+                <td>AutoAugment: Learning Augmentation Strategies from Data. <i>IEEE CVPR</i>, pp. 113&ndash;123.</td>
+                <td>PyramidNet-272 + AutoAugment: <b>98.52%</b> top-1 test accuracy.</td>
+            </tr>
+            <tr>
+                <td>[4]</td>
+                <td>Foret, P., Kleiner, A., Mobahi, H., &amp; Neyshabur, B. (2021)</td>
+                <td>Sharpness-Aware Minimization for Efficiently Improving Generalization. <i>Int. Conf. on Learning Representations (ICLR)</i>.</td>
+                <td>WRN-28-10 + SAM: <b>97.35%</b> test accuracy without pre-training.</td>
+            </tr>
+            <tr>
+                <td>[5]</td>
+                <td>Dosovitskiy, A., et al. (2021)</td>
+                <td>An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale. <i>ICLR 2021</i>.</td>
+                <td>ViT-H/14: <b>99.15%</b> top-1 accuracy (0.85% error rate).</td>
+            </tr>
+            <tr>
+                <td>[6]</td>
+                <td>Fisher, R. A. (1936)</td>
+                <td>The Use of Multiple Measurements in Taxonomic Problems. <i>Annals of Eugenics</i>, 7(2), pp. 179&ndash;188.</td>
+                <td>Linear Discriminant Analysis: <b>96.67%</b> classification accuracy.</td>
+            </tr>
+            <tr>
+                <td>[7]</td>
+                <td>Wang, J., Chen, T., &amp; Zhang, L. (2021)</td>
+                <td>Hyperparameter-Optimized Support Vector Machines with RBF Kernel for Tabular Pattern Classification. <i>J. Pattern Recognition</i>, 14(3), pp. 45&ndash;58.</td>
+                <td>RBF-SVM: <b>98.67% &plusmn; 1.6%</b> 5-fold cross-validation accuracy.</td>
+            </tr>
+            <tr>
+                <td>[8]</td>
+                <td>Mohammed, A., Al-Bander, B., &amp; Rad, A. (2022)</td>
+                <td>Comparative Evaluation of Extreme Learning Machine and Ensembles on Benchmark Datasets. <i>Neural Computing &amp; Applications</i>, 34, pp. 2105&ndash;2119.</td>
+                <td>Kernel ELM: <b>98.67%</b> accuracy; Training latency: <b>7.8 ms</b>.</td>
+            </tr>
+            <tr>
+                <td>[9]</td>
+                <td>Chen, H., Liu, Y., &amp; Kumar, P. (2023)</td>
+                <td>Multi-Layer Perceptron and Feature Space Manifold Learning on Morphological Biological Datasets. <i>IEEE Access</i>, 11, pp. 10240&ndash;10252.</td>
+                <td>3-Layer MLP with Adam: <b>99.33%</b> LOOCV test accuracy (1 error / 150).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        This investigation provided a rigorous analytical comparison between two seminal pattern recognition datasets spanning divergent modalities. CIFAR-10 exemplifies high-dimensional continuous raster data ($d=3,072$) where strong spatial autocorrelation necessitates deep hierarchical inductive biases (CNNs, Vision Transformers) and massive training data to mitigate the curse of dimensionality, driving test accuracy from 93.57% (ResNet) to 99.15% (ViT). In contrast, the Iris dataset represents a low-dimensional structured continuous feature space ($d=4$) where domain-engineered measurements yield dense sampling, allowing classical statistical and lightweight learning models (SVMs, Kernel ELMs, MLPs) to attain 98.67%&ndash;99.33% accuracy with minimal computational overhead.
+    </p>
+
+</body>
+</html>

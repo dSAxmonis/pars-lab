@@ -6,7 +6,13 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 
 ## Laboratory Experiments Directory
 
-### 1. [Experiment 2: Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization](./exp%202/)
+### 1. [Experiment 1: Study of Datasets Across Different Domains (CIFAR-10 &amp; Iris)](./exp%201/)
+- **Description:** In-depth comparative academic study of two benchmark datasets across heterogeneous domains (CIFAR-10 image raster vs Iris tabular attributes), evaluating purpose, source, feature descriptions, dimensionality, state-of-the-art work by various authors, recent performance benchmarks, and formal citations.
+- **Code:** [`exp 1/app.py`](./exp%201/app.py) &amp; [`exp 1/templates/index.html`](./exp%201/templates/index.html)
+- **Manual Report:** [`exp 1/LAB_PRACTICAL_FILE.md`](./exp%201/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_1_Lab_Practical.pdf`](./Experiment_1_Lab_Practical.pdf)
+
+### 2. [Experiment 2: Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization](./exp%202/)
 - **Description:** Flask web application to extract and persist CIFAR-10 (Image) and Iris (Tabular) datasets, inspect feature descriptions, and plot evaluation performance curves and confusion matrices.
 - **Code:** [`exp 2/app.py`](./exp%202/app.py) &amp; [`exp 2/templates/index.html`](./exp%202/templates/index.html)
 - **Manual Report:** [`LAB_PRACTICAL_FILE.md`](./LAB_PRACTICAL_FILE.md)

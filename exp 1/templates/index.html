@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment 1 - Comparative Dataset Study: CIFAR-10 vs. Iris</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 25px auto; max-width: 1080px; line-height: 1.5; color: #222; background-color: #fbfbfb;">
+
+    <!-- HEADER / NAVIGATION BAR -->
+    <div style="border-bottom: 3px solid #1a365d; padding-bottom: 12px; margin-bottom: 20px;">
+        <h1 style="color: #1a365d; margin: 0 0 6px 0; font-size: 24px;">Experiment 1: Study of Datasets Across Different Domains (CIFAR-10 &amp; Iris)</h1>
+        <p style="margin: 0; color: #555; font-size: 14px;">
+            <b>Pattern Analysis &amp; Recognition Systems Lab</b> &nbsp;|&nbsp;
+            <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </div>
+
+    <!-- AIM & OBJECTIVE SUMMARY -->
+    <div style="background-color: #eef2f7; border-left: 5px solid #1a365d; padding: 12px 18px; margin-bottom: 22px;">
+        <h3 style="margin-top: 0; margin-bottom: 6px; color: #1a365d; font-size: 16px;">AIM</h3>
+        <p style="margin: 0; font-size: 14px;">
+            To conduct an in-depth comparative academic study of two benchmark datasets belonging to fundamentally different modalities and application domains:
+            <b>1) CIFAR-10</b> (High-dimensional computer vision image recognition domain) and
+            <b>2) Iris Flower Dataset</b> (Low-dimensional botanical morphological tabular classification domain),
+            evaluating their purpose, source, feature representations, mathematical dimensionality, state-of-the-art work by various authors, recent performance benchmarks, and formal citations.
+        </p>
+    </div>
+
+    <!-- SECTION 1: COMPARATIVE DATASET SPECIFICATION & DOMAIN TAXONOMY -->
+    <div style="background-color: #0d3b66; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 1: DATASET SPECIFICATIONS &amp; CROSS-DOMAIN TAXONOMY SUMMARY
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+            <thead>
+                <tr style="background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                    <th style="padding: 9px 10px; border: 1px solid #ddd; text-align: left; width: 22%;">Dataset Property</th>
+                    <th style="padding: 9px 10px; border: 1px solid #ddd; text-align: left; width: 39%; color: #1e40af;">Dataset 1: CIFAR-10 (Image Domain)</th>
+                    <th style="padding: 9px 10px; border: 1px solid #ddd; text-align: left; width: 39%; color: #047857;">Dataset 2: Iris Flower (Tabular Domain)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in metadata %}
+                <tr {% if loop.index % 2 == 0 %}style="background-color: #fafafa;"{% endif %}>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">{{ item.property }}</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">{{ item.cifar10 }}</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">{{ item.iris }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 2: FEATURE INSPECTIONS & DATASET REPRESENTATION -->
+    <div style="background-color: #0466c8; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 2: FEATURE DESCRIPTIONS &amp; MODALITY INSPECTION
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px;">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <!-- Left Card: CIFAR-10 -->
+            <div style="flex: 1; min-width: 320px; border: 1px solid #bfdbfe; background-color: #eff6ff; padding: 14px; border-radius: 4px;">
+                <h4 style="margin-top: 0; color: #1e40af; border-bottom: 2px solid #93c5fd; padding-bottom: 4px;">CIFAR-10 Feature Architecture ($d = 3,072$)</h4>
+                <ul style="font-size: 13px; padding-left: 18px; margin: 0 0 10px 0;">
+                    <li><b>Spatial Resolution:</b> $32 \times 32$ raster matrix (1,024 pixels per channel).</li>
+                    <li><b>Color Depth:</b> 3 channels (Red, Green, Blue) $\rightarrow$ 3D tensor $I \in \mathbb{R}^{32 \times 32 \times 3}$.</li>
+                    <li><b>Feature Scale:</b> 8-bit unsigned integers $[0, 255]$ representing photon intensity.</li>
+                    <li><b>Inductive Prior:</b> Strong 2D spatial locality and translation equivariance.</li>
+                </ul>
+                <div style="background-color: white; padding: 8px; border: 1px solid #cbd5e1; font-size: 12px; font-family: monospace;">
+                    Total Features = 32 (height) &times; 32 (width) &times; 3 (RGB) = 3,072 continuous values
+                </div>
+            </div>
+
+            <!-- Right Card: Iris Tabular -->
+            <div style="flex: 1; min-width: 320px; border: 1px solid #bbf7d0; background-color: #f0fdf4; padding: 14px; border-radius: 4px;">
+                <h4 style="margin-top: 0; color: #065f46; border-bottom: 2px solid #86efac; padding-bottom: 4px;">Iris Tabular Architecture ($d = 4$)</h4>
+                <ul style="font-size: 13px; padding-left: 18px; margin: 0 0 10px 0;">
+                    <li><b>Feature 1 ($x_1$):</b> Sepal Length in cm (continuous ratio scale, range $4.3 - 7.9$).</li>
+                    <li><b>Feature 2 ($x_2$):</b> Sepal Width in cm (continuous ratio scale, range $2.0 - 4.4$).</li>
+                    <li><b>Feature 3 ($x_3$):</b> Petal Length in cm (continuous ratio scale, range $1.0 - 6.9$).</li>
+                    <li><b>Feature 4 ($x_4$):</b> Petal Width in cm (continuous ratio scale, range $0.1 - 2.5$).</li>
+                </ul>
+                <div style="background-color: white; padding: 8px; border: 1px solid #cbd5e1; font-size: 12px; font-family: monospace;">
+                    Total Features = 4 morphological continuous geometric measurements
+                </div>
+            </div>
+        </div>
+
+        <!-- Distributions Plot -->
+        <div style="margin-top: 18px; text-align: center;">
+            <img src="data:image/png;base64,{{ feature_plot }}" alt="Feature Distributions Plot" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+            <p style="margin: 8px 0 0 0; font-size: 12.5px; color: #555; text-align: left;">
+                <b>Figure 1.1:</b> Left panel exhibits the high-dimensional continuous color intensity dispersion across RGB channels for CIFAR-10. Right panel shows box-and-whisker distributions for the 4 physical botanical measurements in Iris.
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: LITERATURE SURVEY & BENCHMARK ACCURACIES -->
+    <div style="background-color: #0b4f6c; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 3: LITERATURE SURVEY &amp; RECENT AUTHORS' PERFORMANCE BENCHMARKS
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px;">
+        <h4 style="margin-top: 0; color: #1e3a8a;">1. CIFAR-10: State-of-the-Art Achievements by Various Authors</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;">
+            <thead>
+                <tr style="background-color: #eff6ff; border-bottom: 2px solid #bfdbfe;">
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Author(s) &amp; Year</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Model Architecture</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: center;">Test Accuracy</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Key Algorithmic Contribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in cifar_authors %}
+                <tr>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-weight: bold;">{{ a.author }}<br><span style="font-size: 11px; color: #64748b;">{{ a.venue }}</span></td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">{{ a.model }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #0284c7;">{{ a.accuracy }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd;">{{ a.significance }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h4 style="margin-top: 14px; color: #065f46;">2. Iris Dataset: Performance Evolution Across Classical &amp; Recent Authors</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px;">
+            <thead>
+                <tr style="background-color: #f0fdf4; border-bottom: 2px solid #bbf7d0;">
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Author(s) &amp; Year</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Methodology / Classifier</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: center;">Cross-Validation / Test Acc</th>
+                    <th style="padding: 7px; border: 1px solid #ddd; text-align: left;">Algorithmic Distinction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in iris_authors %}
+                <tr>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-weight: bold;">{{ a.author }}<br><span style="font-size: 11px; color: #64748b;">{{ a.venue }}</span></td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">{{ a.model }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #059669;">{{ a.accuracy }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd;">{{ a.significance }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Visual Benchmark Comparison Chart -->
+        <div style="text-align: center; margin-top: 15px;">
+            <img src="data:image/png;base64,{{ benchmark_plot }}" alt="Author Performance Evolution Plot" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+            <p style="margin: 8px 0 0 0; font-size: 12.5px; color: #555; text-align: left;">
+                <b>Figure 1.2:</b> Quantitative visualization of performance progression across authors. CIFAR-10 evolved from early deep residual networks (93.57%) to Vision Transformers (99.15%). Iris classification reached near-optimal boundaries via hyperparameter-tuned SVMs, Kernel ELMs, and MLPs (98.67% - 99.33%).
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 4: CROSS-DOMAIN COMPARATIVE SYNTHESIS -->
+    <div style="background-color: #334155; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 4: CROSS-DOMAIN COMPARATIVE SYNTHESIS &amp; ANALYTICAL SUMMARY
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+            <thead>
+                <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left; width: 25%;">Analytical Dimension</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left; width: 37%;">Computer Vision Domain (CIFAR-10)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left; width: 38%;">Botanical Tabular Domain (Iris)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd; font-weight: bold;">Curse of Dimensionality</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">High feature dimension ($d=3072$) mandates tens of thousands of samples to prevent empty space phenomena.</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Compact feature space ($d=4$) allows dense data coverage with only $N=150$ observations.</td>
+                </tr>
+                <tr style="background-color: #fafafa;">
+                    <td style="padding: 7px 8px; border: 1px solid #ddd; font-weight: bold;">Spatial Correlation &amp; Locality</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Adjacent pixels exhibit high covariance; spatial context and translation invariance are paramount.</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Features are distinct physical measurements with no topological ordering or spatial grid proximity.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd; font-weight: bold;">Feature Engineering Needs</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Requires automatic hierarchical feature representation via convolutional or self-attention layers.</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Features are pre-engineered domain metrics directly interpretable by human botanists.</td>
+                </tr>
+                <tr style="background-color: #fafafa;">
+                    <td style="padding: 7px 8px; border: 1px solid #ddd; font-weight: bold;">Sample &amp; Compute Efficiency</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Requires GPU acceleration, extensive optimization epochs, and millions of parameters.</td>
+                    <td style="padding: 7px 8px; border: 1px solid #ddd;">Sub-second CPU training via closed-form solutions (LDA, ELM) or lightweight SVMs.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER WITH CLICKABLE REPO LINK -->
+    <div style="border-top: 2px solid #ddd; padding-top: 12px; font-size: 13px; color: #666; text-align: center;">
+        Pattern Analysis &amp; Recognition Systems Lab &mdash; Experiment 1 Submission &nbsp;|&nbsp;
+        <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">GitHub: dSAxmonis/pars-lab</a>
+    </div>
+
+</body>
+</html>
