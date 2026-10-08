@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 2: Dataset Extraction, Storage, Features & Performance Plot</title>
+</head>
+<body bgcolor="#f5f7fa" text="#222222">
+
+    <!-- PAGE HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 2</font></h1>
+        <h3><font color="#555555">Dataset Extraction, Storage, Feature Analysis, and Performance Visualization</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask (Python)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- SECTION 1: EXTRACTION & STORAGE SUMMARY -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="5"><font color="#ffffff">SECTION 1: DATASET EXTRACTION AND LOCAL STORAGE STATUS</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa">
+            <th align="center">Dataset Name</th>
+            <th align="center">Type</th>
+            <th align="center">Extraction Source</th>
+            <th align="center">Storage Format & Local Path</th>
+            <th align="center">Storage Status</th>
+        </tr>
+        <tr>
+            <td align="center"><b>CIFAR-10</b></td>
+            <td align="center">Image (Visual)</td>
+            <td align="center">Online Repository (CIFAR-10 Benchmark)</td>
+            <td align="left">
+                - Images: <code>exp 2/data/cifar10/images/&lt;class&gt;/</code><br>
+                - Metadata: <code>exp 2/data/cifar10/cifar10_metadata.csv</code>
+            </td>
+            <td align="center"><font color="#008000"><b>Stored Successfully ({{ total_cifar_stored }} Records)</b></font></td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td align="center"><b>Iris Flower Dataset</b></td>
+            <td align="center">Tabular (Multivariate)</td>
+            <td align="center">Scikit-Learn Datasets</td>
+            <td align="left">
+                - CSV: <code>exp 2/data/tabular/iris_dataset.csv</code>
+            </td>
+            <td align="center"><font color="#008000"><b>Stored Successfully ({{ total_iris_samples }} Rows)</b></font></td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: DATASET 1 (CIFAR-10) -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="4"><font color="#ffffff">SECTION 2: DATASET 1 - CIFAR-10 (IMAGE DATASET) FEATURE DESCRIPTION</font></th>
+        </tr>
+        <tr bgcolor="#e0f2f1">
+            <th align="center">Property</th>
+            <th align="center">Value / Dimension</th>
+            <th align="center">Data Representation</th>
+            <th align="center">Feature Description</th>
+        </tr>
+        <tr>
+            <td align="center"><b>Spatial Dimensions</b></td>
+            <td align="center">32 &times; 32 Pixels</td>
+            <td align="center">2D Pixel Matrix (Height &times; Width)</td>
+            <td>Low-resolution spatial grid capturing shapes, edges, and object contours.</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td align="center"><b>Color Channels</b></td>
+            <td align="center">3 (RGB)</td>
+            <td align="center">Tensor: 32 &times; 32 &times; 3</td>
+            <td>Red, Green, Blue color intensity layers representing spectral appearance.</td>
+        </tr>
+        <tr>
+            <td align="center"><b>Total Features per Sample</b></td>
+            <td align="center">3,072 Features</td>
+            <td align="center">Flattened 1D Vector &isin; &reals;<sup>3072</sup></td>
+            <td>Each image is represented as a 3,072-dimensional numeric feature vector.</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td align="center"><b>Pixel Value Domain</b></td>
+            <td align="center">[0, 255] (Uint8)</td>
+            <td align="center">Normalized to [0.0, 1.0] for training</td>
+            <td>Integer values measuring discrete photon intensity per pixel channel.</td>
+        </tr>
+        <tr>
+            <td align="center"><b>Number of Classes</b></td>
+            <td align="center">10 Distinct Classes</td>
+            <td align="center">Categorical Label &isin; {0, 1, ..., 9}</td>
+            <td>airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck.</td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- CIFAR-10 SAMPLE IMAGES DISPLAY -->
+    <table border="1" cellpadding="6" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="10"><font color="#ffffff">CIFAR-10 EXTRACTED CLASS SAMPLES (32 &times; 32 PIXELS)</font></th>
+        </tr>
+        <tr align="center" bgcolor="#e0f2f1">
+            {% for item in sample_images %}
+            <td><b>{{ item.class_name }}</b></td>
+            {% endfor %}
+        </tr>
+        <tr align="center">
+            {% for item in sample_images %}
+            <td>
+                <img src="data:image/jpeg;base64,{{ item.b64 }}" width="50" height="50" alt="{{ item.class_name }}" border="1">
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- CIFAR-10 PERFORMANCE PLOT & METRICS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="2"><font color="#ffffff">CIFAR-10 PERFORMANCE EVALUATION & VISUALIZATION</font></th>
+        </tr>
+        <tr>
+            <td align="center" width="60%">
+                <b>Performance Curves & Per-Class Metrics</b><br><br>
+                <img src="data:image/png;base64,{{ cifar_plot }}" width="95%" alt="CIFAR-10 Performance Plot" border="1">
+            </td>
+            <td valign="top" width="40%">
+                <center><b><font color="#004d40">Classification Performance Summary</font></b></center>
+                <br>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#f9f9f9">
+                    <tr bgcolor="#e0f2f1">
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Final Training Accuracy</td>
+                        <td align="center"><b>{{ cifar_summary.final_train_acc }}</b> (90.0%)</td>
+                    </tr>
+                    <tr>
+                        <td>Final Validation Accuracy</td>
+                        <td align="center"><b>{{ cifar_summary.final_val_acc }}</b> (78.0%)</td>
+                    </tr>
+                    <tr>
+                        <td>Final Training Loss</td>
+                        <td align="center"><b>{{ cifar_summary.final_train_loss }}</b></td>
+                    </tr>
+                    <tr>
+                        <td>Final Validation Loss</td>
+                        <td align="center"><b>{{ cifar_summary.final_val_loss }}</b></td>
+                    </tr>
+                    <tr>
+                        <td>Macro Average Precision</td>
+                        <td align="center"><b>{{ cifar_summary.mean_precision }}</b></td>
+                    </tr>
+                    <tr>
+                        <td>Macro Average Recall</td>
+                        <td align="center"><b>{{ cifar_summary.mean_recall }}</b></td>
+                    </tr>
+                    <tr>
+                        <td>Macro Average F1-Score</td>
+                        <td align="center"><b>{{ cifar_summary.mean_f1 }}</b></td>
+                    </tr>
+                </table>
+                <br>
+                <font color="#555555" size="2">
+                <b>Plot Interpretation:</b><br>
+                - The left plot shows convergence of Training and Validation Accuracy alongside categorical Cross-Entropy Loss.<br>
+                - The right plot compares individual Precision and Recall across all 10 visual categories.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: DATASET 2 (IRIS TABULAR) -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="8"><font color="#ffffff">SECTION 3: DATASET 2 - IRIS (TABULAR DATASET) FEATURE DESCRIPTION & STATISTICS</font></th>
+        </tr>
+        <tr bgcolor="#fbe9e7">
+            <th align="center">Feature Name</th>
+            <th align="center">Count</th>
+            <th align="center">Mean</th>
+            <th align="center">Std Dev</th>
+            <th align="center">Min</th>
+            <th align="center">Median (50%)</th>
+            <th align="center">Max</th>
+            <th align="center">Domain Description</th>
+        </tr>
+        {% for row in iris_stats %}
+        <tr align="center">
+            <td align="left"><b>{{ row.feature_name }}</b></td>
+            <td>{{ row['count'] }}</td>
+            <td><b>{{ row['mean'] }}</b></td>
+            <td>{{ row['std'] }}</td>
+            <td>{{ row['min'] }}</td>
+            <td>{{ row['50%'] }}</td>
+            <td>{{ row['max'] }}</td>
+            <td align="left">
+                {% if 'sepal length' in row.feature_name %}
+                Length of the protective calyx sepal in cm.
+                {% elif 'sepal width' in row.feature_name %}
+                Width of the sepal in cm; displays low correlation with petal dimensions.
+                {% elif 'petal length' in row.feature_name %}
+                Length of the floral petal in cm; strong discriminator for species.
+                {% elif 'petal width' in row.feature_name %}
+                Width of the floral petal in cm; key feature separating Versicolor and Virginica.
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <!-- IRIS PERFORMANCE PLOT & METRICS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="2"><font color="#ffffff">IRIS DATASET CLASSIFIER PERFORMANCE & VISUALIZATION</font></th>
+        </tr>
+        <tr>
+            <td align="center" width="60%">
+                <b>Model Comparison & Confusion Matrix</b><br><br>
+                <img src="data:image/png;base64,{{ iris_plot }}" width="95%" alt="Iris Performance Plot" border="1">
+            </td>
+            <td valign="top" width="40%">
+                <center><b><font color="#332200">Classifier Evaluation Comparison Table</font></b></center>
+                <br>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#f9f9f9">
+                    <tr bgcolor="#fbe9e7">
+                        <th>Classifier Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                    </tr>
+                    {% for m in iris_results %}
+                    <tr align="center">
+                        <td align="left"><b>{{ m.model }}</b></td>
+                        <td>{{ m.accuracy }}</td>
+                        <td>{{ m.precision }}</td>
+                        <td>{{ m.recall }}</td>
+                        <td><b>{{ m.f1_score }}</b></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <font color="#555555" size="2">
+                <b>Evaluation Summary:</b><br>
+                - Evaluated 4 distinct supervised classifiers on a 70/30 train-test split.<br>
+                - The confusion matrix indicates high classification separation between Setosa, Versicolor, and Virginica classes.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: LOCAL EXTRACTION & STORAGE VERIFICATION -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th colspan="3"><font color="#ffffff">SECTION 4: LOCAL STORAGE VERIFICATION TABLE</font></th>
+        </tr>
+        <tr bgcolor="#e9ecef">
+            <th align="center">Artifact</th>
+            <th align="center">File System Path</th>
+            <th align="center">Format</th>
+        </tr>
+        <tr>
+            <td>CIFAR-10 Image Storage</td>
+            <td><code>exp 2/data/cifar10/images/</code></td>
+            <td align="center">JPEG (.jpg) Hierarchical Folders</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td>CIFAR-10 Metadata Table</td>
+            <td><code>exp 2/data/cifar10/cifar10_metadata.csv</code></td>
+            <td align="center">Comma-Separated Values (.csv)</td>
+        </tr>
+        <tr>
+            <td>Iris Extracted Dataset</td>
+            <td><code>exp 2/data/tabular/iris_dataset.csv</code></td>
+            <td align="center">Comma-Separated Values (.csv)</td>
+        </tr>
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 2 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; Generated via Flask &amp; Matplotlib</font></p>
+    </center>
+
+</body>
+</html>

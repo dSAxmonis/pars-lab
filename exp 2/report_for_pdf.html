@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 2 - Lab Practical File</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #222222;
+            line-height: 1.5;
+            font-size: 11pt;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #003366;
+            font-size: 18pt;
+            text-align: center;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: #003366;
+            font-size: 14pt;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 4px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #004d40;
+            font-size: 12pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+        .header-sub {
+            text-align: center;
+            color: #555555;
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .meta-bar {
+            text-align: center;
+            font-size: 10pt;
+            background-color: #f0f4f8;
+            padding: 8px;
+            border: 1px solid #d0dbe5;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        table, th, td {
+            border: 1px solid #cccccc;
+        }
+        th {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 8px 6px;
+            text-align: left;
+        }
+        td {
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .formula-box {
+            background-color: #f7f9fa;
+            border-left: 4px solid #003366;
+            padding: 8px 14px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 12px 0 18px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 96%;
+            border: 1px solid #999999;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+        }
+        .screenshot-caption {
+            font-size: 9pt;
+            color: #555555;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #181717;
+            color: #ffffff !important;
+            padding: 5px 12px;
+            font-size: 9.5pt;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        a {
+            color: #0044cc;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #002288;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            font-size: 9.5pt;
+            font-family: monospace;
+        }
+        .link-card {
+            background-color: #f8faff;
+            border: 1px solid #cce0ff;
+            border-left: 4px solid #0055ff;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <b>Experiment No.:</b> 02 &nbsp;|&nbsp; 
+        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
+        <b>Framework:</b> Python 3.14 / Flask / Scikit-Learn &nbsp;|&nbsp;
+        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization using Flask</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To prepare an interactive web application using Flask in Python to extract and store two datasets studied in Experiment 1 (CIFAR-10 image dataset and Iris tabular dataset), inspect and describe their feature representations, and generate and display model performance evaluation plots.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. Dataset Extraction &amp; Ingestion</h3>
+    <p>
+        Dataset extraction refers to the programmatic acquisition of raw visual or structured attributes from remote servers or storage repositories. For visual data, 2D/3D pixel matrices are fetched and decoded into multidimensional tensors. For tabular data, structured relations are loaded into columnar dataframes.
+    </p>
+
+    <h3>2. Data Persistence &amp; Storage</h3>
+    <p>
+        Extracted data must be saved locally to avoid redundant bandwidth overhead:
+    </p>
+    <ul>
+        <li><b>Image Data:</b> Stored in structured class-level filesystem directories (<code>exp 2/data/cifar10/images/&lt;class&gt;/</code>) with a centralized CSV metadata catalog.</li>
+        <li><b>Tabular Data:</b> Persisted as standard Comma-Separated Values (<code>exp 2/data/tabular/iris_dataset.csv</code>).</li>
+    </ul>
+
+    <h3>3. Feature Representation</h3>
+    <ul>
+        <li><b>Image Features:</b> Formatted as a 3D matrix $I \in \mathbb{R}^{H \times W \times C}$ (for CIFAR-10: $32 \times 32 \times 3 = 3072$ features per sample) with pixel values in $[0, 255]$.</li>
+        <li><b>Tabular Features:</b> Formatted as a real-valued matrix $\mathbf{X} \in \mathbb{R}^{N \times d}$ ($150 \times 4$ for Iris) with target labels $\mathbf{y} \in \{0, 1, 2\}$.</li>
+    </ul>
+
+    <h3>4. Performance Metrics &amp; Mathematical Formulas</h3>
+
+    <div class="formula-box">
+        <b>1. Accuracy:</b><br>
+        Accuracy = (TP + TN) / (TP + TN + FP + FN)
+    </div>
+
+    <div class="formula-box">
+        <b>2. Precision (Positive Predictive Value):</b><br>
+        Precision = TP / (TP + FP)
+    </div>
+
+    <div class="formula-box">
+        <b>3. Recall (Sensitivity / True Positive Rate):</b><br>
+        Recall = TP / (TP + FN)
+    </div>
+
+    <div class="formula-box">
+        <b>4. F1-Score (Harmonic Mean):</b><br>
+        F1-Score = 2 &times; (Precision &times; Recall) / (Precision + Recall) = 2TP / (2TP + FP + FN)
+    </div>
+
+    <div class="formula-box">
+        <b>5. Categorical Cross-Entropy Loss:</b><br>
+        L_CE = - &sum; [y_k &times; ln(y_hat_k)]
+    </div>
+
+    <div class="formula-box">
+        <b>6. Confusion Matrix:</b><br>
+        C = [[TP, FN], [FP, TN]]
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
+    <p>Configured the Python environment, established the directory structure under <code>exp 2/</code>, and verified all core dependencies (Flask, scikit-learn, pandas, matplotlib, pillow).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
+        <div class="screenshot-caption">Figure 1.1: Environment verification and dependency installation log.</div>
+    </div>
+
+    <h3>Step 2: Dataset Extraction &amp; Local Disk Storage</h3>
+    <p>Executed extraction logic inside <code>app.py</code> to download CIFAR-10 images into designated class subfolders, generate metadata index <code>cifar10_metadata.csv</code>, and export the Iris dataset to CSV format.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step2_extraction_storage.png" alt="Step 2 Extraction">
+        <div class="screenshot-caption">Figure 1.2: Terminal log demonstrating local extraction and file storage verification.</div>
+    </div>
+
+    <h3>Step 3: Web Server Deployment</h3>
+    <p>Launched the Flask application server on <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a> to dynamically generate performance plots and display dataset summaries.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/step6_flask_running.png" alt="Step 6 Running">
+        <div class="screenshot-caption">Figure 1.3: Terminal session showing active Flask server listening on port 5000.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>OUTPUT / DASHBOARD RESULTS</h2>
+
+    <h3>Output 1: Dataset Extraction &amp; Storage Summary</h3>
+    <p>The web dashboard confirms extraction and local filesystem storage for both datasets.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out1_storage_status.png" alt="Output 1 Storage Status">
+        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Extraction source, format, and storage status for CIFAR-10 and Iris datasets.</div>
+    </div>
+
+    <h3>Output 2: CIFAR-10 Image Dataset &mdash; Features &amp; Sample Classes</h3>
+    <p>Displays image tensor dimensions ($32 \times 32 \times 3$), pixel domains, and visual thumbnails across all 10 visual classes.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out2_cifar_features_samples.png" alt="Output 2 CIFAR Features">
+        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; CIFAR-10 spatial specifications and sample extracted images for all 10 categories.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 3: CIFAR-10 Model Performance Visualization</h3>
+    <p>Visualizes training/validation convergence curves alongside individual precision and recall across visual categories.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out3_cifar_performance.png" alt="Output 3 CIFAR Performance">
+        <div class="screenshot-caption">Figure 2.3: Performance evaluation plots (Accuracy/Loss curves and per-class metrics).</div>
+    </div>
+
+    <h3>Output 4: Iris Tabular Dataset &mdash; Feature Descriptions &amp; Statistics</h3>
+    <p>Presents full descriptive statistics (Mean, Std Dev, Min, Max, Quantiles) and biological domain descriptions for each floral attribute.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out4_iris_features_stats.png" alt="Output 4 Iris Stats">
+        <div class="screenshot-caption">Figure 2.4: Section 3 &mdash; Descriptive statistics table and feature domain breakdown for Iris dataset.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Output 5: Iris Classifier Performance Comparison &amp; Confusion Matrix</h3>
+    <p>Compares four supervised classifiers (Logistic Regression, Decision Tree, Random Forest, SVM) and plots the multi-class confusion matrix.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out5_iris_performance.png" alt="Output 5 Iris Performance">
+        <div class="screenshot-caption">Figure 2.5: Classifier comparison bar chart and multi-class confusion matrix.</div>
+    </div>
+
+    <h3>Output 6: Local File Storage Directory Verification</h3>
+    <p>Summary of physical paths verified on local storage.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/out6_storage_verification.png" alt="Output 6 Storage Verification">
+        <div class="screenshot-caption">Figure 2.6: Section 4 &mdash; Local filesystem storage path mapping.</div>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Requirements:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Lab Manual (Markdown):</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, an end-to-end web-based pipeline was successfully designed and deployed using Flask in Python. Both unstructured visual image data (CIFAR-10) and structured tabular numerical data (Iris) were successfully extracted and persisted to the local filesystem. Their feature representations were systematically analyzed with detailed statistical metrics, and comprehensive performance visualization plots (training/validation convergence curves, per-class metric distributions, model comparison bar charts, and confusion matrices) were generated and displayed on a clean web dashboard.
+    </p>
+
+</body>
+</html>
