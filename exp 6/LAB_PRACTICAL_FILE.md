@@ -47,25 +47,21 @@ $$\mathbf{\Lambda} = \begin{bmatrix}
 
 ### STEPS:
 
-1. **Step 1: Environment & Project Directory Setup**
+1. **Step 1: Environment & Dependency Setup**
    - Create directory `exp 6/` with subfolders `templates/` and `screenshots/`.
    - Install required packages: `Flask`, `numpy`, and `matplotlib`.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 1 - Environment & Project Setup]**
 
 2. **Step 2: Define Loss Matrix & Actions Engine**
    - Define states of nature: $\omega_1$ (Normal), $\omega_2$ (Suspicious), $\omega_3$ (Fraudulent).
    - Configure action alternatives: $\alpha_1$ (Approve), $\alpha_2$ (Review), $\alpha_3$ (Block) with corresponding asymmetric penalty costs.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 2 - Loss Function Formulation]**
 
 3. **Step 3: Implement Conditional Risk Calculation Logic**
    - Implement dot product matrix multiplication $R = \mathbf{\Lambda} \cdot \mathbf{P}$.
    - Identify index of minimum risk: $\alpha^* = \arg\min_i R_i$.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 3 - Risk Computation]**
 
 4. **Step 4: Launch Web Server & Validate Dynamic Action Reflection**
    - Run the Flask server: `python3 "exp 6/app.py"` on port 5008.
    - Test benchmark presets and observe dynamic colored status banner and action event logs reflected directly on the page.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 4 - Active Application on Port 5008]**
 
 ---
 
@@ -79,14 +75,23 @@ $$\mathbf{\Lambda} = \begin{bmatrix}
   - [Flask Server (`exp 6/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/app.py)
   - [HTML Template (`exp 6/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/templates/index.html)
   - [Dependencies (`exp 6/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/requirements.txt)
-  - [Full Page Screenshot (`exp 6/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/screenshots/full_page.png)
+  - [Lab Manual Report (`exp 6/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/LAB_PRACTICAL_FILE.md)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 6/screenshots/full_page.png`  
-> **[ATTACH FULL PAGE SCREENSHOT HERE]**
+#### 1. Loss Matrix Specification Table
+![Output 1 Loss Matrix](screenshots/ss1_loss_matrix.png)
+
+#### 2. Test Sample Posterior Probabilities & Benchmark Scenarios
+![Output 2 Posteriors](screenshots/ss2_posteriors_benchmarks.png)
+
+#### 3. Conditional Risk Minimization Computation Table
+![Output 3 Risk Computation](screenshots/ss3_risk_computation.png)
+
+#### 4. Conditional Risk Comparison Bar Chart
+![Output 4 Risk Plot](screenshots/ss4_risk_plot.png)
 
 ---
 
