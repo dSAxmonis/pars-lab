@@ -51,17 +51,14 @@ $$\lim_{t \to \infty} \nabla J(w_t, b_t) = \mathbf{0}$$
 1. **Step 1: Environment & Mathematical Engine Setup**
    - Create directory `exp 7/` with Flask web server and NumPy array processing routines.
    - Prohibit external regression packages (`sklearn.linear_model`).
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 1 - Environment & Implementation Structure]**
 
 2. **Step 2: Mathematical Gradient & Cost Implementation**
    - Code `compute_cost(X, y, w, b)` and `compute_gradients(X, y, w, b)` strictly using vectorized arithmetic.
    - Implement optimization loop tracking cost per epoch.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 2 - Gradient Descent Routine]**
 
 3. **Step 3: Web Server Deployment & Visualization**
    - Run Flask server on port 5009 (`python3 "exp 7/app.py"`).
    - Display dual plots: Gradient Descent MSE decay curve and Fitted Regression Line against actual housing points.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 3 - Dashboard Active on Port 5009]**
 
 ---
 
@@ -75,14 +72,20 @@ $$\lim_{t \to \infty} \nabla J(w_t, b_t) = \mathbf{0}$$
   - [Flask Server (`exp 7/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/app.py)
   - [HTML Template (`exp 7/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/templates/index.html)
   - [Dependencies (`exp 7/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/requirements.txt)
-  - [Full Page Screenshot (`exp 7/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/screenshots/full_page.png)
+  - [Lab Manual Report (`exp 7/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/LAB_PRACTICAL_FILE.md)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 7/screenshots/full_page.png`  
-> **[ATTACH FULL PAGE SCREENSHOT HERE]**
+#### 1. Hyperparameter Tuning Controls & Optimization Summary
+![Output 1 Hyperparameters](screenshots/ss1_hyperparameters_tuning.png)
+
+#### 2. Gradient Descent Convergence Curve & Fitted Model Plot
+![Output 2 Convergence and Fit](screenshots/ss2_convergence_curve_fit.png)
+
+#### 3. Real Estate Dataset Samples & Residual Errors Table
+![Output 3 Dataset Residuals](screenshots/ss3_dataset_residuals.png)
 
 ---
 
