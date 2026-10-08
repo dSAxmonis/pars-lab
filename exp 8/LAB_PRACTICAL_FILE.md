@@ -50,20 +50,16 @@ where $\mathbf{W} \in \mathbb{R}^{d \times K}$ and $\mathbf{b} \in \mathbb{R}^K$
 
 1. **Step 1: Scratch Vectorized Engine Setup**
    - Configure `exp 8/` directory with pure NumPy mathematical tensor routines without external estimators.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 1 - Environment & Structure]**
 
 2. **Step 2: Binary Sigmoid & Cross-Entropy Implementation**
    - Formulate sigmoid hypothesis, binary cross-entropy loss, and gradient descent optimization loop.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 2 - Binary Optimization Logic]**
 
 3. **Step 3: Multiclass Softmax Regression Implementation**
    - Implement stabilized softmax transformation, categorical cross-entropy loss, and matrix gradient updates.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 3 - Multiclass Softmax Logic]**
 
 4. **Step 4: Interactive Web Deployment & Loss Curve Visualization**
    - Run Flask application on port 5010 (`python3 "exp 8/app.py"`).
    - Display dual gradient descent loss curves and decision boundary plots.
-   - > **[ATTACH FULL PAGE SCREENSHOT: Step 4 - Dashboard on Port 5010]**
 
 ---
 
@@ -77,14 +73,20 @@ where $\mathbf{W} \in \mathbb{R}^{d \times K}$ and $\mathbf{b} \in \mathbb{R}^K$
   - [Flask Server (`exp 8/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/app.py)
   - [HTML Template (`exp 8/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/templates/index.html)
   - [Dependencies (`exp 8/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/requirements.txt)
-  - [Full Page Screenshot (`exp 8/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/screenshots/full_page.png)
+  - [Lab Manual Report (`exp 8/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/LAB_PRACTICAL_FILE.md)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
-> **Full Page Application Screenshot Saved At:** `exp 8/screenshots/full_page.png`  
-> **[ATTACH FULL PAGE SCREENSHOT HERE]**
+#### 1. Test Sample Prediction Controls & Active Classification Outputs
+![Output 1 Prediction Controls](screenshots/ss1_prediction_controls.png)
+
+#### 2. Gradient Descent Optimized Parameters Summary (From Scratch)
+![Output 2 Parameters Summary](screenshots/ss2_parameters_summary.png)
+
+#### 3. Gradient Descent Loss Curves & Decision Boundaries Multi-Panel Plot
+![Output 3 Curves and Boundaries](screenshots/ss3_descent_curves_boundaries.png)
 
 ---
 
