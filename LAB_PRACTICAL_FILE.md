@@ -10,7 +10,7 @@
 ---
 
 ### AIM:
-To prepare an interactive web application using Flask in Python to extract and store two datasets (CIFAR-10 image dataset and Iris tabular dataset), inspect and describe their feature representations, and generate and display performance evaluation plots.
+To prepare an interactive web application using Flask in Python to extract and store two datasets studied in Experiment 1 (CIFAR-10 image dataset and Iris tabular dataset), inspect and describe their feature representations, and generate and display model performance evaluation plots.
 
 ---
 
@@ -56,24 +56,18 @@ To prepare an interactive web application using Flask in Python to extract and s
 ### STEPS:
 
 1. **Step 1: Environment & Project Directory Setup**
-   - Create a dedicated folder `exp 2` with subdirectories `templates/`, `data/`, and `static/`.
+   - Create dedicated folder `exp 2` with subdirectories `templates/`, `data/`, and `screenshots/`.
    - Install required packages: `Flask`, `scikit-learn`, `pandas`, `matplotlib`, `numpy`, and `Pillow`.
-   - **Screenshot:**  
-     ![Step 1 Setup](exp%202/screenshots/step1_setup.png)
 
 2. **Step 2: Dataset Extraction & Local Persistence**
    - Implement data extraction routines in [`exp 2/app.py`](file:///Users/monis/Downloads/core%20subject/pars%20lab/exp%202/app.py):
      - Download CIFAR-10 images across all 10 classes and persist to `exp 2/data/cifar10/images/<class_name>/`.
      - Extract CIFAR-10 metadata and save to `exp 2/data/cifar10/cifar10_metadata.csv`.
      - Load Iris tabular dataset from Scikit-Learn and persist locally to `exp 2/data/tabular/iris_dataset.csv`.
-   - **Screenshot:**  
-     ![Step 2 Extraction & Storage](exp%202/screenshots/step2_extraction_storage.png)
 
 3. **Step 3: Web Server Execution & Route Configuration**
    - Execute the server: `python3 "exp 2/app.py"`.
    - Open browser at `http://127.0.0.1:5000` to review extraction status, feature descriptions, sample images, and performance plots.
-   - **Screenshot:**  
-     ![Step 6 Running Server](exp%202/screenshots/step6_flask_running.png)
 
 ---
 
@@ -87,29 +81,31 @@ To prepare an interactive web application using Flask in Python to extract and s
   - [Flask Server (`exp 2/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/app.py)
   - [HTML Template (`exp 2/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/templates/index.html)
   - [Dependencies (`exp 2/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/requirements.txt)
-  - [Lab Manual Report (`LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md)
+  - [Full Page Screenshot (`exp 2/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/screenshots/full_page.png)
 
 ---
 
 ### OUTPUT / SCREENSHOTS:
 
 #### 1. Flask Web Dashboard — Extraction & Storage Status
-![Output 1 Storage Status](exp%202/screenshots/out1_storage_status.png)
+![Output 1 Storage Status](exp%202/screenshots/ss1_storage_status.png)
 
 #### 2. CIFAR-10 Image Dataset — Feature Description & Class Samples
-![Output 2 CIFAR Features](exp%202/screenshots/out2_cifar_features_samples.png)
+![Output 2 CIFAR Features](exp%202/screenshots/ss2_cifar_features.png)
+
+![Output 2 CIFAR Samples](exp%202/screenshots/ss3_cifar_samples.png)
 
 #### 3. CIFAR-10 Dataset — Performance Plots & Evaluation Metrics
-![Output 3 CIFAR Performance](exp%202/screenshots/out3_cifar_performance.png)
+![Output 3 CIFAR Performance](exp%202/screenshots/ss4_cifar_performance.png)
 
 #### 4. Iris Tabular Dataset — Feature Description & Statistical Analysis
-![Output 4 Iris Features & Statistics](exp%202/screenshots/out4_iris_features_stats.png)
+![Output 4 Iris Features & Statistics](exp%202/screenshots/ss5_iris_features_stats.png)
 
 #### 5. Iris Dataset — Classifier Performance Comparison & Confusion Matrix
-![Output 5 Iris Performance](exp%202/screenshots/out5_iris_performance.png)
+> *[Awaiting 6th screenshot upload from user]*
 
 #### 6. Local Storage Directory Verification
-![Output 6 Storage Verification](exp%202/screenshots/out6_storage_verification.png)
+> *[Awaiting 7th screenshot upload from user]*
 
 ---
 

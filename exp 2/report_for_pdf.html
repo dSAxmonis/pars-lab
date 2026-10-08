@@ -92,7 +92,7 @@
             page-break-inside: avoid;
         }
         .screenshot-container img {
-            max-width: 96%;
+            max-width: 98%;
             border: 1px solid #999999;
             box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
         }
@@ -101,6 +101,16 @@
             color: #555555;
             font-style: italic;
             margin-top: 4px;
+        }
+        .ss-placeholder-box {
+            border: 2px dashed #003366;
+            background-color: #fbfbfb;
+            padding: 25px 20px;
+            text-align: center;
+            margin: 14px 0;
+            font-size: 10.5pt;
+            color: #555555;
+            page-break-inside: avoid;
         }
         .badge {
             display: inline-block;
@@ -216,42 +226,34 @@
     <h2>STEPS &amp; EXECUTION</h2>
 
     <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
-    <p>Configured the Python environment, established the directory structure under <code>exp 2/</code>, and verified all core dependencies (Flask, scikit-learn, pandas, matplotlib, pillow).</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
-        <div class="screenshot-caption">Figure 1.1: Environment verification and dependency installation log.</div>
-    </div>
+    <p>Configured Python environment under <code>exp 2/</code>, and verified dependencies (Flask, scikit-learn, pandas, matplotlib, pillow).</p>
 
     <h3>Step 2: Dataset Extraction &amp; Local Disk Storage</h3>
     <p>Executed extraction logic inside <code>app.py</code> to download CIFAR-10 images into designated class subfolders, generate metadata index <code>cifar10_metadata.csv</code>, and export the Iris dataset to CSV format.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step2_extraction_storage.png" alt="Step 2 Extraction">
-        <div class="screenshot-caption">Figure 1.2: Terminal log demonstrating local extraction and file storage verification.</div>
-    </div>
 
     <h3>Step 3: Web Server Deployment</h3>
     <p>Launched the Flask application server on <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a> to dynamically generate performance plots and display dataset summaries.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step6_flask_running.png" alt="Step 6 Running">
-        <div class="screenshot-caption">Figure 1.3: Terminal session showing active Flask server listening on port 5000.</div>
-    </div>
 
     <div class="page-break"></div>
 
-    <h2>OUTPUT / DASHBOARD RESULTS</h2>
+    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
 
     <h3>Output 1: Dataset Extraction &amp; Storage Summary</h3>
     <p>The web dashboard confirms extraction and local filesystem storage for both datasets.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out1_storage_status.png" alt="Output 1 Storage Status">
+        <img src="screenshots/ss1_storage_status.png" alt="Output 1 Storage Status">
         <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Extraction source, format, and storage status for CIFAR-10 and Iris datasets.</div>
     </div>
 
     <h3>Output 2: CIFAR-10 Image Dataset &mdash; Features &amp; Sample Classes</h3>
     <p>Displays image tensor dimensions ($32 \times 32 \times 3$), pixel domains, and visual thumbnails across all 10 visual classes.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out2_cifar_features_samples.png" alt="Output 2 CIFAR Features">
-        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; CIFAR-10 spatial specifications and sample extracted images for all 10 categories.</div>
+        <img src="screenshots/ss2_cifar_features.png" alt="Output 2 CIFAR Features">
+        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; CIFAR-10 spatial specifications and feature properties.</div>
+    </div>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_cifar_samples.png" alt="Output 2 CIFAR Samples">
+        <div class="screenshot-caption">Figure 2.3: CIFAR-10 extracted sample thumbnail gallery across 10 visual classes.</div>
     </div>
 
     <div class="page-break"></div>
@@ -259,31 +261,29 @@
     <h3>Output 3: CIFAR-10 Model Performance Visualization</h3>
     <p>Visualizes training/validation convergence curves alongside individual precision and recall across visual categories.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out3_cifar_performance.png" alt="Output 3 CIFAR Performance">
-        <div class="screenshot-caption">Figure 2.3: Performance evaluation plots (Accuracy/Loss curves and per-class metrics).</div>
+        <img src="screenshots/ss4_cifar_performance.png" alt="Output 3 CIFAR Performance">
+        <div class="screenshot-caption">Figure 2.4: Performance evaluation plots (Accuracy/Loss curves and per-class metrics).</div>
     </div>
 
     <h3>Output 4: Iris Tabular Dataset &mdash; Feature Descriptions &amp; Statistics</h3>
     <p>Presents full descriptive statistics (Mean, Std Dev, Min, Max, Quantiles) and biological domain descriptions for each floral attribute.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out4_iris_features_stats.png" alt="Output 4 Iris Stats">
-        <div class="screenshot-caption">Figure 2.4: Section 3 &mdash; Descriptive statistics table and feature domain breakdown for Iris dataset.</div>
+        <img src="screenshots/ss5_iris_features_stats.png" alt="Output 4 Iris Stats">
+        <div class="screenshot-caption">Figure 2.5: Section 3 &mdash; Descriptive statistics table and feature domain breakdown for Iris dataset.</div>
     </div>
 
     <div class="page-break"></div>
 
     <h3>Output 5: Iris Classifier Performance Comparison &amp; Confusion Matrix</h3>
-    <p>Compares four supervised classifiers (Logistic Regression, Decision Tree, Random Forest, SVM) and plots the multi-class confusion matrix.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/out5_iris_performance.png" alt="Output 5 Iris Performance">
-        <div class="screenshot-caption">Figure 2.5: Classifier comparison bar chart and multi-class confusion matrix.</div>
+    <div class="ss-placeholder-box">
+        <b>[ATTACH SCREENSHOT 6 HERE: Iris Classifier Performance Comparison &amp; Confusion Matrix Heatmap]</b><br>
+        <font size="2" color="#777777"><i>Placeholder: Awaiting uploaded screenshot</i></font>
     </div>
 
     <h3>Output 6: Local File Storage Directory Verification</h3>
-    <p>Summary of physical paths verified on local storage.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/out6_storage_verification.png" alt="Output 6 Storage Verification">
-        <div class="screenshot-caption">Figure 2.6: Section 4 &mdash; Local filesystem storage path mapping.</div>
+    <div class="ss-placeholder-box">
+        <b>[ATTACH SCREENSHOT 7 HERE: Local File Storage Directory Verification Table]</b><br>
+        <font size="2" color="#777777"><i>Placeholder: Awaiting uploaded screenshot</i></font>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
@@ -307,12 +307,12 @@
                 <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/templates/index.html</a>
             </li>
             <li style="margin-top: 6px;">
-                <b>Requirements:</b><br>
+                <b>Dependencies:</b><br>
                 <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/requirements.txt</a>
             </li>
             <li style="margin-top: 6px;">
-                <b>Lab Manual (Markdown):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md</a>
+                <b>Full Page Screenshot:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/screenshots/full_page.png</a>
             </li>
         </ul>
     </div>

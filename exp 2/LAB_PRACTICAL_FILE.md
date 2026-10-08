@@ -94,22 +94,24 @@ To prepare an interactive web application using Flask in Python to extract and s
 ### OUTPUT / SCREENSHOTS:
 
 #### 1. Flask Web Dashboard — Extraction & Storage Status
-![Output 1 Storage Status](exp%202/screenshots/out1_storage_status.png)
+![Output 1 Storage Status](screenshots/ss1_storage_status.png)
 
 #### 2. CIFAR-10 Image Dataset — Feature Description & Class Samples
-![Output 2 CIFAR Features](exp%202/screenshots/out2_cifar_features_samples.png)
+![Output 2 CIFAR Features](screenshots/ss2_cifar_features.png)
+
+![Output 2 CIFAR Samples](screenshots/ss3_cifar_samples.png)
 
 #### 3. CIFAR-10 Dataset — Performance Plots & Evaluation Metrics
-![Output 3 CIFAR Performance](exp%202/screenshots/out3_cifar_performance.png)
+![Output 3 CIFAR Performance](screenshots/ss4_cifar_performance.png)
 
 #### 4. Iris Tabular Dataset — Feature Description & Statistical Analysis
-![Output 4 Iris Features & Statistics](exp%202/screenshots/out4_iris_features_stats.png)
+![Output 4 Iris Features & Statistics](screenshots/ss5_iris_features_stats.png)
 
 #### 5. Iris Dataset — Classifier Performance Comparison & Confusion Matrix
-![Output 5 Iris Performance](exp%202/screenshots/out5_iris_performance.png)
+> *[Awaiting 6th screenshot upload from user]*
 
 #### 6. Local Storage Directory Verification
-![Output 6 Storage Verification](exp%202/screenshots/out6_storage_verification.png)
+> *[Awaiting 7th screenshot upload from user]*
 
 ---
 
