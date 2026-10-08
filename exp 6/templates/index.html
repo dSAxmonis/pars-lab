@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 6: Bayesian Risk Minimization (3 Classes, 3 Actions)</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 6</font></h1>
+        <h3><font color="#555555">Bayesian Risk Minimization &amp; Action Trigger Engine</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask (Python)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- CRITICAL DYNAMIC REFLECTION: TRIGGERED ACTION BANNER -->
+    <table border="2" cellpadding="12" cellspacing="0" width="90%" align="center" bgcolor="{{ triggered_state.bg_color }}">
+        <tr>
+            <td>
+                <center>
+                    <h2><font color="{{ triggered_state.color }}">{{ triggered_state.title }}</font></h2>
+                    <p style="font-size: 12pt;"><b>System Status:</b> {{ triggered_state.status_msg }}</p>
+                </center>
+                <hr color="{{ triggered_state.border_color }}">
+                <b>Automated Action Consequence Pipeline Execution Log:</b>
+                <ul>
+                    {% for log_entry in triggered_state.event_log %}
+                    <li><font color="{{ triggered_state.color }}"><b>{{ log_entry }}</b></font></li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 1: LOSS MATRIX & CLASSES -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="4"><font color="#ffffff">SECTION 1: LOSS MATRIX SPECIFICATION &lambda;(&alpha;<sub>i</sub> | &omega;<sub>j</sub>)</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" align="center">
+            <th width="35%">Decision Action (&alpha;<sub>i</sub>)</th>
+            <th width="20%">&omega;<sub>1</sub>: Normal Transaction</th>
+            <th width="20%">&omega;<sub>2</sub>: Suspicious Activity</th>
+            <th width="25%">&omega;<sub>3</sub>: Confirmed Fraud</th>
+        </tr>
+        {% for row in loss_matrix %}
+        <tr align="center">
+            <td align="left"><b>{{ actions[loop.index0] }}</b></td>
+            <td>Loss = <b>{{ row[0] }}</b></td>
+            <td>Loss = <b>{{ row[1] }}</b></td>
+            <td>Loss = <b>{{ row[2] }}</b></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: INPUT PROBABILITIES & BENCHMARK PRESETS -->
+    <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th><font color="#ffffff">SECTION 2: TEST SAMPLE POSTERIOR PROBABILITIES P(&omega;<sub>j</sub> | x) &amp; BENCHMARKS</font></th>
+        </tr>
+        <tr>
+            <td>
+                <form method="POST" action="/">
+                    <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                        <tr align="center">
+                            <td>
+                                <b>P(&omega;<sub>1</sub> | x) [Normal]:</b><br>
+                                <input type="number" step="0.01" min="0" max="1" name="p1" value="{{ '%.2f'|format(posteriors[0]) }}" style="font-size: 13pt; width: 100px; text-align: center;" required>
+                            </td>
+                            <td>
+                                <b>P(&omega;<sub>2</sub> | x) [Suspicious]:</b><br>
+                                <input type="number" step="0.01" min="0" max="1" name="p2" value="{{ '%.2f'|format(posteriors[1]) }}" style="font-size: 13pt; width: 100px; text-align: center;" required>
+                            </td>
+                            <td>
+                                <b>P(&omega;<sub>3</sub> | x) [Fraud]:</b><br>
+                                <input type="number" step="0.01" min="0" max="1" name="p3" value="{{ '%.2f'|format(posteriors[2]) }}" style="font-size: 13pt; width: 100px; text-align: center;" required>
+                            </td>
+                            <td>
+                                <input type="submit" value="Evaluate Bayesian Risk" style="font-size: 11pt; font-weight: bold; padding: 8px 16px; background-color: #003366; color: #ffffff; cursor: pointer;">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <hr color="#e0e0e0">
+                <b>Quick-Select Benchmark Scenarios:</b>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#f9f9f9">
+                    <tr bgcolor="#e8f5e9" align="center">
+                        <th width="30%">Scenario Preset</th>
+                        <th width="25%">Posterior Vector [P1, P2, P3]</th>
+                        <th width="30%">Operational Context</th>
+                        <th width="15%">Trigger</th>
+                    </tr>
+                    {% for p in presets %}
+                    <tr>
+                        <td><b>{{ p.name }}</b></td>
+                        <td align="center">[{{ p.p1 }}, {{ p.p2 }}, {{ p.p3 }}]</td>
+                        <td><font size="2">{{ p.description }}</font></td>
+                        <td align="center">
+                            <form method="POST" action="/" style="margin: 0;">
+                                <input type="hidden" name="p1" value="{{ p.p1 }}">
+                                <input type="hidden" name="p2" value="{{ p.p2 }}">
+                                <input type="hidden" name="p3" value="{{ p.p3 }}">
+                                <input type="submit" value="Trigger State" style="font-size: 9pt; cursor: pointer;">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: CONDITIONAL RISK COMPUTATION TABLE -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="4"><font color="#ffffff">SECTION 3: CONDITIONAL RISK MINIMIZATION COMPUTATION R(&alpha;<sub>i</sub> | x)</font></th>
+        </tr>
+        <tr bgcolor="#fbe9e7" align="center">
+            <th width="30%">Action Alternative (&alpha;<sub>i</sub>)</th>
+            <th width="45%">Formula Expansion: &sum; &lambda;(&alpha;<sub>i</sub> | &omega;<sub>j</sub>) &times; P(&omega;<sub>j</sub> | x)</th>
+            <th width="15%">Conditional Risk</th>
+            <th width="10%">Decision</th>
+        </tr>
+        {% for b in breakdown %}
+        <tr align="center" {% if b.is_optimal %}bgcolor="#e8f5e9"{% endif %}>
+            <td align="left"><b>{{ b.action }}</b></td>
+            <td align="left"><code>{{ b.formula_str | safe }}</code></td>
+            <td><b>{{ b.risk_val }}</b></td>
+            <td>
+                {% if b.is_optimal %}
+                <font color="#2e7d32"><b>&#9733; MINIMUM RISK (OPTIMAL)</b></font>
+                {% else %}
+                <font color="#777777">Suboptimal</font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: RISK VISUALIZATION PLOT -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th><font color="#ffffff">SECTION 4: CONDITIONAL RISK COMPARISON PLOT</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="70%" alt="Conditional Risk Plot" border="1">
+                <br><br>
+                <font size="2" color="#555555">
+                <b>Decision Rule:</b> Select action &alpha;* minimizing total expected cost R(&alpha;* | x) &le; R(&alpha;<sub>i</sub> | x) for all available actions.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 6 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; Bayesian Risk Minimization Engine</font></p>
+    </center>
+
+</body>
+</html>

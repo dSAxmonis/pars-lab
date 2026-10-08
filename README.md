@@ -4,7 +4,7 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 
 ---
 
-## Laboratory Experiments
+## Laboratory Experiments Directory
 
 ### 1. [Experiment 2: Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization](./exp%202/)
 - **Description:** Flask web application to extract and persist CIFAR-10 (Image) and Iris (Tabular) datasets, inspect feature descriptions, and plot evaluation performance curves and confusion matrices.
@@ -29,3 +29,21 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 - **Code:** [`exp 5/app.py`](./exp%205/app.py) &amp; [`exp 5/templates/index.html`](./exp%205/templates/index.html)
 - **Manual Report:** [`exp 5/LAB_PRACTICAL_FILE.md`](./exp%205/LAB_PRACTICAL_FILE.md)
 - **Print-Ready PDF:** [`Experiment_5_Lab_Practical.pdf`](./Experiment_5_Lab_Practical.pdf)
+
+### 5. [Experiment 6: Bayesian Risk Minimization for Three Classes and Three Actions](./exp%206/)
+- **Description:** Interactive Flask web application evaluating Bayesian conditional risks $R(\alpha_i | \mathbf{x}) = \sum \lambda_{ij} P(\omega_j | \mathbf{x})$ given an asymmetric loss matrix, dynamically triggering and reflecting operational consequences (Clearance, Review, Lockout) on the page.
+- **Code:** [`exp 6/app.py`](./exp%206/app.py) &amp; [`exp 6/templates/index.html`](./exp%206/templates/index.html)
+- **Manual Report:** [`exp 6/LAB_PRACTICAL_FILE.md`](./exp%206/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_6_Lab_Practical.pdf`](./Experiment_6_Lab_Practical.pdf)
+
+### 6. [Experiment 7: Linear Regression from Scratch Using Gradient Descent](./exp%207/)
+- **Description:** Pure Python/NumPy Linear Regression implementation (no inbuilt estimators) optimizing weight $w$ and bias $b$ via gradient descent on housing prices with live Gradient Descent MSE cost decay curve plotting.
+- **Code:** [`exp 7/app.py`](./exp%207/app.py) &amp; [`exp 7/templates/index.html`](./exp%207/templates/index.html)
+- **Manual Report:** [`exp 7/LAB_PRACTICAL_FILE.md`](./exp%207/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_7_Lab_Practical.pdf`](./Experiment_7_Lab_Practical.pdf)
+
+### 7. [Experiment 8: Logistic Regression (Binary & Multiclass from Scratch)](./exp%208/)
+- **Description:** Pure Python/NumPy Logistic Regression implementation (no inbuilt estimators) providing Sigmoid binary classification and Softmax multiclass classification with Gradient Descent cross-entropy curves and decision boundary plots.
+- **Code:** [`exp 8/app.py`](./exp%208/app.py) &amp; [`exp 8/templates/index.html`](./exp%208/templates/index.html)
+- **Manual Report:** [`exp 8/LAB_PRACTICAL_FILE.md`](./exp%208/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_8_Lab_Practical.pdf`](./Experiment_8_Lab_Practical.pdf)

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 7: Linear Regression via Gradient Descent (From Scratch)</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 7</font></h1>
+        <h3><font color="#555555">Linear Regression from Scratch Using Gradient Descent &amp; Cost Curve Analysis</font></h3>
+        <p><b>Subject:</b> Pattern Analysis and Recognition Systems (PARS) Lab &nbsp;|&nbsp; <b>Framework:</b> Flask / Pure NumPy (No Inbuilt Functions)</p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- SECTION 1: INTERACTIVE HYPERPARAMETER FORM & PREDICTION -->
+    <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">SECTION 1: HYPERPARAMETER TUNING &amp; REAL-TIME REGRESSION PREDICTION</font></th>
+        </tr>
+        <tr>
+            <td width="50%" valign="top">
+                <form method="POST" action="/">
+                    <b>Gradient Descent Hyperparameters:</b>
+                    <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                        <tr>
+                            <td><b>Learning Rate (&alpha;):</b></td>
+                            <td><input type="number" step="0.005" min="0.001" max="0.5" name="alpha" value="{{ alpha }}" style="width: 110px; font-size: 11pt;" required></td>
+                        </tr>
+                        <tr>
+                            <td><b>Number of Iterations:</b></td>
+                            <td><input type="number" step="100" min="50" max="5000" name="iterations" value="{{ iterations }}" style="width: 110px; font-size: 11pt;" required></td>
+                        </tr>
+                        <tr>
+                            <td><b>Predict For House Area (1k sq ft):</b></td>
+                            <td><input type="number" step="0.1" min="0.5" max="10.0" name="test_x" value="{{ test_x }}" style="width: 110px; font-size: 11pt;" required></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center">
+                                <br>
+                                <input type="submit" value="Run Gradient Descent Optimization" style="font-size: 11pt; font-weight: bold; padding: 8px 18px; background-color: #003366; color: #ffffff; cursor: pointer;">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+            <td width="50%" valign="top" bgcolor="#f9fbfd">
+                <center><b><font color="#003366" size="3">Optimization Results Summary</font></b></center>
+                <br>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e6f0fa">
+                        <th>Parameter / Metric</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td><b>Optimized Slope (Weight w*):</b></td>
+                        <td><b>{{ w }}</b></td>
+                    </tr>
+                    <tr bgcolor="#f9f9f9">
+                        <td><b>Optimized Intercept (Bias b*):</b></td>
+                        <td><b>{{ b }}</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Initial MSE Cost J(w<sub>0</sub>, b<sub>0</sub>):</b></td>
+                        <td><font color="#b71c1c">{{ initial_cost }}</font></td>
+                    </tr>
+                    <tr bgcolor="#f9f9f9">
+                        <td><b>Final Converged MSE Cost J*:</b></td>
+                        <td><font color="#1b5e20"><b>{{ final_cost }}</b></font></td>
+                    </tr>
+                </table>
+                <br>
+                <div style="background-color: #e8f5e9; border: 1px solid #81c784; padding: 8px;">
+                    <b>Sample Prediction Result:</b><br>
+                    House Area = <b>{{ test_x }}k sq ft</b> &rarr; Predicted Selling Price = <font color="#1b5e20" size="3"><b>${{ "{:,.2f}".format(predicted_price_dollars) }}</b></font> ({{ test_y }} &times; $10k)
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: GRADIENT DESCENT & REGRESSION PLOTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th><font color="#ffffff">SECTION 2: GRADIENT DESCENT CONVERGENCE CURVE &amp; FITTED REGRESSION MODEL</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="96%" alt="Gradient Descent and Fitted Line Plot" border="1">
+                <br><br>
+                <font size="2" color="#555555">
+                <b>Visual Verification:</b> Left plot confirms monotonic decrease of Mean Squared Error cost J(w,b) towards minimum. Right plot displays optimal linear regression line y = {{ w }}x + {{ b }} capturing data trajectory.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: TRAINING DATASET SAMPLES -->
+    <table border="1" cellpadding="6" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#332200">
+            <th colspan="5"><font color="#ffffff">SECTION 3: REAL ESTATE DATASET SAMPLES &amp; RESIDUAL ERRORS</font></th>
+        </tr>
+        <tr bgcolor="#fbe9e7" align="center">
+            <th>House #</th>
+            <th>Area (1,000 sq ft) [x]</th>
+            <th>Actual Selling Price ($10k) [y]</th>
+            <th>Model Prediction [y&#770;]</th>
+            <th>Absolute Error |y - y&#770;|</th>
+        </tr>
+        {% for r in data_rows %}
+        <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td>{{ r.id }}</td>
+            <td>{{ r.x }}</td>
+            <td><b>{{ r.y }}</b></td>
+            <td>{{ r.pred }}</td>
+            <td><font color="#555555">{{ "%.2f"|format((r.y - r.pred)|abs) }}</font></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p><font color="#777777" size="2">Experiment 7 - Pattern Analysis &amp; Recognition Systems Lab &nbsp;|&nbsp; Scratch Linear Regression Gradient Descent</font></p>
+    </center>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 8 - Lab Practical File</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #222222;
+            line-height: 1.5;
+            font-size: 11pt;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #003366;
+            font-size: 18pt;
+            text-align: center;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: #003366;
+            font-size: 14pt;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 4px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #004d40;
+            font-size: 12pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+        .header-sub {
+            text-align: center;
+            color: #555555;
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .meta-bar {
+            text-align: center;
+            font-size: 10pt;
+            background-color: #f0f4f8;
+            padding: 8px;
+            border: 1px solid #d0dbe5;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        table, th, td {
+            border: 1px solid #cccccc;
+        }
+        th {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 8px 6px;
+            text-align: left;
+        }
+        td {
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .formula-box {
+            background-color: #f7f9fa;
+            border-left: 4px solid #003366;
+            padding: 8px 14px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10pt;
+        }
+        .ss-placeholder-box {
+            border: 2px dashed #003366;
+            background-color: #fbfbfb;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 16px 0;
+            font-size: 12pt;
+            color: #555555;
+            page-break-inside: avoid;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #181717;
+            color: #ffffff !important;
+            padding: 5px 12px;
+            font-size: 9.5pt;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        a {
+            color: #0044cc;
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #002288;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            font-size: 9.5pt;
+            font-family: monospace;
+        }
+        .link-card {
+            background-color: #f8faff;
+            border: 1px solid #cce0ff;
+            border-left: 4px solid #0055ff;
+            padding: 10px 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <b>Experiment No.:</b> 08 &nbsp;|&nbsp; 
+        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
+        <b>Framework:</b> Python 3.14 / Pure NumPy &nbsp;|&nbsp;
+        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Logistic Regression for Binary and Multiclass Classification from Scratch Using Gradient Descent in Python</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To implement Logistic Regression in Python from scratch without using any inbuilt machine learning library functions (such as <code>scikit-learn</code>), optimize model parameters via Gradient Descent for both binary class (Sigmoid) and multiclass (Softmax) classification, and plot the respective Gradient Descent loss convergence curves.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. Binary Logistic Regression</h3>
+    <div class="formula-box">
+        Hypothesis: y_hat = &sigma;(z) = 1 / ( 1 + exp(-z) ), where z = <b>w</b>^T <b>x</b> + b<br><br>
+        Binary Cross-Entropy Loss:<br>
+        J(<b>w</b>, b) = - (1/m) &times; &sum; [ y^(i) ln(y_hat^(i)) + (1 - y^(i)) ln(1 - y_hat^(i)) ]
+    </div>
+
+    <h3>2. Multiclass (Softmax) Regression</h3>
+    <div class="formula-box">
+        Softmax Activation:<br>
+        P_hat_k = exp(z_k) / &sum; exp(z_j)<br><br>
+        Categorical Cross-Entropy Loss:<br>
+        J(<b>W</b>, <b>b</b>) = - (1/m) &times; &sum; &sum; [ Y_ik ln(P_hat_ik) ]
+    </div>
+
+    <h3>3. Gradients and Parameter Updates</h3>
+    <div class="formula-box">
+        Binary Gradients: &part;J/&part;<b>w</b> = (1/m) <b>X</b>^T (<b>y_hat</b> - <b>y</b>), &part;J/&part;b = (1/m) &sum; (y_hat - y)<br>
+        Multiclass Gradients: &part;J/&part;<b>W</b> = (1/m) <b>X</b>^T (<b>P_hat</b> - <b>Y</b>), &part;J/&part;<b>b</b> = (1/m) &sum; (P_hat - Y)
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup</h3>
+    <p>Constructed vectorized tensor pipeline in <code>exp 8/</code> applying pure NumPy mathematics for both binary and softmax regressions.</p>
+
+    <h3>Step 2: Binary &amp; Multiclass Optimization Loop</h3>
+    <p>Formulated forward passes, loss computations, and simultaneous gradient updates tracking convergence histories.</p>
+
+    <h3>Step 3: Web Application Deployment</h3>
+    <p>Launched server at <a href="http://127.0.0.1:5010" target="_blank">http://127.0.0.1:5010</a> with real-time test inference and 4-panel visual dashboard.</p>
+
+    <h2>OUTPUT / ATTACHED FULL PAGE SCREENSHOT</h2>
+    <div class="ss-placeholder-box">
+        <b>[ATTACH FULL PAGE APPLICATION SCREENSHOT HERE]</b><br><br>
+        <font size="2" color="#777777">Generated full-page capture available at: <code>exp 8/screenshots/full_page.png</code></font>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Full Page Screenshot:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/screenshots/full_page.png</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, both Binary and Multiclass Logistic Regression were constructed from scratch in Python without leveraging black-box libraries. Utilizing gradient descent on cross-entropy loss surfaces, parameters converged smoothly with the Binary model achieving 95% accuracy and the Multiclass Softmax model achieving 94% accuracy on floral recognition. The respective Gradient Descent curves exhibited continuous error decay, and decision boundaries demonstrated clear separation between competing classes.
+    </p>
+
+</body>
+</html>
