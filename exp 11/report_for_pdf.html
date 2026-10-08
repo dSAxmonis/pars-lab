@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 11 - Linear Discriminant Analysis (LDA) with Testing</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                font-family: Arial, sans-serif;
+                color: #555;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.45;
+            color: #111;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 19pt;
+            color: #1a365d;
+            text-align: center;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            font-size: 13pt;
+            color: #1a365d;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 3px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        h3 {
+            font-size: 11pt;
+            color: #2b6cb0;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        p, li {
+            text-align: justify;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+        ul, ol {
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding-left: 22px;
+        }
+        .header-sub {
+            text-align: center;
+            font-size: 11pt;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+        .meta-bar {
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 9.5pt;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .formula-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            padding: 8px 14px;
+            margin: 8px 0;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 9.5pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            border: 1px solid #cbd5e0;
+            border-radius: 3px;
+        }
+        .screenshot-caption {
+            font-size: 8.5pt;
+            color: #4a5568;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .link-card {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid #3182ce;
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 9.5pt;
+        }
+        .link-card a {
+            color: #2b6cb0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #1a365d;
+            color: #ffffff !important;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 9pt;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <span><b>Experiment No.:</b> 11</span>
+        <span><b>Course:</b> PARS Lab</span>
+        <span><b>Topic:</b> Linear Discriminant Analysis (LDA)</span>
+        <span><b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a></span>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Linear Discriminant Analysis (LDA) with Projected Line, Reduced Feature Mapping, and Testing</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To implement Linear Discriminant Analysis (LDA) from scratch in Python for an engineering pattern classification application involving test sample evaluation, derive Fisher's optimal projection vector $\mathbf{w} = \mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$, and visualize:
+        <b>1) The optimal projected line</b>,
+        <b>2) New reduced features from each class mapped onto the projected line</b>, and
+        <b>3) Testing and decision threshold classification of unseen test samples</b>.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. Fisher's Linear Discriminant Criterion</h3>
+    <p>
+        Unlike PCA which maximizes total variance without considering labels, Linear Discriminant Analysis (LDA) is a supervised dimensionality reduction technique that seeks a projection direction $\mathbf{w}$ maximizing class separability while minimizing intra-class variance:
+    </p>
+    <div class="formula-box">
+        J(w) = ( w^T S_B w ) / ( w^T S_W w )
+    </div>
+
+    <h3>2. Scatter Matrices Formulation</h3>
+    <ul>
+        <li><b>Within-Class Scatter Matrix:</b> $\mathbf{S}_W = \sum_{\mathbf{x} \in \mathcal{C}_1} (\mathbf{x} - \boldsymbol{\mu}_1)(\mathbf{x} - \boldsymbol{\mu}_1)^T + \sum_{\mathbf{x} \in \mathcal{C}_2} (\mathbf{x} - \boldsymbol{\mu}_2)(\mathbf{x} - \boldsymbol{\mu}_2)^T$</li>
+        <li><b>Between-Class Scatter Matrix:</b> $\mathbf{S}_B = (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)(\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)^T$</li>
+    </ul>
+
+    <h3>3. Optimal Projection Direction Vector</h3>
+    <p>
+        Maximizing Rayleigh's quotient yields the closed-form Fisher linear discriminant direction:
+    </p>
+    <div class="formula-box">
+        w = S_W^(-1) &times; (&mu;_1 - &mu;_2), &nbsp;&nbsp;w_hat = w / ||w||
+    </div>
+
+    <h3>4. 1D Projected Line &amp; Decision Rule</h3>
+    <p>
+        The projected discriminant axis passes through the overall mean $\boldsymbol{\mu}$ in direction $\hat{\mathbf{w}}$. The projected 1D coordinate of any sample $\mathbf{x}$ and its mapped 2D position on the line are:
+    </p>
+    <div class="formula-box">
+        1D Coordinate: y = (x - &mu;) &middot; w_hat<br>
+        Mapped 2D Point on Line: x_hat = &mu; + y &times; w_hat<br>
+        Optimal Decision Threshold: y* = ( y_&mu;1 + y_&mu;2 ) / 2
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup &amp; Mathematical Engine</h3>
+    <p>Configured <code>exp 11/</code> environment containing <code>app.py</code>, <code>templates/</code>, and verified dependencies (Flask, NumPy, Matplotlib, SciPy).</p>
+
+    <h3>Step 2: Class Mean Vectors &amp; Within-Class Scatter Matrix</h3>
+    <p>Synthesized two-class clinical pattern distribution (Healthy vs Diabetic Risk) and formulated $\mathbf{S}_{W1}$, $\mathbf{S}_{W2}$, and total pooled scatter $\mathbf{S}_W$.</p>
+
+    <h3>Step 3: Fisher Optimal Direction Vector Computation</h3>
+    <p>Inverted scatter matrix $\mathbf{S}_W^{-1}$ and computed normalized discriminant vector $\hat{\mathbf{w}}$.</p>
+
+    <h3>Step 4: Orthogonal Feature Mapping onto Discriminant Line</h3>
+    <p>Projected all observations onto the 1D line passing through global centroid $\boldsymbol{\mu}$, calculated optimal separating threshold $y^*$, and mapped points onto the 2D projected line.</p>
+
+    <h3>Step 5: Interactive Testing &amp; Web Deployment on Port 5013</h3>
+    <p>Launched interactive Flask web dashboard on <a href="http://127.0.0.1:5013" target="_blank">http://127.0.0.1:5013</a> supporting real-time patient test coordinates and visual classification.</p>
+
+    <h2>OUTPUT / ATTACHED SCREENSHOT</h2>
+    <p>The full-page capture of the deployed Flask web application is embedded below:</p>
+    <div class="screenshot-container">
+        <img src="screenshots/full_page.png" alt="Experiment 11 Full Dashboard Screenshot">
+        <div class="screenshot-caption">Figure 11.1: Web dashboard displaying Fisher scatter matrices, interactive test sample classification controls, 2D discriminant projected line with mapped class points, and 1D separation distribution.</div>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Full Page Screenshot:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/full_page.png</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, Linear Discriminant Analysis was implemented from first principles in Python. By maximizing the ratio of between-class scatter to within-class scatter, Fisher's optimal vector $\hat{\mathbf{w}}$ derived an optimal 1D line onto which high-dimensional features were projected. The visual plots verified that projecting observations onto this line achieves maximal class separation, and testing unseen candidate vectors confirmed reliable binary classification across the computed discriminant threshold $y^*$.
+    </p>
+
+</body>
+</html>

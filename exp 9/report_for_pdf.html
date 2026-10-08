@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 9 - Implementation of Regularization (L1 &amp; L2)</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 9pt;
+                font-family: Arial, sans-serif;
+                color: #555;
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.45;
+            color: #111;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 19pt;
+            color: #1a365d;
+            text-align: center;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            font-size: 13pt;
+            color: #1a365d;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 3px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        h3 {
+            font-size: 11pt;
+            color: #2b6cb0;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        p, li {
+            text-align: justify;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+        ul, ol {
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding-left: 22px;
+        }
+        .header-sub {
+            text-align: center;
+            font-size: 11pt;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+        .meta-bar {
+            background-color: #f7fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 9.5pt;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .formula-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            padding: 8px 14px;
+            margin: 8px 0;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 9.5pt;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            border: 1px solid #cbd5e0;
+            border-radius: 3px;
+        }
+        .screenshot-caption {
+            font-size: 8.5pt;
+            color: #4a5568;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .link-card {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            border-left: 4px solid #3182ce;
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 9.5pt;
+        }
+        .link-card a {
+            color: #2b6cb0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #1a365d;
+            color: #ffffff !important;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 9pt;
+            text-decoration: none;
+            margin-right: 6px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- COVER / HEADER -->
+    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
+    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
+    <div class="meta-bar">
+        <span><b>Experiment No.:</b> 09</span>
+        <span><b>Course:</b> PARS Lab</span>
+        <span><b>Topic:</b> Regularization (L1 &amp; L2)</span>
+        <span><b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a></span>
+    </div>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Regularization (L1 / Lasso &amp; L2 / Ridge) for Overfitting Prevention and Generalization</b></p>
+
+    <h2>AIM</h2>
+    <p>
+        To implement regularization techniques (L1 / Lasso and L2 / Ridge) in Python for a non-linear classification task using polynomial feature mapping, analyze the mathematical impact of penalty parameter &lambda; on model variance, and generate visualization plots illustrating:
+        <b>1) Decision boundary before and after regularization</b>, and
+        <b>2) Quantitative performance (Accuracy and Cross-Entropy Loss) before and after applying regularization</b>.
+    </p>
+
+    <h2>THEORY</h2>
+
+    <h3>1. The Overfitting Problem (High Variance)</h3>
+    <p>
+        When complex machine learning models with high representational capacity (e.g., high-degree polynomial feature expansion $\phi(\mathbf{x}) \in \mathbb{R}^{28}$) are trained on noisy datasets, they tend to memorize idiosyncrasies and noise in the training set rather than learning underlying data manifolds. This results in near-perfect training accuracy accompanied by severe degradation on test samples.
+    </p>
+
+    <h3>2. L2 Regularization (Ridge Regression / Weight Decay)</h3>
+    <p>
+        L2 regularization penalizes the squared Euclidean $L_2$ norm of the weight vector, preventing individual weights from attaining disproportionately large magnitudes:
+    </p>
+    <div class="formula-box">
+        J_L2(w, b) = J_CE(w, b) + [ &lambda; / (2m) ] &times; &sum;_{j=1}^{d} w_j^2
+    </div>
+    <p>
+        The parameter update shrinks weights proportionally:
+    </p>
+    <div class="formula-box">
+        w_j := w_j &times; (1 - &alpha;&lambda; / m) - &alpha; &times; [ &part;J_CE / &part;w_j ]
+    </div>
+
+    <h3>3. L1 Regularization (Lasso / Sparse Feature Selection)</h3>
+    <p>
+        L1 regularization introduces a penalty proportional to the absolute values of the weight vector:
+    </p>
+    <div class="formula-box">
+        J_L1(w, b) = J_CE(w, b) + [ &lambda; / m ] &times; &sum;_{j=1}^{d} |w_j|
+    </div>
+    <p>
+        Due to non-differentiability at zero, L1 drives non-essential feature weights strictly to zero, acting as an automated feature pruner.
+    </p>
+
+    <div class="page-break"></div>
+
+    <h2>STEPS &amp; EXECUTION</h2>
+
+    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
+    <p>Constructed <code>exp 9/</code> environment containing <code>app.py</code>, <code>templates/</code>, and verified dependencies (Flask, NumPy, scikit-learn, Matplotlib).</p>
+
+    <h3>Step 2: Synthetic Dataset &amp; Polynomial Expansion</h3>
+    <p>Generated noisy non-linear decision boundary samples and constructed a degree-6 polynomial feature map producing 28 interaction terms.</p>
+
+    <h3>Step 3: Unregularized Baseline Fitting (&lambda; = 0)</h3>
+    <p>Fitted unconstrained Logistic Regression, noting high training accuracy but poor generalization caused by wild contour oscillations.</p>
+
+    <h3>Step 4: Regularized Optimization (&lambda; &gt; 0)</h3>
+    <p>Trained Ridge and Lasso models across multiple penalty magnitudes to identify optimal bias-variance equilibrium.</p>
+
+    <h3>Step 5: Web Application Deployment on Port 5011</h3>
+    <p>Launched interactive Flask web dashboard on <a href="http://127.0.0.1:5011" target="_blank">http://127.0.0.1:5011</a> to compare decision boundaries, accuracy bars, and cross-entropy metrics in real time.</p>
+
+    <h2>OUTPUT / ATTACHED SCREENSHOT</h2>
+    <p>The complete full-page capture of the deployed Flask web application is embedded below:</p>
+    <div class="screenshot-container">
+        <img src="screenshots/full_page.png" alt="Experiment 9 Full Dashboard Screenshot">
+        <div class="screenshot-caption">Figure 9.1: Web dashboard displaying hyperparameter tuning, quantitative performance comparison table, decision boundary before/after regularization, and performance bar charts.</div>
+    </div>
+
+    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
+    <div class="link-card">
+        <p><b>GitHub Repository (Clickable):</b></p>
+        <p>
+            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
+        </p>
+        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    </div>
+
+    <div class="link-card">
+        <p><b>Direct Source Code Files:</b></p>
+        <ul>
+            <li>
+                <b>Flask Server Application:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 9/app.py</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>HTML Template:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 9/templates/index.html</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Dependencies:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 9/requirements.txt</a>
+            </li>
+            <li style="margin-top: 6px;">
+                <b>Full Page Screenshot:</b><br>
+                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 9/screenshots/full_page.png</a>
+            </li>
+        </ul>
+    </div>
+
+    <h2>CONCLUSION</h2>
+    <p>
+        In this experiment, L1 (Lasso) and L2 (Ridge) regularization were successfully implemented and analyzed. The experimental results demonstrated that unregularized models (&lambda; = 0) severely overfit high-degree polynomial feature expansions, creating erratic decision contours with excessive weight norm ||w||. Applying L2 regularization with &lambda; = 1.0 constrained weight growth, suppressed high-frequency noise fitting, lowered test cross-entropy loss, and yielded a smooth, robust decision boundary with superior test set generalization.
+    </p>
+
+</body>
+</html>

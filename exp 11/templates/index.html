@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment 11 - Linear Discriminant Analysis (LDA)</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 25px auto; max-width: 1050px; line-height: 1.5; color: #222; background-color: #fbfbfb;">
+
+    <!-- HEADER / NAVIGATION BAR -->
+    <div style="border-bottom: 3px solid #1a365d; padding-bottom: 12px; margin-bottom: 20px;">
+        <h1 style="color: #1a365d; margin: 0 0 6px 0; font-size: 24px;">Experiment 11: Linear Discriminant Analysis (LDA) with Testing</h1>
+        <p style="margin: 0; color: #555; font-size: 14px;">
+            <b>Pattern Analysis &amp; Recognition Systems Lab</b> &nbsp;|&nbsp;
+            <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </div>
+
+    <!-- AIM & THEORY SUMMARY -->
+    <div style="background-color: #eef2f7; border-left: 5px solid #1a365d; padding: 12px 18px; margin-bottom: 22px;">
+        <h3 style="margin-top: 0; margin-bottom: 6px; color: #1a365d; font-size: 16px;">AIM</h3>
+        <p style="margin: 0; font-size: 14px;">
+            To implement Linear Discriminant Analysis (LDA) from scratch in Python for an engineering pattern classification application involving testing, derive Fisher's optimal projection vector $\mathbf{w} = \mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$, and visualize:
+            <b>1) The optimal projected line</b>,
+            <b>2) New reduced features from each class mapped onto the projected line</b>, and
+            <b>3) Testing and decision threshold classification of unseen test samples</b>.
+        </p>
+    </div>
+
+    <!-- SECTION 1: LDA SCATTER MATRICES & PROJECTION METRICS -->
+    <div style="background-color: #0d3b66; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 1: FISHER'S CRITERION &amp; SCATTER MATRICES SUMMARY
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+                <tr style="background-color: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
+                    <th style="padding: 8px 10px; border: 1px solid #ddd; text-align: left;">LDA Property</th>
+                    <th style="padding: 8px 10px; border: 1px solid #ddd; text-align: center;">Mathematical Value</th>
+                    <th style="padding: 8px 10px; border: 1px solid #ddd; text-align: left;">Discriminant Role / Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Class 1 Mean Vector &mu;<sub>1</sub> (Low Risk)</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; text-align: center; font-family: monospace; color: #1d4ed8;">[{{ stats.mu1_1 }}, {{ stats.mu1_2 }}]</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">Centroid of healthy baseline patient observations.</td>
+                </tr>
+                <tr style="background-color: #fcfcfc;">
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Class 2 Mean Vector &mu;<sub>2</sub> (High Risk)</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; text-align: center; font-family: monospace; color: #b91c1c;">[{{ stats.mu2_1 }}, {{ stats.mu2_2 }}]</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">Centroid of diabetic high-risk patient observations.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Within-Class Scatter Matrix S<sub>W</sub></td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; text-align: center; font-family: monospace;">[[{{ stats.sw_00 }}, {{ stats.sw_01 }}], [{{ stats.sw_01 }}, {{ stats.sw_11 }}]]</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">Total intra-class variance to be minimized: S<sub>W</sub> = S<sub>W1</sub> + S<sub>W2</sub>.</td>
+                </tr>
+                <tr style="background-color: #fcfcfc;">
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Optimal Fisher Direction w&#770;</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; text-align: center; font-family: monospace; color: #6b21a8; font-weight: bold;">[{{ stats.w_x }}, {{ stats.w_y }}]</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">Normalized eigenvector maximizing ratio of between-class to within-class scatter.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; font-weight: bold;">Optimal 1D Decision Threshold y*</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd; text-align: center; font-family: monospace; font-weight: bold;">{{ stats.y_thresh }}</td>
+                    <td style="padding: 8px 10px; border: 1px solid #ddd;">Midpoint separating 1D projected class distributions along the direction vector.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION 2: INTERACTIVE TEST SAMPLE EVALUATION -->
+    <div style="background-color: #1e3a5f; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 2: TEST SAMPLE CLASSIFICATION &amp; PROJECTION CONTROLS
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px;">
+        <form method="POST" action="/">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top; padding-right: 20px; border-right: 1px solid #eee;">
+                        <h4 style="margin-top: 0; margin-bottom: 12px; color: #1a365d;">Input Test Patient Measurements:</h4>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-weight: bold; font-size: 13px;">Fasting Blood Glucose (x<sub>1</sub> in mmol/L):</label><br>
+                            <input type="number" step="0.1" name="test_x1" value="{{ test_x1 }}" style="padding: 7px 10px; width: 140px; border: 1px solid #999; border-radius: 3px; font-size: 14px;">
+                        </div>
+
+                        <div style="margin-bottom: 14px;">
+                            <label style="font-weight: bold; font-size: 13px;">Postprandial Glucose Index (x<sub>2</sub>):</label><br>
+                            <input type="number" step="0.1" name="test_x2" value="{{ test_x2 }}" style="padding: 7px 10px; width: 140px; border: 1px solid #999; border-radius: 3px; font-size: 14px;">
+                        </div>
+
+                        <button type="submit" style="background-color: #6b21a8; color: white; border: none; padding: 8px 18px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer;">
+                            Classify Test Sample via LDA Projection
+                        </button>
+                    </td>
+
+                    <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                        <h4 style="margin-top: 0; margin-bottom: 10px; color: #1a365d;">Active Inference Results:</h4>
+                        <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; padding: 12px 14px; border-radius: 4px; font-size: 13.5px;">
+                            <p style="margin: 0 0 6px 0;"><b>Input Vector x<sub>test</sub>:</b> [{{ stats.test_x1 }}, {{ stats.test_x2 }}]</p>
+                            <p style="margin: 0 0 6px 0;">
+                                &bull; 1D Projection Coordinate y<sub>test</sub>: <b>{{ stats.y_test }}</b> (Threshold: {{ stats.y_thresh }})
+                            </p>
+                            <p style="margin: 0 0 6px 0;">
+                                &bull; Mapped Point on Projected Line: [{{ stats.test_mapped_1 }}, {{ stats.test_mapped_2 }}]
+                            </p>
+                            <p style="margin: 0; font-size: 15px;">
+                                &bull; <b>Predicted Diagnosis:</b> 
+                                {% if 'Low Risk' in stats.pred_class %}
+                                    <span style="color: #1d4ed8; font-weight: bold;">{{ stats.pred_class }}</span>
+                                {% else %}
+                                    <span style="color: #b91c1c; font-weight: bold;">{{ stats.pred_class }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            <b>Preset Test Benchmarks:</b>
+                            <button type="button" onclick="setPreset(4.0, 4.8)" style="padding: 2px 6px; font-size: 11px; margin-left: 4px; cursor: pointer;">Low Risk [4.0, 4.8]</button>
+                            <button type="button" onclick="setPreset(6.0, 6.7)" style="padding: 2px 6px; font-size: 11px; margin-left: 4px; cursor: pointer;">Borderline [6.0, 6.7]</button>
+                            <button type="button" onclick="setPreset(8.2, 9.0)" style="padding: 2px 6px; font-size: 11px; margin-left: 4px; cursor: pointer;">High Risk [8.2, 9.0]</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <!-- SECTION 3: VISUALIZATION PLOTS -->
+    <div style="background-color: #0b4f6c; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 3: FISHER LDA 2D PROJECTED LINE &amp; 1D SEPARATION PLOTS
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 25px; text-align: center;">
+        <img src="data:image/png;base64,{{ plot_url }}" alt="LDA Projected Line and Mapped Features" style="max-width: 100%; height: auto; border: 1px solid #ddd;">
+        <p style="margin: 10px 0 0 0; font-size: 12.5px; color: #555; text-align: left;">
+            <b>Figure Explanation:</b> 
+            <b>Left Panel:</b> Displays 2D observations from Class 1 (blue circles) and Class 2 (red circles). The purple line represents Fisher's optimal projected line passing through the global mean &mu; along direction vector $\mathbf{w}$. Dashed projection segments drop each observation orthogonally onto the line, where the reduced features form distinct separated clusters. The black cross marker on the line designates the decision threshold. The active test sample is depicted as a yellow star with its projection shown as a green diamond.
+            <b>Right Panel:</b> Illustrates the 1D projected feature subspace, demonstrating maximized between-class distance and minimal within-class variance, cleanly divided by threshold $y^*$.
+        </p>
+    </div>
+
+    <!-- SECTION 4: SAMPLE REDUCTION & VERIFICATION TABLE -->
+    <div style="background-color: #334155; color: white; padding: 9px 14px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+        SECTION 4: REDUCED 1D FEATURE MAPPINGS &amp; CLASSIFICATION VERIFICATION
+    </div>
+    <div style="border: 1px solid #ccc; background-color: white; padding: 18px; margin-bottom: 20px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: center;">
+            <thead>
+                <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">True Class</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Original Vector [x<sub>1</sub>, x<sub>2</sub>]</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; color: #6b21a8; font-weight: bold;">Projected 1D Coordinate (y)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Mapped Point on Line [x&#770;<sub>1</sub>, x&#770;<sub>2</sub>]</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Decision Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in sample_table %}
+                <tr {% if loop.index % 2 == 0 %}style="background-color: #fafafa;"{% endif %}>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-weight: bold;">{{ row.label }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">{{ row.orig }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace; font-weight: bold; color: #6b21a8;">y = {{ row.y_proj }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">{{ row.mapped }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; color: #006600; font-weight: bold;">{{ row.status }}</td>
+                </tr>
+                {% endfor %}
+                <tr style="background-color: #fef3c7; font-weight: bold;">
+                    <td style="padding: 7px; border: 1px solid #ddd; color: #b45309;">Active Test</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">[{{ stats.test_x1 }}, {{ stats.test_x2 }}]</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace; color: #6b21a8;">y = {{ stats.y_test }}</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; font-family: monospace;">[{{ stats.test_mapped_1 }}, {{ stats.test_mapped_2 }}]</td>
+                    <td style="padding: 7px; border: 1px solid #ddd; color: #6b21a8;">{{ stats.pred_class }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER WITH CLICKABLE REPO LINK -->
+    <div style="border-top: 2px solid #ddd; padding-top: 12px; font-size: 13px; color: #666; text-align: center;">
+        Pattern Analysis &amp; Recognition Systems Lab &mdash; Experiment 11 Submission &nbsp;|&nbsp;
+        <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">GitHub: dSAxmonis/pars-lab</a>
+    </div>
+
+    <script>
+        function setPreset(x1, x2) {
+            const form = document.forms[0];
+            form.elements['test_x1'].value = x1;
+            form.elements['test_x2'].value = x2;
+            form.submit();
+        }
+    </script>
+</body>
+</html>

@@ -47,3 +47,21 @@ Comprehensive practical solutions, implementations, datasets, and laboratory rep
 - **Code:** [`exp 8/app.py`](./exp%208/app.py) &amp; [`exp 8/templates/index.html`](./exp%208/templates/index.html)
 - **Manual Report:** [`exp 8/LAB_PRACTICAL_FILE.md`](./exp%208/LAB_PRACTICAL_FILE.md)
 - **Print-Ready PDF:** [`Experiment_8_Lab_Practical.pdf`](./Experiment_8_Lab_Practical.pdf)
+
+### 8. [Experiment 9: Implementation of Regularization (L1 & L2)](./exp%209/)
+- **Description:** Flask web application demonstrating L1 (Lasso) and L2 (Ridge) regularization on polynomial features, comparing decision boundaries before vs after regularization, and plotting performance accuracy and loss.
+- **Code:** [`exp 9/app.py`](./exp%209/app.py) &amp; [`exp 9/templates/index.html`](./exp%209/templates/index.html)
+- **Manual Report:** [`exp 9/LAB_PRACTICAL_FILE.md`](./exp%209/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_9_Lab_Practical.pdf`](./Experiment_9_Lab_Practical.pdf)
+
+### 9. [Experiment 10: Principal Component Analysis (PCA) with Testing](./exp%2010/)
+- **Description:** Pure Python/NumPy PCA implementation projecting bivariate sensor data onto the 1st principal component line, mapping reduced 1D features along the line, and testing unseen candidate vectors with reconstruction error analysis.
+- **Code:** [`exp 10/app.py`](./exp%2010/app.py) &amp; [`exp 10/templates/index.html`](./exp%2010/templates/index.html)
+- **Manual Report:** [`exp 10/LAB_PRACTICAL_FILE.md`](./exp%2010/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_10_Lab_Practical.pdf`](./Experiment_10_Lab_Practical.pdf)
+
+### 10. [Experiment 11: Linear Discriminant Analysis (LDA) with Testing](./exp%2011/)
+- **Description:** Pure Python/NumPy Fisher's Linear Discriminant Analysis implementation maximizing between-class to within-class scatter, visualizing the optimal projected line with mapped class points, and testing classification with decision threshold.
+- **Code:** [`exp 11/app.py`](./exp%2011/app.py) &amp; [`exp 11/templates/index.html`](./exp%2011/templates/index.html)
+- **Manual Report:** [`exp 11/LAB_PRACTICAL_FILE.md`](./exp%2011/LAB_PRACTICAL_FILE.md)
+- **Print-Ready PDF:** [`Experiment_11_Lab_Practical.pdf`](./Experiment_11_Lab_Practical.pdf)
