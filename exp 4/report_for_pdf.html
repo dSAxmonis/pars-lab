@@ -194,33 +194,17 @@
 
     <h2>STEPS &amp; EXECUTION</h2>
 
-    <h3>Step 1: Environment Setup &amp; Dependencies</h3>
+    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
     <p>Created directory <code>exp 4/</code> containing <code>app.py</code> and verified dependencies (Flask, scipy, numpy, pandas, scikit-learn, matplotlib).</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
-        <div class="screenshot-caption">Figure 1.1: Environment verification and project directory structure.</div>
-    </div>
 
     <h3>Step 2: Gaussian Parameter Learning via MLE</h3>
     <p>Estimated univariate and multivariate Gaussian parameters (means and covariance matrices) across all three classes.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step2_model_training.png" alt="Step 2 Parameter Learning">
-        <div class="screenshot-caption">Figure 1.2: Terminal log showing Maximum Likelihood Parameter estimation.</div>
-    </div>
 
     <h3>Step 3: Bayesian Classification Inference</h3>
     <p>Evaluated likelihoods, evidence, and normalized posteriors to reach MAP classification decision.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step3_classification_test.png" alt="Step 3 Inference">
-        <div class="screenshot-caption">Figure 1.3: Terminal verification of Bayesian inference logic.</div>
-    </div>
 
     <h3>Step 4: Interactive Web Server Launch on Port 5006</h3>
     <p>Launched interactive Flask web server on <a href="http://127.0.0.1:5006" target="_blank">http://127.0.0.1:5006</a> supporting custom test coordinates and benchmark presets.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step4_running.png" alt="Step 4 Running">
-        <div class="screenshot-caption">Figure 1.4: Active Flask web server session on port 5006.</div>
-    </div>
 
     <div class="page-break"></div>
 
@@ -229,15 +213,15 @@
     <h3>Output 1: Learned Model Parameters &amp; Class Priors</h3>
     <p>Displays univariate means/variances, multivariate mean vectors, and covariance matrices for Setosa, Versicolor, and Virginica.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out1_learned_params.png" alt="Output 1 Learned Params">
-        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Estimated Gaussian parameters and class prior probabilities.</div>
+        <img src="screenshots/ss1_learned_params.png" alt="Output 1 Learned Params">
+        <div class="screenshot-caption">Figure 4.1: Section 1 &mdash; Estimated Gaussian parameters and class prior probabilities.</div>
     </div>
 
     <h3>Output 2: Interactive Input Form &amp; Quick Benchmarks</h3>
     <p>Interactive inputs enabling real-time classification of any custom floral measurements.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out2_interactive_form.png" alt="Output 2 Form">
-        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; Input form and preset testing benchmark cases.</div>
+        <img src="screenshots/ss2_interactive_input.png" alt="Output 2 Form">
+        <div class="screenshot-caption">Figure 4.2: Section 2 &mdash; Input form and preset testing benchmark cases.</div>
     </div>
 
     <div class="page-break"></div>
@@ -245,15 +229,15 @@
     <h3>Output 3: Single-Feature &amp; Multi-Feature Bayesian Inference</h3>
     <p>Detailed breakdown of Likelihood, Prior, Evidence, and Posterior Probabilities for Part A (Single Feature) and Part B (Multi-Feature).</p>
     <div class="screenshot-container">
-        <img src="screenshots/out3_classification_results.png" alt="Output 3 Classification Results">
-        <div class="screenshot-caption">Figure 2.3: Section 3 &mdash; Side-by-side comparison of single-feature and multi-feature Bayesian decisions.</div>
+        <img src="screenshots/ss3_classification_results.png" alt="Output 3 Classification Results">
+        <div class="screenshot-caption">Figure 4.3: Section 3 &mdash; Side-by-side comparison of single-feature and multi-feature Bayesian decisions.</div>
     </div>
 
     <h3>Output 4: Bayesian Decision Visualization Plots</h3>
     <p>1D Gaussian probability density curves alongside 2D scatter decision plot with test sample marker.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out4_decision_plots.png" alt="Output 4 Plots">
-        <div class="screenshot-caption">Figure 2.4: Section 4 &mdash; 1D likelihood curves and 2D feature distribution scatter plot.</div>
+        <img src="screenshots/ss4_decision_plots.png" alt="Output 4 Plots">
+        <div class="screenshot-caption">Figure 4.4: Section 4 &mdash; 1D likelihood curves and 2D feature distribution scatter plot.</div>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>

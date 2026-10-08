@@ -45,30 +45,22 @@ $$\hat{\omega} = \arg\max_{\omega_i \in \Omega} P(\omega_i|\mathbf{x}) = \arg\ma
 
 ### STEPS:
 
-1. **Step 1: Environment Setup & Project Directory Structure**
+1. **Step 1: Environment & Dependency Setup**
    - Create project directory `exp 4/` with subfolders `templates/` and `screenshots/`.
    - Install dependencies: `Flask`, `numpy`, `pandas`, `scipy`, `scikit-learn`, and `matplotlib`.
-   - **Screenshot:**  
-     ![Step 1 Setup](exp%204/screenshots/step1_setup.png)
 
 2. **Step 2: Gaussian Parameter Estimation (MLE)**
    - Partition the training dataset (Iris) into 3 classes ($\omega_1$: Setosa, $\omega_2$: Versicolor, $\omega_3$: Virginica).
    - Estimate univariate mean $\mu_i$ and variance $\sigma_i^2$ for Single Feature ($x_1$).
    - Estimate mean vectors $\boldsymbol{\mu}_i$ and covariance matrices $\mathbf{\Sigma}_i$ for Multiple Features ($x_1, x_2$).
-   - **Screenshot:**  
-     ![Step 2 Parameter Learning](exp%204/screenshots/step2_model_training.png)
 
 3. **Step 3: Bayesian Classification Inference**
    - Evaluate univariate Gaussian likelihood $p(x|\omega_i)$ and multivariate Gaussian likelihood $p(\mathbf{x}|\omega_i)$.
    - Compute total evidence $p(\mathbf{x})$ and normalize to calculate exact posterior probabilities $P(\omega_i|\mathbf{x})$.
-   - **Screenshot:**  
-     ![Step 3 Inference](exp%204/screenshots/step3_classification_test.png)
 
 4. **Step 4: Interactive Web Application Deployment**
    - Implement interactive Flask routes on port 5006 accepting user-supplied test sample coordinates.
    - Render 1D probability density bell curves and 2D scatter decision boundaries.
-   - **Screenshot:**  
-     ![Step 4 Running](exp%204/screenshots/step4_running.png)
 
 ---
 
@@ -89,16 +81,16 @@ $$\hat{\omega} = \arg\max_{\omega_i \in \Omega} P(\omega_i|\mathbf{x}) = \arg\ma
 ### OUTPUT / SCREENSHOTS:
 
 #### 1. Learned Gaussian Model Parameters & Class Priors
-![Output 1 Learned Parameters](exp%204/screenshots/out1_learned_params.png)
+![Output 1 Learned Parameters](screenshots/ss1_learned_params.png)
 
 #### 2. Interactive Test Sample Input Form & Benchmark Presets
-![Output 2 Interactive Form](exp%204/screenshots/out2_interactive_form.png)
+![Output 2 Interactive Form](screenshots/ss2_interactive_input.png)
 
 #### 3. Single-Feature and Multi-Feature Bayesian Classification Results
-![Output 3 Classification Results](exp%204/screenshots/out3_classification_results.png)
+![Output 3 Classification Results](screenshots/ss3_classification_results.png)
 
 #### 4. Bayesian Decision Visualization Plots (1D Curves & 2D Scatter)
-![Output 4 Decision Plots](exp%204/screenshots/out4_decision_plots.png)
+![Output 4 Decision Plots](screenshots/ss4_decision_plots.png)
 
 ---
 
