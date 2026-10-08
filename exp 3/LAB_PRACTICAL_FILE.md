@@ -46,29 +46,21 @@ where $w[n]$ represents a temporal analysis window of length $N$.
 
 ### STEPS:
 
-1. **Step 1: Environment & Project Directory Setup**
+1. **Step 1: Environment & Dependency Setup**
    - Create directory `exp 3/` with subfolders `static/`, `templates/`, and `screenshots/`.
    - Configure dependencies: `Flask`, `numpy`, `pandas`, `scipy`, and `matplotlib`.
-   - **Screenshot:**  
-     ![Step 1 Setup](exp%203/screenshots/step1_setup.png)
 
 2. **Step 2: Audio Ingestion & Signal Verification**
    - Place/generate 16-bit PCM Mono audio file at 16,000 Hz (`exp 3/static/sample_audio.wav`).
    - Validate temporal duration (5.0 s) and sample count (80,000 frames).
-   - **Screenshot:**  
-     ![Step 2 Audio Verification](exp%203/screenshots/step2_audio_gen.png)
 
 3. **Step 3: Multi-Timestamp Feature Extraction Algorithm**
    - Sample audio at 10 discrete timestamps ($t = 0.5s, 1.0s, 1.5s, 2.0s, 2.5s, 3.0s, 3.5s, 4.0s, 4.5s, 5.0s$) using a 50 ms window.
    - Extract RMS Energy, ZCR, and Spectral Centroid per timestamp and construct time-series plots.
-   - **Screenshot:**  
-     ![Step 3 Extraction](exp%203/screenshots/step3_extraction.png)
 
 4. **Step 4: Web Application Launch on Port 5005**
    - Launch Flask application server: `python3 "exp 3/app.py"`.
    - Open browser at `http://127.0.0.1:5005` to view the embedded audio player, timestamp feature table, dynamic plots, and justifications.
-   - **Screenshot:**  
-     ![Step 4 Running](exp%203/screenshots/step4_running.png)
 
 ---
 
@@ -89,16 +81,16 @@ where $w[n]$ represents a temporal analysis window of length $N$.
 ### OUTPUT / SCREENSHOTS:
 
 #### 1. Embedded Playable Audio File & Signal Attributes
-![Output 1 Audio Player & Specs](exp%203/screenshots/out1_audio_player_specs.png)
+![Output 1 Audio Player & Specs](screenshots/ss1_audio_player_specs.png)
 
 #### 2. Feature Extraction Table Across 10 Timestamps
-![Output 2 Timestamps Features](exp%203/screenshots/out2_timestamps_features.png)
+![Output 2 Timestamps Features](screenshots/ss2_timestamps_features.png)
 
 #### 3. Temporal Feature Trajectory Multi-Plot
-![Output 3 Feature Plot](exp%203/screenshots/out3_feature_plot.png)
+![Output 3 Feature Plot](screenshots/ss3_feature_variation_plot.png)
 
 #### 4. Application Objective Justification Table
-![Output 4 Justifications](exp%203/screenshots/out4_justifications.png)
+![Output 4 Justifications](screenshots/ss4_feature_justifications.png)
 
 ---
 

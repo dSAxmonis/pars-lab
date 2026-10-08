@@ -191,33 +191,17 @@
 
     <h2>STEPS &amp; EXECUTION</h2>
 
-    <h3>Step 1: Environment Setup &amp; Directory Structure</h3>
+    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
     <p>Configured <code>exp 3/</code> containing <code>app.py</code>, <code>static/</code>, <code>templates/</code>, and verified dependencies (Flask, numpy, pandas, scipy, matplotlib).</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step1_setup.png" alt="Step 1 Setup">
-        <div class="screenshot-caption">Figure 1.1: Environment verification and project directory listing.</div>
-    </div>
 
     <h3>Step 2: Audio Ingestion &amp; Signal Properties</h3>
     <p>Verified the 16-bit PCM Mono audio file at 16,000 Hz with 80,000 samples spanning 5.0 seconds.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step2_audio_gen.png" alt="Step 2 Audio Verification">
-        <div class="screenshot-caption">Figure 1.2: Terminal output validating wave file header and sampling rate.</div>
-    </div>
 
     <h3>Step 3: Multi-Timestamp Feature Extraction Execution</h3>
     <p>Executed extraction logic across 10 timestamps ($t = 0.5s, 1.0s, \dots, 5.0s$) calculating RMS Energy, ZCR, and Spectral Centroid.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step3_extraction.png" alt="Step 3 Extraction">
-        <div class="screenshot-caption">Figure 1.3: Verification of 10-timestamp feature extraction.</div>
-    </div>
 
     <h3>Step 4: Web Application Launch on Port 5005</h3>
     <p>Launched the Flask web server on <a href="http://127.0.0.1:5005" target="_blank">http://127.0.0.1:5005</a> to render the interactive dashboard with playable audio.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/step4_running.png" alt="Step 4 Running">
-        <div class="screenshot-caption">Figure 1.4: Flask development server active on port 5005.</div>
-    </div>
 
     <div class="page-break"></div>
 
@@ -226,15 +210,15 @@
     <h3>Output 1: Embedded Audio Player &amp; Signal Specifications</h3>
     <p>The web page embeds a native HTML5 playable audio player alongside digital sampling attributes.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out1_audio_player_specs.png" alt="Output 1 Audio Player & Specs">
-        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Playable audio player and signal metadata table.</div>
+        <img src="screenshots/ss1_audio_player_specs.png" alt="Output 1 Audio Player & Specs">
+        <div class="screenshot-caption">Figure 3.1: Section 1 &mdash; Playable audio player and signal metadata table.</div>
     </div>
 
     <h3>Output 2: Feature Extraction Across 10 Timestamps</h3>
     <p>Extracted numerical features (RMS Energy, ZCR, Spectral Centroid) for all 10 timestamp samples.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out2_timestamps_features.png" alt="Output 2 Timestamps Features">
-        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; 10 timestamps feature extraction table with inferred acoustic state.</div>
+        <img src="screenshots/ss2_timestamps_features.png" alt="Output 2 Timestamps Features">
+        <div class="screenshot-caption">Figure 3.2: Section 2 &mdash; 10 timestamps feature extraction table with inferred acoustic state.</div>
     </div>
 
     <div class="page-break"></div>
@@ -242,15 +226,15 @@
     <h3>Output 3: Temporal Feature Trajectory Multi-Plot</h3>
     <p>Time-series multi-plot displaying the variations of RMS Energy, ZCR, and Spectral Centroid.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out3_feature_plot.png" alt="Output 3 Feature Plot">
-        <div class="screenshot-caption">Figure 2.3: Section 3 &mdash; Multi-panel Matplotlib plot across timestamps.</div>
+        <img src="screenshots/ss3_feature_variation_plot.png" alt="Output 3 Feature Plot">
+        <div class="screenshot-caption">Figure 3.3: Section 3 &mdash; Multi-panel Matplotlib plot across timestamps.</div>
     </div>
 
     <h3>Output 4: Application Objective Justification Table</h3>
     <p>Detailed engineering justifications for applying each extracted metric to practical systems.</p>
     <div class="screenshot-container">
-        <img src="screenshots/out4_justifications.png" alt="Output 4 Justifications">
-        <div class="screenshot-caption">Figure 2.4: Section 4 &mdash; Application objectives and mathematical definitions.</div>
+        <img src="screenshots/ss4_feature_justifications.png" alt="Output 4 Justifications">
+        <div class="screenshot-caption">Figure 3.4: Section 4 &mdash; Application objectives and mathematical definitions.</div>
     </div>
 
     <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
