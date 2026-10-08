@@ -53,27 +53,19 @@ $$P(c|\mathbf{d}) = \frac{P(c) \prod_{j=1}^k P(w_j|c)}{P(\mathbf{d})}$$
    - Create directory `exp 5/` containing `app.py`, `templates/`, and `screenshots/`.
    - Install dependencies: `Flask`, `nltk`, `numpy`, and `matplotlib`.
    - Verify NLTK resource packages: `punkt`, `punkt_tab`, `stopwords`, and `wordnet`.
-   - **Screenshot:**  
-     ![Step 1 Setup](exp%205/screenshots/step1_setup.png)
 
 2. **Step 2: Sentence Segmentation & Lexical Tokenization**
    - Ingest input multi-sentence paragraph and apply `sent_tokenize()`.
    - Break each segmented sentence into alphabetical tokens using `word_tokenize()`.
-   - **Screenshot:**  
-     ![Step 2 Segmentation](exp%205/screenshots/step2_segmentation.png)
 
 3. **Step 3: Stop Words Removal, Stemming, and Lemmatization**
    - Filter tokens against standard English stop words dictionary (179 words).
    - Apply `PorterStemmer` to extract morphological stems.
    - Apply `WordNetLemmatizer` to derive base dictionary lemmas.
-   - **Screenshot:**  
-     ![Step 3 Stemming & Lemmatization](exp%205/screenshots/step3_stem_lemma.png)
 
 4. **Step 4: Bayesian Classification Execution & Web Deployment**
    - Train Multinomial Naive Bayes model on domain corpus (Technology, Sports, Health).
    - Launch interactive Flask web server on port 5007 to classify custom paragraphs and plot posterior distributions.
-   - **Screenshot:**  
-     ![Step 4 Running](exp%205/screenshots/step4_running.png)
 
 ---
 
@@ -94,16 +86,16 @@ $$P(c|\mathbf{d}) = \frac{P(c) \prod_{j=1}^k P(w_j|c)}{P(\mathbf{d})}$$
 ### OUTPUT / SCREENSHOTS:
 
 #### 1. Input Paragraph & Benchmark Presets
-![Output 1 Input Form](exp%205/screenshots/out1_input_form.png)
+![Output 1 Input Form](screenshots/ss1_input_form.png)
 
 #### 2. Sentence-by-Sentence NLP Preprocessing Pipeline Table
-![Output 2 NLP Pipeline](exp%205/screenshots/out2_nlp_pipeline_table.png)
+![Output 2 NLP Pipeline](screenshots/ss2_nlp_pipeline_table.png)
 
 #### 3. Multinomial Naive Bayes Classification Results Table
-![Output 3 Classification](exp%205/screenshots/out3_bayesian_classification.png)
+![Output 3 Classification](screenshots/ss3_bayesian_classification.png)
 
 #### 4. Bayesian Posterior Distribution & Salient Keywords Plot
-![Output 4 Plots](exp%205/screenshots/out4_posterior_word_plots.png)
+![Output 4 Plots](screenshots/ss4_posterior_word_plots.png)
 
 ---
 
