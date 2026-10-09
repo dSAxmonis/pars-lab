@@ -25,7 +25,7 @@ EXPERIMENTS = [
     {
         "id": 1,
         "port": 5001,
-        "title": "Study of Datasets Across Different Domains (CIFAR-10 & Iris)",
+        "title": "Prepare a document by studying any two datasets of different domain, write the description of dataset consisting of purpose. what is source, write Feature description, how many features, work done by various authors and performance achieved by atleast three authors in recent years. Cite References and add references.",
         "badge": "Dataset Analysis & Literature Survey",
         "desc": "Comparative taxonomy of CIFAR-10 (d=3072 raw pixels) vs Iris (d=4 tabular), statistical profiles, and formal citations of SOTA benchmark models (AlexNet, ResNet, ViT).",
         "path": os.path.join(BASE_DIR, "exp 1", "app.py")
@@ -33,7 +33,7 @@ EXPERIMENTS = [
     {
         "id": 2,
         "port": 5002,
-        "title": "Dataset Extraction, Storage, Feature Analysis & Metric Visualization",
+        "title": "Prepare a page using flask consisting of a code in python to extract and store the two datasets that you studied in Experiment 1, Plot the performance plot, display different features having description",
         "badge": "Data Engineering & Model Benchmarks",
         "desc": "Automatic extraction and local storage of CIFAR-10 images & Iris tabular CSVs, training 4 classifiers with Accuracy, Precision, Recall, F1, and Confusion Matrices.",
         "path": os.path.join(BASE_DIR, "exp 2", "app.py")
@@ -41,7 +41,7 @@ EXPERIMENTS = [
     {
         "id": 3,
         "port": 5003,
-        "title": "Multimodal Feature Extraction from Audio Across Timestamps",
+        "title": "Prepare an informative page using flask consisting of a code in python to extract features from text/video/audio. Extract at least 3 features from various timestamp (at least 10 Samples) justifying the objective for application. text/video/audio file should exist in the page.",
         "badge": "Audio Signal Processing",
         "desc": "Framing and windowing raw acoustic waveforms to compute RMS Energy, Zero Crossing Rate (ZCR), and Spectral Centroid across 10 temporal frames with interactive audio player.",
         "path": os.path.join(BASE_DIR, "exp 3", "app.py")
@@ -49,7 +49,7 @@ EXPERIMENTS = [
     {
         "id": 4,
         "port": 5004,
-        "title": "Bayesian Classification: Single Feature & Multi-Feature Multi-Class",
+        "title": "Prepare an interactive page using flask consisting of a code in python for Single feature multiple class, Multiple features multiple class and then classify test samples using Bayesian approach.",
         "badge": "Generative Modeling & Decision Surfaces",
         "desc": "Gaussian generative Bayes classification computing Prior, Likelihood, and Posterior distributions with 1D thresholds and 2D non-linear quadratic decision boundary contours.",
         "path": os.path.join(BASE_DIR, "exp 4", "app.py")
@@ -57,7 +57,7 @@ EXPERIMENTS = [
     {
         "id": 5,
         "port": 5005,
-        "title": "NLP Paragraph Preprocessing & Bayesian Domain Classification",
+        "title": "Prepare a page using flask consisting of a code in python to extract text paragraph, separate the sentences, remove various stop words, perform Lemmatization and stemming then classify test samples using Bayesian approach.",
         "badge": "NLP & Text Mining",
         "desc": "End-to-end text preprocessing pipeline (Tokenization, Stop Words, Porter Stemming, WordNet Lemmatization) followed by Multinomial Naive Bayes with Laplace smoothing.",
         "path": os.path.join(BASE_DIR, "exp 5", "app.py")
@@ -65,7 +65,7 @@ EXPERIMENTS = [
     {
         "id": 6,
         "port": 5006,
-        "title": "Bayesian Risk Minimization for Three Classes and Three Actions",
+        "title": "Prepare a page using flask consisting of a code in python to perform Bayesian Risk Minimization for at least three classes, three actions. Given loss function, particular action should trigger particular action, that action should reflect in page itself.",
         "badge": "Decision Theory & Asymmetric Costs",
         "desc": "Conditional risk formulation R(a_i | x) = sum(lambda_ij * P(w_j | x)) incorporating an asymmetric loss penalty matrix for safety-critical classification.",
         "path": os.path.join(BASE_DIR, "exp 6", "app.py")
@@ -73,7 +73,7 @@ EXPERIMENTS = [
     {
         "id": 7,
         "port": 5007,
-        "title": "Linear Regression from Scratch Using Gradient Descent",
+        "title": "Implement Linear regression in python (no inbuild function should be used) to find optimized parameters using Gradient descent for any application and Plot Gradient Descent curve.",
         "badge": "NumPy From Scratch",
         "desc": "Vectorized Batch Gradient Descent implemented from first principles without scikit-learn, estimating housing prices and tracking MSE cost function decay curves.",
         "path": os.path.join(BASE_DIR, "exp 7", "app.py")
@@ -81,7 +81,7 @@ EXPERIMENTS = [
     {
         "id": 8,
         "port": 5008,
-        "title": "Logistic Regression (Binary & Multiclass Softmax from Scratch)",
+        "title": "Implement Logistic regression for binary class and multiclass classification in python (no inbuild function should be used) to find optimized parameters using Gradient descent for any application and Plot Gradient Descent curve.",
         "badge": "Classification From Scratch",
         "desc": "Sigmoid binary classification and Softmax multiclass classification from first principles with Log Loss / Cross-Entropy gradient updates and decision region meshgrids.",
         "path": os.path.join(BASE_DIR, "exp 8", "app.py")
@@ -89,7 +89,7 @@ EXPERIMENTS = [
     {
         "id": 9,
         "port": 5009,
-        "title": "Implementation of Regularization (L1 Lasso & L2 Ridge)",
+        "title": "Implement regularization for any application show plots of 1)decision boundary and 2) performance before and after applying regularization",
         "badge": "Overfitting Control & Shrinkage",
         "desc": "Demonstrates decision boundary smoothing, feature weight shrinkage (L2 Ridge) vs exact sparsity (L1 Lasso), and before/after performance comparison bar charts.",
         "path": os.path.join(BASE_DIR, "exp 9", "app.py")
@@ -97,7 +97,7 @@ EXPERIMENTS = [
     {
         "id": 10,
         "port": 5010,
-        "title": "Principal Component Analysis (PCA) with Projection & Testing",
+        "title": "Implement Principal component analysis (PCA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line.",
         "badge": "Unsupervised Dimensionality Reduction",
         "desc": "Computes sample covariance matrix and dominant eigenvectors to project 2D data onto the 1st Principal Component line, evaluating test sample reconstruction errors.",
         "path": os.path.join(BASE_DIR, "exp 10", "app.py")
@@ -105,7 +105,7 @@ EXPERIMENTS = [
     {
         "id": 11,
         "port": 5011,
-        "title": "Linear Discriminant Analysis (LDA) with Testing & Class Separation",
+        "title": "Implement Linear Discriminant analysis (LDA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line.",
         "badge": "Supervised Projection & Fisher Criterion",
         "desc": "Maximizes between-class to within-class scatter ratio S_W^-1(mu_1 - mu_2), projects 2D points onto the optimal discriminant line, and classifies test coordinates.",
         "path": os.path.join(BASE_DIR, "exp 11", "app.py")
@@ -373,11 +373,11 @@ HTML_PORTAL = """
             border-radius: 50%;
         }
         .exp-title {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 13.5px;
+            font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 6px;
-            line-height: 1.35;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
         .exp-badge {
             font-size: 11.5px;

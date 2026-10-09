@@ -151,37 +151,26 @@
         .index-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.2pt;
+            font-size: 7.2pt;
         }
         .index-table th {
             background-color: #1a365d;
             color: #ffffff;
-            padding: 5px 4px;
+            padding: 4px 4px;
             border: 1px solid #0f2d59;
             text-align: center;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 8pt;
+            font-size: 7.6pt;
         }
         .index-table td {
             border: 1px solid #cbd5e1;
-            padding: 3.5px 5px;
+            padding: 2.8px 6px;
             vertical-align: middle;
+            line-height: 1.25;
         }
         .index-table tr:nth-child(even) {
             background-color: #f8fafc;
-        }
-        .exp-title {
-            font-weight: bold;
-            color: #1e3a8a;
-            display: block;
-            margin-bottom: 1px;
-            font-size: 8.3pt;
-        }
-        .exp-desc {
-            font-size: 7.4pt;
-            color: #475569;
-            line-height: 1.2;
         }
         .repo-banner {
             margin-top: 8px;
@@ -266,120 +255,75 @@
             <thead>
                 <tr>
                     <th style="width: 6%;">Exp. #</th>
-                    <th style="width: 12%;">Date</th>
-                    <th style="width: 65%; text-align: left; padding-left: 10px;">Experiment Title &amp; Technical Scope</th>
-                    <th style="width: 8%;">Page</th>
-                    <th style="width: 9%;">Teacher's Sign.</th>
+                    <th style="width: 75%; text-align: left; padding-left: 10px;">Experiment Aim / Problem Statement</th>
+                    <th style="width: 9%;">Page</th>
+                    <th style="width: 10%;">Teacher's Sign.</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">01</td>
-                    <td style="text-align: center;">01/08/2026</td>
-                    <td>
-                        <span class="exp-title">Study of Datasets Across Different Domains (CIFAR-10 &amp; Iris)</span>
-                        <span class="exp-desc">Comparative analysis of purpose, source, feature structures ($d=3072$ vs $d=4$), author performance surveys, and formal citations.</span>
-                    </td>
+                    <td>Prepare a document by studying any two datasets of different domain, write the description of dataset consisting of purpose. what is source, write Feature description, how many features, work done by various authors and performance achieved by atleast three authors in recent years. Cite References and add references.</td>
                     <td style="text-align: center; font-weight: bold;">01&ndash;06</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">02</td>
-                    <td style="text-align: center;">08/08/2026</td>
-                    <td>
-                        <span class="exp-title">Dataset Extraction, Storage, Feature Analysis &amp; Performance Visualization</span>
-                        <span class="exp-desc">Interactive web ingestion and storage of CIFAR-10 images and Iris dataset with multi-metric evaluation (Accuracy, F1, Log Loss).</span>
-                    </td>
+                    <td>Prepare a page using flask consisting of a code in python to extract and store the two datasets that you studied in Experiment 1, Plot the performance plot, display different features having description</td>
                     <td style="text-align: center; font-weight: bold;">07&ndash;11</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">03</td>
-                    <td style="text-align: center;">15/08/2026</td>
-                    <td>
-                        <span class="exp-title">Multimodal Feature Extraction from Audio Across Timestamps</span>
-                        <span class="exp-desc">Extracted RMS Energy, Zero Crossing Rate (ZCR), and Spectral Centroid across 10 temporal frames from playable browser audio.</span>
-                    </td>
+                    <td>Prepare an informative page using flask consisting of a code in python to extract features from text/video/audio. Extract at least 3 features from various timestamp (at least 10 Samples) justifying the objective for application. text/video/audio file should exist in the page.</td>
                     <td style="text-align: center; font-weight: bold;">12&ndash;15</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">04</td>
-                    <td style="text-align: center;">22/08/2026</td>
-                    <td>
-                        <span class="exp-title">Bayesian Classification: Single Feature &amp; Multiple Features Multiple Class</span>
-                        <span class="exp-desc">Gaussian generative modeling computing Prior, Likelihood, and Posterior distributions with real-time decision boundary plots.</span>
-                    </td>
+                    <td>Prepare an interactive page using flask consisting of a code in python for Single feature multiple class, Multiple features multiple class and then classify test samples using Bayesian approach.</td>
                     <td style="text-align: center; font-weight: bold;">16&ndash;19</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">05</td>
-                    <td style="text-align: center;">29/08/2026</td>
-                    <td>
-                        <span class="exp-title">NLP Paragraph Preprocessing &amp; Bayesian Domain Classification</span>
-                        <span class="exp-desc">Text pipeline implementing tokenization, stop word removal, Porter stemming, WordNet lemmatization, and Multinomial Naive Bayes.</span>
-                    </td>
+                    <td>Prepare a page using flask consisting of a code in python to extract text paragraph, separate the sentences, remove various stop words, perform Lemmatization and stemming then classify test samples using Bayesian approach.</td>
                     <td style="text-align: center; font-weight: bold;">20&ndash;23</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">06</td>
-                    <td style="text-align: center;">05/09/2026</td>
-                    <td>
-                        <span class="exp-title">Bayesian Risk Minimization for Three Classes and Three Actions</span>
-                        <span class="exp-desc">Conditional risk formulation $R(\alpha_i | \mathbf{x}) = \sum \lambda_{ij} P(\omega_j | \mathbf{x})$ given an asymmetric operational loss matrix.</span>
-                    </td>
+                    <td>Prepare a page using flask consisting of a code in python to perform Bayesian Risk Minimization for at least three classes, three actions. Given loss function, particular action should trigger particular action, that action should reflect in page itself.</td>
                     <td style="text-align: center; font-weight: bold;">24&ndash;27</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">07</td>
-                    <td style="text-align: center;">12/09/2026</td>
-                    <td>
-                        <span class="exp-title">Linear Regression from Scratch Using Gradient Descent</span>
-                        <span class="exp-desc">Analytical derivation and manual vectorized update rules ($\Delta w, \Delta b$) predicting housing prices with MSE cost decay curves.</span>
-                    </td>
+                    <td>Implement Linear regression in python (no inbuild function should be used) to find optimized parameters using Gradient descent for any application and Plot Gradient Descent curve.</td>
                     <td style="text-align: center; font-weight: bold;">28&ndash;31</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">08</td>
-                    <td style="text-align: center;">19/09/2026</td>
-                    <td>
-                        <span class="exp-title">Logistic Regression (Binary &amp; Multiclass from Scratch)</span>
-                        <span class="exp-desc">Sigmoid binary and Softmax multiclass classification from first principles with cross-entropy loss tracking and decision contours.</span>
-                    </td>
+                    <td>Implement Logistic regression for binary class and multiclass classification in python (no inbuild function should be used) to find optimized parameters using Gradient descent for any application and Plot Gradient Descent curve.</td>
                     <td style="text-align: center; font-weight: bold;">32&ndash;35</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">09</td>
-                    <td style="text-align: center;">26/09/2026</td>
-                    <td>
-                        <span class="exp-title">Implementation of Regularization (L1 Lasso &amp; L2 Ridge)</span>
-                        <span class="exp-desc">Demonstrated shrinkage mechanisms, decision boundary smoothing, and quantitative performance bars before and after regularization.</span>
-                    </td>
+                    <td>Implement regularization for any application show plots of 1)decision boundary and 2) performance before and after applying regularization</td>
                     <td style="text-align: center; font-weight: bold;">36&ndash;39</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">10</td>
-                    <td style="text-align: center;">03/10/2026</td>
-                    <td>
-                        <span class="exp-title">Principal Component Analysis (PCA) with Testing &amp; Reconstruction</span>
-                        <span class="exp-desc">Derived dominant eigenvector $\mathbf{v}_1$, plotted 1st PC projected line, mapped 1D features, and evaluated test reconstruction errors.</span>
-                    </td>
+                    <td>Implement Principal component analysis (PCA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line.</td>
                     <td style="text-align: center; font-weight: bold;">40&ndash;43</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td style="text-align: center; font-weight: bold;">11</td>
-                    <td style="text-align: center;">08/10/2026</td>
-                    <td>
-                        <span class="exp-title">Linear Discriminant Analysis (LDA) with Testing &amp; Class Separation</span>
-                        <span class="exp-desc">Maximization of between-class to within-class scatter $\mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$ with projected line, 1D separation, and threshold testing.</span>
-                    </td>
+                    <td>Implement Linear Discriminant analysis (LDA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line.</td>
                     <td style="text-align: center; font-weight: bold;">44&ndash;47</td>
                     <td></td>
                 </tr>
