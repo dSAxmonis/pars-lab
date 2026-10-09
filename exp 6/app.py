@@ -179,5 +179,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    print("Starting Experiment 6 Bayesian Risk Minimization Server on http://127.0.0.1:5008")
-    app.run(host='127.0.0.1', port=5008, debug=True)
+    port = int(os.environ.get('PORT', 5006))
+    print(f"Starting Experiment 6 Bayesian Risk Minimization Server on http://127.0.0.1:{port}")
+    app.run(host='127.0.0.1', port=port, debug=False)

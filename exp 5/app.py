@@ -268,5 +268,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    print("Starting Experiment 5 NLP Bayesian Server on http://127.0.0.1:5007")
-    app.run(host='127.0.0.1', port=5007, debug=True)
+    port = int(os.environ.get('PORT', 5005))
+    print(f"Starting Experiment 5 NLP Bayesian Server on http://127.0.0.1:{port}")
+    app.run(host='127.0.0.1', port=port, debug=False)

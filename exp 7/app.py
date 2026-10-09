@@ -144,5 +144,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    print("Starting Experiment 7 Linear Regression Server on http://127.0.0.1:5009")
-    app.run(host='127.0.0.1', port=5009, debug=True)
+    port = int(os.environ.get('PORT', 5007))
+    print(f"Starting Experiment 7 Linear Regression Server on http://127.0.0.1:{port}")
+    app.run(host='127.0.0.1', port=port, debug=False)

@@ -1,3 +1,4 @@
+import os
 import io
 import base64
 import numpy as np
@@ -180,4 +181,6 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5011, debug=True)
+    port = int(os.environ.get('PORT', 5009))
+    print(f"Starting Experiment 9 Regularization Server on http://127.0.0.1:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)

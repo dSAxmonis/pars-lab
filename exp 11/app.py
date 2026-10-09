@@ -1,3 +1,4 @@
+import os
 import io
 import base64
 import numpy as np
@@ -203,4 +204,6 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5013, debug=True)
+    port = int(os.environ.get('PORT', 5011))
+    print(f"Starting Experiment 11 LDA Server on http://127.0.0.1:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)

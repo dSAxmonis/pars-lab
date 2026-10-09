@@ -215,5 +215,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    print("Starting Experiment 3 Flask Server on http://127.0.0.1:5005")
-    app.run(host='127.0.0.1', port=5005, debug=True)
+    port = int(os.environ.get('PORT', 5003))
+    print(f"Starting Experiment 3 Flask Server on http://127.0.0.1:{port}")
+    app.run(host='127.0.0.1', port=port, debug=False)

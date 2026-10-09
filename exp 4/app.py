@@ -204,5 +204,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    print("Starting Experiment 4 Bayesian Classifier on http://127.0.0.1:5006")
-    app.run(host='127.0.0.1', port=5006, debug=True)
+    port = int(os.environ.get('PORT', 5004))
+    print(f"Starting Experiment 4 Bayesian Classifier on http://127.0.0.1:{port}")
+    app.run(host='127.0.0.1', port=port, debug=False)
