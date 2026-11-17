@@ -562,7 +562,7 @@ HTML_PORTAL = """
             </div>
             <div class="btn-group">
                 <a href="/download_pdf" target="_blank" class="btn-pdf">
-                    📄 View Complete Practical File (94-Page PDF)
+                    📄 View Complete Practical File (90-Page PDF)
                 </a>
             </div>
         </div>

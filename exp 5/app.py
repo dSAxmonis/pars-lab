@@ -9,10 +9,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import nltk
-nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
 
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
