@@ -1,4 +1,4 @@
-# PATTERN ANALYSIS AND RECOGNITION SYSTEMS (PARS) LAB MANUAL
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
 
 ---
 
@@ -10,89 +10,90 @@
 ---
 
 ### AIM:
-To prepare an informative web page using Flask in Python to extract features from an audio recording across at least 10 timestamps, extracting at least 3 distinct features (RMS Energy, Zero Crossing Rate, and Spectral Centroid), justify their objectives for real-world applications, and embed the playable audio directly into the page.
+To prepare an informative web-based application using Flask to perform automated feature extraction from multimedia signals (audio). Specifically, to extract at least three distinctive time-domain and frequency-domain acoustic features across at least 10 discrete timestamps, justify their technical objectives for downstream machine learning applications, and provide an embedded audio player for real-time verification.
 
 ---
 
-### THEORY:
-
-#### 1. Temporal Windowing in Audio Processing
-Continuous audio signals are non-stationary over extended periods but exhibit quasi-stationary characteristics across short analysis frames ($20\text{--}50\text{ ms}$). To capture dynamic acoustic behavior, short-time windowing is applied at discrete timestamps $t_i$:
-$$x_{t_i}[n] = x[n] \cdot w[n - n_i]$$
-where $w[n]$ represents a temporal analysis window of length $N$.
-
-#### 2. Extracted Features & Mathematical Formulas:
-
-- **Feature 1: Root Mean Square (RMS) Energy**
-  Measures the instantaneous physical signal power, amplitude, and perceived loudness:
-  $$\text{RMS}_{t} = \sqrt{\frac{1}{N} \sum_{n=0}^{N-1} x_t[n]^2}$$
-  - **Application Objective:** Voice Activity Detection (VAD), silence/speech segmentation, acoustic event detection, noise gate triggering.
-
-- **Feature 2: Zero Crossing Rate (ZCR)**
-  Measures the rate of sign changes between successive discrete audio samples:
-  $$\text{ZCR}_{t} = \frac{1}{2N} \sum_{n=1}^{N-1} |\text{sgn}(x_t[n]) - \text{sgn}(x_t[n-1])|$$
-  where:
-  $$\text{sgn}(u) = \begin{cases} 1, & u \ge 0 \\ -1, & u < 0 \end{cases}$$
-  - **Application Objective:** Discriminating periodic voiced speech (low ZCR vowels) from noise-like unvoiced speech (high ZCR fricatives /s/, /sh/) and percussion sounds.
-
-- **Feature 3: Spectral Centroid (Frequency Center of Mass)**
-  Indicates the center of gravity of the frequency spectrum, strongly correlated with acoustic brightness and timbre:
-  $$C_{t} = \frac{\sum_{k=0}^{K-1} f_k \cdot |X_t[k]|}{\sum_{k=0}^{K-1} |X_t[k]|}$$
-  where $f_k$ is the center frequency of bin $k$, and $|X_t[k]|$ is the discrete Fourier transform magnitude:
-  $$X_t[k] = \sum_{n=0}^{N-1} x_t[n] \, e^{-j \frac{2\pi}{N} k n}$$
-  - **Application Objective:** Timbre identification, musical instrument recognition, speaker identification, and sound quality classification.
+### DEFINITIONS & CORE CONCEPTS:
+* **Non-Stationary Signal Framing:** Continuous audio is non-stationary over extended periods but quasi-stationary over short frames (20–50 ms). Temporal windowing isolates localized segments for feature computation.
+* **Time-Domain Acoustic Features:** Calculated directly from raw waveform amplitudes, capturing signal power, energy envelope, and zero-crossing frequency without Fourier transformation.
+* **Frequency-Domain Spectral Features:** Computed via Discrete Fourier Transform (DFT), quantifying frequency distribution, harmonic balance, and spectral brightness (timbre).
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Temporal Short-Time Windowing
+```text
+x_t[n] = x[n] * w[n - n_t],    0 <= n <= N - 1
 
-1. **Step 1: Environment & Dependency Setup**
-   - Create directory `exp 3/` with subfolders `static/`, `templates/`, and `screenshots/`.
-   - Configure dependencies: `Flask`, `numpy`, `pandas`, `scipy`, and `matplotlib`.
+Where:
+• x[n] is the discrete input audio signal.
+• w[n] is the analysis window (Hamming/rectangular) of length N.
+• n_t = floor( t * F_s ) is the sample index corresponding to timestamp t.
+• N is the number of samples in the frame.
+```
 
-2. **Step 2: Audio Ingestion & Signal Verification**
-   - Place/generate 16-bit PCM Mono audio file at 16,000 Hz (`exp 3/static/sample_audio.wav`).
-   - Validate temporal duration (5.0 s) and sample count (80,000 frames).
+#### 2. Root Mean Square (RMS) Energy
+```text
+RMS_t = sqrt( ( 1 / N ) * sum_{n=0}^{N-1} ( x_t[n] )^2 )
 
-3. **Step 3: Multi-Timestamp Feature Extraction Algorithm**
-   - Sample audio at 10 discrete timestamps ($t = 0.5s, 1.0s, 1.5s, 2.0s, 2.5s, 3.0s, 3.5s, 4.0s, 4.5s, 5.0s$) using a 50 ms window.
-   - Extract RMS Energy, ZCR, and Spectral Centroid per timestamp and construct time-series plots.
+Where:
+• x_t[n] is the framed audio sample.
+• Technical Objective: Voice Activity Detection (VAD), silence removal, and loudness metering.
+```
 
-4. **Step 4: Web Application Launch on Port 5005**
-   - Launch Flask application server: `python3 "exp 3/app.py"`.
-   - Open browser at `http://127.0.0.1:5005` to view the embedded audio player, timestamp feature table, dynamic plots, and justifications.
+#### 3. Zero Crossing Rate (ZCR)
+```text
+ZCR_t = ( 1 / ( 2 * N ) ) * sum_{n=1}^{N-1} | sgn(x_t[n]) - sgn(x_t[n-1]) |
+
+Where:
+• sgn(u) = +1 if u >= 0, else -1.
+• Technical Objective: Distinguishing periodic voiced speech (vowels, low ZCR) from noisy unvoiced fricatives (high ZCR).
+```
+
+#### 4. Spectral Centroid (Frequency Center of Mass)
+```text
+C_t = sum_{k=0}^{M-1} ( f_k * |X_t[k]| ) / sum_{k=0}^{M-1} |X_t[k]|
+
+Where:
+• |X_t[k]| is the Fourier transform magnitude at bin k.
+• f_k is the physical frequency in Hertz.
+• Technical Objective: Timbre characterization, instrument classification, and audio brightness analysis.
+```
 
 ---
 
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 3/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/app.py)
-  - [HTML Template (`exp 3/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/templates/index.html)
-  - [Dependencies (`exp 3/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/requirements.txt)
-  - [Lab Manual Report (`exp 3/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%203/LAB_PRACTICAL_FILE.md)
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Embedded a high-fidelity synthetic WAV audio asset directly into the Flask web interface with interactive HTML5 audio controls.
+2. Divided the continuous audio stream into quasi-stationary temporal frames across 10 discrete timestamps spanning 0.5s to 9.5s.
+3. Implemented mathematical algorithms for Root Mean Square (RMS) Energy, Zero Crossing Rate (ZCR), and Spectral Centroid using pure NumPy and SciPy FFT.
+4. Tabulated extracted multi-feature profiles alongside their rigorous downstream technical justifications.
+5. Deployed interactive Flask dashboard on port 5006 displaying synchronous audio playback, multi-feature trajectory graphs, and statistical summaries.
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 3.1: Audio Player & Signal Specifications
+Embedded HTML5 audio player alongside complete signal metadata including sampling rate (22,050 Hz), duration (10.0 s), and total sample count.
 
-#### 1. Embedded Playable Audio File & Signal Attributes
-![Output 1 Audio Player & Specs](screenshots/ss1_audio_player_specs.png)
+![Figure 3.1: Audio Player & Signal Specifications](screenshots/ss1_audio_player_specs.png)
 
-#### 2. Feature Extraction Table Across 10 Timestamps
-![Output 2 Timestamps Features](screenshots/ss2_timestamps_features.png)
+#### Figure 3.2: Extracted Features Across 10 Timestamps
+Structured table displaying RMS Energy, Zero Crossing Rate, and Spectral Centroid calculated across 10 distinct temporal observation points.
 
-#### 3. Temporal Feature Trajectory Multi-Plot
-![Output 3 Feature Plot](screenshots/ss3_feature_variation_plot.png)
+![Figure 3.2: Extracted Features Across 10 Timestamps](screenshots/ss2_timestamps_features.png)
 
-#### 4. Application Objective Justification Table
-![Output 4 Justifications](screenshots/ss4_feature_justifications.png)
+#### Figure 3.3: Temporal Multi-Feature Variation Curves
+Triple-panel Matplotlib plot showing synchronous variations of RMS Energy, ZCR, and Spectral Centroid over the audio duration.
+
+![Figure 3.3: Temporal Multi-Feature Variation Curves](screenshots/ss3_feature_variation_plot.png)
+
+#### Figure 3.4: Downstream Technical Justifications
+Detailed documentation of practical applications for each acoustic feature (Voice Activity Detection, phoneme classification, and music genre analysis).
+
+![Figure 3.4: Downstream Technical Justifications](screenshots/ss4_feature_justifications.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, an informative web application was developed using Flask in Python to perform temporal feature extraction on an audio signal. Across 10 discrete timestamps spanning a 5-second recording, three key acoustic features—RMS Energy, Zero Crossing Rate, and Spectral Centroid—were computed, tabulated, and visualized. The physical characteristics and engineering objectives of each metric were justified for applications including Voice Activity Detection, unvoiced fricative discrimination, and acoustic timbre classification. Finally, the playable audio source was embedded into the dashboard.
+Experiment 3 demonstrated the fundamental principles of short-time audio feature engineering across temporal windows. By computing RMS Energy, Zero Crossing Rate, and Spectral Centroid across 10 distinct timestamps, the application proved how time-domain and frequency-domain descriptors capture complementary physical attributes of acoustic signals, establishing the foundational feature representations essential for speech recognition, music information retrieval, and audio classification.

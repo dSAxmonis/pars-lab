@@ -1,4 +1,4 @@
-# PATTERN ANALYSIS AND RECOGNITION SYSTEMS (PARS) LAB MANUAL
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
 
 ---
 
@@ -10,85 +10,71 @@
 ---
 
 ### AIM:
-To implement Logistic Regression in Python from scratch without using any inbuilt machine learning library functions (such as `scikit-learn`), optimize model parameters via Gradient Descent for both binary class (Sigmoid) and multiclass (Softmax) classification, and plot the respective Gradient Descent loss convergence curves.
+To implement Logistic Regression from first principles in pure NumPy without using pre-built machine learning libraries for both: 1) Binary Classification (using the Sigmoid activation and Binary Cross-Entropy loss) and 2) Multiclass Classification (using the Softmax activation and Categorical Cross-Entropy loss). The system derives analytical gradients, optimizes weights and biases via Gradient Descent, plots cost convergence curves, and displays linear decision boundaries in Flask.
 
 ---
 
-### THEORY:
-
-#### 1. Binary Logistic Regression (Sigmoid Formulation)
-Binary logistic regression predicts the posterior probability $P(y=1|\mathbf{x}) \in [0, 1]$ using the logistic sigmoid activation:
-$$\hat{y}^{(i)} = \sigma(z^{(i)}) = \frac{1}{1 + e^{-z^{(i)}}}, \quad \text{where } z^{(i)} = \mathbf{w}^T \mathbf{x}^{(i)} + b$$
-
-- **Binary Cross-Entropy Loss Function:**
-  $$J(\mathbf{w}, b) = -\frac{1}{m} \sum_{i=1}^{m} \left[ y^{(i)} \ln\left(\hat{y}^{(i)}\right) + \left(1 - y^{(i)}\right) \ln\left(1 - \hat{y}^{(i)}\right) \right]$$
-
-- **Analytical Gradients:**
-  $$\frac{\partial J}{\partial \mathbf{w}} = \frac{1}{m} \mathbf{X}^T (\hat{\mathbf{y}} - \mathbf{y}), \quad \frac{\partial J}{\partial b} = \frac{1}{m} \sum_{i=1}^{m} (\hat{y}^{(i)} - y^{(i)})$$
-
-- **Parameter Updates:**
-  $$\mathbf{w} := \mathbf{w} - \alpha \frac{\partial J}{\partial \mathbf{w}}, \quad b := b - \alpha \frac{\partial J}{\partial b}$$
-
-#### 2. Multiclass Logistic Regression (Softmax Regression)
-For $K$ mutually exclusive categories ($K = 3$ for Iris dataset), class linear scores $\mathbf{z} = \mathbf{X} \mathbf{W} + \mathbf{b}$ are converted into normalized probabilities via the Softmax activation:
-$$\hat{P}_{ik} = \frac{e^{z_{ik}}}{\sum_{j=1}^{K} e^{z_{ij}}}$$
-where $\mathbf{W} \in \mathbb{R}^{d \times K}$ and $\mathbf{b} \in \mathbb{R}^K$.
-
-- **Categorical Cross-Entropy Loss Function:**
-  $$J(\mathbf{W}, \mathbf{b}) = -\frac{1}{m} \sum_{i=1}^{m} \sum_{k=1}^{K} Y_{ik} \ln\left(\hat{P}_{ik}\right)$$
-  where $\mathbf{Y}$ represents the one-hot ground truth matrix.
-
-- **Analytical Multiclass Gradients:**
-  $$\frac{\partial J}{\partial \mathbf{W}} = \frac{1}{m} \mathbf{X}^T (\hat{\mathbf{P}} - \mathbf{Y}), \quad \frac{\partial J}{\partial \mathbf{b}} = \frac{1}{m} \sum_{i=1}^{m} (\hat{\mathbf{P}}_i - \mathbf{Y}_i)$$
-
-- **Parameter Updates:**
-  $$\mathbf{W} := \mathbf{W} - \alpha \frac{\partial J}{\partial \mathbf{W}}, \quad \mathbf{b} := \mathbf{b} - \alpha \frac{\partial J}{\partial \mathbf{b}}$$
+### DEFINITIONS & CORE CONCEPTS:
+* **Binary Logistic Regression:** Maps a linear combination of features through the Sigmoid activation function to estimate posterior probability P(y=1|x).
+* **Multiclass (Softmax) Regression:** Extends logistic classification to K classes by mapping unnormalized logit vectors into a normalized probability distribution.
+* **Cross-Entropy Loss:** A convex negative log-likelihood objective that strongly penalizes misclassifications.
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Binary Logistic Regression
+```text
+Sigmoid Hypothesis:
+y_hat = sigma(z) = 1 / ( 1 + exp( - ( w^T * x + b ) ) )
 
-1. **Step 1: Scratch Vectorized Engine Setup**
-   - Configure `exp 8/` directory with pure NumPy mathematical tensor routines without external estimators.
+Binary Cross-Entropy Loss:
+J(w, b) = - (1/m) * sum_{i=1}^m [ y^(i) * ln(y_hat^(i)) + (1 - y^(i)) * ln(1 - y_hat^(i)) ]
 
-2. **Step 2: Binary Sigmoid & Cross-Entropy Implementation**
-   - Formulate sigmoid hypothesis, binary cross-entropy loss, and gradient descent optimization loop.
+Gradients:
+del_J / del_w = (1/m) * X^T * ( y_hat - y )
+del_J / del_b = (1/m) * sum_{i=1}^m ( y_hat^(i) - y^(i) )
+```
 
-3. **Step 3: Multiclass Softmax Regression Implementation**
-   - Implement stabilized softmax transformation, categorical cross-entropy loss, and matrix gradient updates.
+#### 2. Multiclass (Softmax) Regression
+```text
+Softmax Probability:
+P_hat_ik = exp( z_ik ) / sum_{j=1}^K exp( z_ij )
 
-4. **Step 4: Interactive Web Deployment & Loss Curve Visualization**
-   - Run Flask application on port 5010 (`python3 "exp 8/app.py"`).
-   - Display dual gradient descent loss curves and decision boundary plots.
+Categorical Cross-Entropy Loss:
+J(W, b) = - (1/m) * sum_{i=1}^m sum_{k=1}^K Y_ik * ln( P_hat_ik )
 
----
-
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 8/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/app.py)
-  - [HTML Template (`exp 8/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/templates/index.html)
-  - [Dependencies (`exp 8/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/requirements.txt)
-  - [Lab Manual Report (`exp 8/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/LAB_PRACTICAL_FILE.md)
+Matrix Gradients:
+del_J / del_W = (1/m) * X^T * ( P_hat - Y )
+del_J / del_b = (1/m) * sum_{i=1}^m ( P_hat_i - Y_i )
+```
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Implemented pure NumPy vectorization for Sigmoid and numerically stable Softmax activations.
+2. Programmed first-principles Gradient Descent loops for Binary Cross-Entropy and Categorical Cross-Entropy objectives.
+3. Formulated decision boundary linear equations mapping decision planes in 2D feature coordinates.
+4. Built interactive Flask application on port 5010 providing mode toggles (Binary vs. Multiclass), learning rate sliders, and live decision boundary plots.
 
-#### 1. Test Sample Prediction Controls & Active Classification Outputs
-![Output 1 Prediction Controls](screenshots/ss1_prediction_controls.png)
+---
 
-#### 2. Gradient Descent Optimized Parameters Summary (From Scratch)
-![Output 2 Parameters Summary](screenshots/ss2_parameters_summary.png)
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 8.1: Prediction Controls & Hyperparameter Interface
+Interface allowing selection of Binary/Multiclass models, learning rate, iterations, and test sample coordinates.
 
-#### 3. Gradient Descent Loss Curves & Decision Boundaries Multi-Panel Plot
-![Output 3 Curves and Boundaries](screenshots/ss3_descent_curves_boundaries.png)
+![Figure 8.1: Prediction Controls & Hyperparameter Interface](screenshots/ss1_prediction_controls.png)
+
+#### Figure 8.2: Learned Parameters & Optimization Summary
+Displays converged weight vectors, bias terms, training accuracy, and final Cross-Entropy loss.
+
+![Figure 8.2: Learned Parameters & Optimization Summary](screenshots/ss2_parameters_summary.png)
+
+#### Figure 8.3: Cost Descent Curves & Decision Boundaries
+Dual visualization showing smooth Cross-Entropy decay curves and the resulting linear decision boundaries separating classes.
+
+![Figure 8.3: Cost Descent Curves & Decision Boundaries](screenshots/ss3_descent_curves_boundaries.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, both Binary and Multiclass Logistic Regression were constructed from scratch in Python without leveraging black-box libraries. Utilizing gradient descent on cross-entropy loss surfaces, parameters converged smoothly with the Binary model achieving 95% accuracy and the Multiclass Softmax model achieving 94% accuracy on floral recognition. The respective Gradient Descent curves exhibited continuous error decay, and decision boundaries demonstrated clear separation between competing classes.
+Experiment 8 verified the mathematical elegance of Logistic Regression implemented from first principles. By leveraging the Sigmoid function for binary tasks and the Softmax function for multiclass problems, the experiment confirmed how convex Cross-Entropy minimization via analytical gradients guarantees stable convergence to optimal decision boundaries separating non-overlapping feature spaces.

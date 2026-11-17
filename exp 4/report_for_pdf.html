@@ -1,280 +1,280 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Experiment 4 - Lab Practical File</title>
+    <meta charset="UTF-8">
+    <title>Experiment 4 - Bayesian Classification for Single Feature & Multiple Features Multiple Class Using Flask</title>
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 11pt;
-            background-color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.42;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
             color: #003366;
-            font-size: 18pt;
             text-align: center;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            color: #003366;
-            font-size: 14pt;
-            border-bottom: 2px solid #003366;
-            padding-bottom: 4px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            page-break-after: avoid;
-        }
-        h3 {
-            color: #004d40;
-            font-size: 12pt;
-            margin-top: 16px;
-            margin-bottom: 8px;
-            page-break-after: avoid;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
-            text-align: center;
+            font-size: 8.5pt;
             color: #555555;
-            font-size: 11pt;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .meta-bar {
             text-align: center;
-            font-size: 10pt;
-            background-color: #f0f4f8;
-            padding: 8px;
-            border: 1px solid #d0dbe5;
-            margin-bottom: 20px;
+            margin: 0 0 8px 0;
         }
-        table {
+        .meta-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
         }
-        table, th, td {
-            border: 1px solid #cccccc;
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
         }
-        th {
-            background-color: #003366;
-            color: #ffffff;
-            padding: 8px 6px;
-            text-align: left;
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
         }
-        td {
-            padding: 6px 8px;
-            vertical-align: top;
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9pt;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #f7f9fa;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-left: 4px solid #003366;
-            padding: 8px 14px;
-            margin: 10px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .screenshot-container {
             text-align: center;
-            margin: 12px 0 18px 0;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .screenshot-container img {
-            max-width: 96%;
-            border: 1px solid #999999;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+            max-width: 98%;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .screenshot-caption {
-            font-size: 9pt;
-            color: #555555;
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
             font-style: italic;
-            margin-top: 4px;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #181717;
-            color: #ffffff !important;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
         }
         .page-break {
             page-break-before: always;
         }
-        a {
-            color: #0044cc;
-            text-decoration: underline;
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        a:hover {
-            color: #002288;
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
         }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            font-size: 9.5pt;
-            font-family: monospace;
-        }
-        .link-card {
-            background-color: #f8faff;
-            border: 1px solid #cce0ff;
-            border-left: 4px solid #0055ff;
-            padding: 10px 14px;
-            margin: 10px 0;
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <b>Experiment No.:</b> 04 &nbsp;|&nbsp; 
-        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
-        <b>Framework:</b> Python 3.14 / Flask &nbsp;|&nbsp;
-        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>04</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
-    <p><b>Bayesian Classification for Single Feature &amp; Multiple Features Multiple Class Using Flask</b></p>
+    <p><b>Bayesian Classification for Single Feature & Multiple Features Multiple Class Using Flask</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To prepare an interactive web application using Flask in Python to implement Bayesian classification for both Single-Feature Multiple-Class and Multiple-Features Multiple-Class scenarios, compute prior, likelihood, and posterior probabilities, and classify test samples using the Maximum A Posteriori (MAP) decision rule.
-    </p>
+    <h2>Aim</h2>
+    <p>To design, formulate, and deploy an interactive Flask web application to perform pattern classification using the Bayesian framework for both 1) Single Feature Multi-Class models and 2) Multiple Features Multi-Class models. The system fits Gaussian class-conditional likelihoods, calculates posterior class probabilities, and classifies arbitrary user-supplied test samples according to the Maximum A Posteriori (MAP) decision rule.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Bayesian Pattern Classification:</b> A statistical decision-theoretic approach that minimizes classification error by combining prior knowledge of class prevalences with class-conditional likelihood evidence observed from sample features.</p>
+    <p><b>Class-Conditional Likelihood:</b> The probability density of observing feature vector x given that the true class is &omega;<sub>k</sub>, modeled via univariate or multivariate Normal distributions.</p>
+    <p><b>Maximum A Posteriori (MAP) Rule:</b> An optimal classification criterion assigning candidate sample x to the class yielding the highest posterior probability P(&omega;<sub>k</sub> | x).</p>
 
-    <h3>1. Bayesian Decision Theory</h3>
-    <p>
-        Bayesian decision theory provides a statistical framework for pattern classification by balancing prior probabilities with class-conditional likelihoods. Under Bayes' Rule:
-    </p>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Bayes' Theorem for Pattern Classification</h3>
+    <p>For K mutually exclusive and exhaustive classes &omega;<sub>1</sub>, &omega;<sub>2</sub>, &hellip;, &omega;<sub>K</sub> and observed feature vector x:</p>
     <div class="formula-box">
-        P(&omega;_i | <b>x</b>) = [ p(<b>x</b> | &omega;_i) &times; P(&omega;_i) ] / p(<b>x</b>)<br>
-        where p(<b>x</b>) = &sum; [ p(<b>x</b> | &omega;_j) &times; P(&omega;_j) ]
+        <b>Bayes' Rule:</b><br>
+        P(&omega;<sub>k</sub> | x) = [ p(x | &omega;<sub>k</sub>) &times; P(&omega;<sub>k</sub>) ] / p(x)<br><br>
+        <b>Total Evidence (Normalization Factor):</b><br>
+        p(x) = &sum;<sub>j=1</sub><sup>K</sup> [ p(x | &omega;<sub>j</sub>) &times; P(&omega;<sub>j</sub>) ]<br><br>
+        <b>Where:</b><br>
+        • P(&omega;<sub>k</sub> | x) is the posterior probability that sample x belongs to class &omega;<sub>k</sub>.<br>
+        • p(x | &omega;<sub>k</sub>) is the class-conditional probability density function (likelihood).<br>
+        • P(&omega;<sub>k</sub>) is the prior probability of class &omega;<sub>k</sub>.<br>
+        • p(x) is the unconditional marginal feature probability density.
     </div>
 
-    <h3>2. Single Feature Multiple Class (Univariate Gaussian)</h3>
-    <p>
-        For a scalar observation $x \in \mathbb{R}$, likelihood is modeled via a 1D normal distribution:
-    </p>
+    <h3>2. Univariate Gaussian Likelihood (Single Feature Multi-Class)</h3>
+    <p>When modeling a single continuous scalar feature x &isin; &real;:</p>
     <div class="formula-box">
-        p(x | &omega;_i) = ( 1 / [ &sigma;_i &times; sqrt(2&pi;) ] ) &times; exp( - (x - &mu;_i)^2 / (2 &sigma;_i^2) )
+        <b>Univariate Normal Density:</b><br>
+        p(x | &omega;<sub>k</sub>) = ( 1 / &radic;( 2&pi; &sigma;<sub>k</sub><sup>2</sup> ) ) &times; exp[ - ( x - &mu;<sub>k</sub> )<sup>2</sup> / ( 2 &sigma;<sub>k</sub><sup>2</sup> ) ]<br><br>
+        <b>Where:</b><br>
+        • &mu;<sub>k</sub> = ( 1 / N<sub>k</sub> ) &sum; x<sup>(i)</sup> is the empirical mean of class &omega;<sub>k</sub>.<br>
+        • &sigma;<sub>k</sub><sup>2</sup> = ( 1 / N<sub>k</sub> ) &sum; ( x<sup>(i)</sup> - &mu;<sub>k</sub> )<sup>2</sup> is the empirical variance of class &omega;<sub>k</sub>.
     </div>
 
-    <h3>3. Multiple Features Multiple Class (Multivariate Gaussian)</h3>
-    <p>
-        For multidimensional vectors $\mathbf{x} \in \mathbb{R}^d$, the joint density incorporates full covariance interactions:
-    </p>
+    <h3>3. Multivariate Gaussian Likelihood (Multiple Features Multi-Class)</h3>
+    <p>When modeling a d-dimensional feature vector x &isin; &real;<sup>d</sup> (e.g., d = 4 for Iris):</p>
     <div class="formula-box">
-        p(<b>x</b> | &omega;_i) = ( 1 / [ (2&pi;)^(d/2) &times; |&Sigma;_i|^(1/2) ] ) &times; exp( -0.5 &times; (<b>x</b> - &mu;_i)^T &times; &Sigma;_i^(-1) &times; (<b>x</b> - &mu;_i) )
+        <b>Multivariate Normal Density:</b><br>
+        p(x | &omega;<sub>k</sub>) = ( 1 / [ (2&pi;)<sup>d/2</sup> |&Sigma;<sub>k</sub>|<sup>1/2</sup> ] ) &times; exp[ - (1/2) ( x - &mu;<sub>k</sub> )<sup>T</sup> &Sigma;<sub>k</sub><sup>-1</sup> ( x - &mu;<sub>k</sub> ) ]<br><br>
+        <b>Where:</b><br>
+        • &mu;<sub>k</sub> &isin; &real;<sup>d</sup> is the d-dimensional class centroid mean vector.<br>
+        • &Sigma;<sub>k</sub> &isin; &real;<sup>d &times; d</sup> is the class covariance matrix.<br>
+        • |&Sigma;<sub>k</sub>| is the determinant of the covariance matrix.<br>
+        • ( x - &mu;<sub>k</sub> )<sup>T</sup> &Sigma;<sub>k</sub><sup>-1</sup> ( x - &mu;<sub>k</sub> ) is the squared Mahalanobis distance.
     </div>
 
     <h3>4. Maximum A Posteriori (MAP) Decision Rule</h3>
+    <p>The optimal decision boundary classifies test vector x by maximizing log-posterior scores:</p>
     <div class="formula-box">
-        Assign <b>x</b> to class &omega;_k if:<br>
-        P(&omega;_k | <b>x</b>) &gt; P(&omega;_j | <b>x</b>)  &forall; j &ne; k
+        <b>Optimal Decision Rule:</b><br>
+        &omega;<sup>*</sup> = argmax<sub>k &isin; {1, &hellip;, K}</sub> P(&omega;<sub>k</sub> | x) = argmax<sub>k &isin; {1, &hellip;, K}</sub> [ ln p(x | &omega;<sub>k</sub>) + ln P(&omega;<sub>k</sub>) ]
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed training dataset from Fisher's Iris data spanning 3 distinct flower classes.</li>
+        <li>Estimated maximum likelihood Gaussian parameters: class scalar means and variances for Single Feature (Petal Length), and mean vectors and covariance matrices for Multiple Features (Sepal Length, Sepal Width, Petal Length, Petal Width).</li>
+        <li>Formulated univariate and multivariate Gaussian likelihood evaluators with numerical stability safeguards.</li>
+        <li>Built interactive Flask application on port 5007 accepting test sample inputs, computing real-time posterior probabilities, and rendering decision curves.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
-    <p>Created directory <code>exp 4/</code> containing <code>app.py</code> and verified dependencies (Flask, scipy, numpy, pandas, scikit-learn, matplotlib).</p>
-
-    <h3>Step 2: Gaussian Parameter Learning via MLE</h3>
-    <p>Estimated univariate and multivariate Gaussian parameters (means and covariance matrices) across all three classes.</p>
-
-    <h3>Step 3: Bayesian Classification Inference</h3>
-    <p>Evaluated likelihoods, evidence, and normalized posteriors to reach MAP classification decision.</p>
-
-    <h3>Step 4: Interactive Web Server Launch on Port 5006</h3>
-    <p>Launched interactive Flask web server on <a href="http://127.0.0.1:5006" target="_blank">http://127.0.0.1:5006</a> supporting custom test coordinates and benchmark presets.</p>
-
-    <div class="page-break"></div>
-
-    <h2>OUTPUT / DASHBOARD RESULTS</h2>
-
-    <h3>Output 1: Learned Model Parameters &amp; Class Priors</h3>
-    <p>Displays univariate means/variances, multivariate mean vectors, and covariance matrices for Setosa, Versicolor, and Virginica.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 4.1: Learned Statistical Class Parameters</h3>
+    <p>Displays empirical class priors, univariate Gaussian means/variances, and full 4x4 multivariate covariance matrices across classes.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_learned_params.png" alt="Output 1 Learned Params">
-        <div class="screenshot-caption">Figure 4.1: Section 1 &mdash; Estimated Gaussian parameters and class prior probabilities.</div>
+        <img src="screenshots/ss1_learned_params.png" alt="Figure 4.1: Learned Statistical Class Parameters">
+        <div class="screenshot-caption">Figure 4.1: Learned Statistical Class Parameters</div>
     </div>
 
-    <h3>Output 2: Interactive Input Form &amp; Quick Benchmarks</h3>
-    <p>Interactive inputs enabling real-time classification of any custom floral measurements.</p>
+    
+    <h3>Figure 4.2: Interactive Sample Input Interface</h3>
+    <p>Slider and numeric entry controls allowing users to supply arbitrary continuous test features for real-time classification.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_interactive_input.png" alt="Output 2 Form">
-        <div class="screenshot-caption">Figure 4.2: Section 2 &mdash; Input form and preset testing benchmark cases.</div>
+        <img src="screenshots/ss2_interactive_input.png" alt="Figure 4.2: Interactive Sample Input Interface">
+        <div class="screenshot-caption">Figure 4.2: Interactive Sample Input Interface</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 3: Single-Feature &amp; Multi-Feature Bayesian Inference</h3>
-    <p>Detailed breakdown of Likelihood, Prior, Evidence, and Posterior Probabilities for Part A (Single Feature) and Part B (Multi-Feature).</p>
+    <h3>Figure 4.3: Real-Time Posterior Probabilities & MAP Output</h3>
+    <p>Shows resulting likelihoods, normalized posterior probabilities summing to 1.0, and final predicted class label.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss3_classification_results.png" alt="Output 3 Classification Results">
-        <div class="screenshot-caption">Figure 4.3: Section 3 &mdash; Side-by-side comparison of single-feature and multi-feature Bayesian decisions.</div>
+        <img src="screenshots/ss3_classification_results.png" alt="Figure 4.3: Real-Time Posterior Probabilities & MAP Output">
+        <div class="screenshot-caption">Figure 4.3: Real-Time Posterior Probabilities & MAP Output</div>
     </div>
 
-    <h3>Output 4: Bayesian Decision Visualization Plots</h3>
-    <p>1D Gaussian probability density curves alongside 2D scatter decision plot with test sample marker.</p>
+    
+    <h3>Figure 4.4: Univariate Gaussian Curves & 2D Decision Boundaries</h3>
+    <p>Visualization of bell-shaped probability density curves showing class overlap and 2D bivariate Gaussian contour decision boundaries.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss4_decision_plots.png" alt="Output 4 Plots">
-        <div class="screenshot-caption">Figure 4.4: Section 4 &mdash; 1D likelihood curves and 2D feature distribution scatter plot.</div>
+        <img src="screenshots/ss4_decision_plots.png" alt="Figure 4.4: Univariate Gaussian Curves & 2D Decision Boundaries">
+        <div class="screenshot-caption">Figure 4.4: Univariate Gaussian Curves & 2D Decision Boundaries</div>
     </div>
 
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
+    
 
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 4/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 4/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 4/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Lab Manual (Markdown):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/LAB_PRACTICAL_FILE.md" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 4/LAB_PRACTICAL_FILE.md</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, an interactive Bayesian pattern classification system was developed using Flask in Python. The implementation successfully evaluated both Single-Feature Multiple-Class (univariate Gaussian) and Multiple-Features Multiple-Class (multivariate Gaussian) architectures. Prior probabilities, class-conditional likelihoods, and posterior probabilities were computed under Bayes' rule. The Maximum A Posteriori (MAP) decision criterion was demonstrated interactively, revealing how incorporating multiple dimensions (e.g. covariance between features) sharpens class boundaries and resolves ambiguities in overlapping regions.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 4 verified the theoretical rigor and practical efficacy of Bayesian pattern classification. By evaluating both Single Feature (univariate Gaussian) and Multiple Feature (multivariate Gaussian with full covariance matrices) models, the application demonstrated how Mahalanobis distance and class covariance geometry govern optimal decision surfaces under the Maximum A Posteriori (MAP) rule, achieving optimal error minimization.</p>
 
 </body>
 </html>

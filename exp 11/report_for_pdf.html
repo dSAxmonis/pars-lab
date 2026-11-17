@@ -2,284 +2,280 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Experiment 11 - Linear Discriminant Analysis (LDA) with Testing</title>
+    <title>Experiment 11 - Implementation of Linear Discriminant Analysis (LDA) with Projected Line, Reduced Feature Mapping, and Testing</title>
     <style>
         @page {
             size: A4;
             margin: 12mm 14mm 12mm 14mm;
             @bottom-right {
-                content: "Page " counter(page) " of " counter(pages);
-                font-size: 9pt;
+                content: "Page " counter(page);
+                font-size: 8.5pt;
                 font-family: Arial, sans-serif;
-                color: #555;
+                color: #555555;
             }
         }
         body {
-            font-family: Arial, sans-serif;
-            font-size: 10pt;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
             line-height: 1.42;
-            color: #111;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
-            font-size: 18pt;
-            color: #1a365d;
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #003366;
             text-align: center;
-            margin: 0 0 4px 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            font-size: 12.5pt;
-            color: #1a365d;
-            border-bottom: 2px solid #1a365d;
-            padding-bottom: 3px;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-        h3 {
-            font-size: 10.5pt;
-            color: #2b6cb0;
-            margin-top: 10px;
-            margin-bottom: 4px;
-        }
-        p, li {
-            text-align: justify;
-            margin-top: 3px;
-            margin-bottom: 5px;
-        }
-        ul, ol {
-            margin-top: 3px;
-            margin-bottom: 6px;
-            padding-left: 20px;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
+            font-size: 8.5pt;
+            color: #555555;
             text-align: center;
-            font-size: 10.5pt;
-            color: #4a5568;
-            margin-bottom: 10px;
+            margin: 0 0 8px 0;
         }
-        .meta-bar {
-            background-color: #f7fafc;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            padding: 6px 12px;
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
             font-size: 9pt;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #edf2f7;
-            border-left: 4px solid #2b6cb0;
-            padding: 6px 12px;
-            margin: 6px 0;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 9pt;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .screenshot-container {
             text-align: center;
-            margin: 10px 0;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .screenshot-container img {
             max-width: 98%;
-            border: 1px solid #cbd5e0;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
             border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .screenshot-caption {
             font-size: 8pt;
-            color: #4a5568;
+            color: #475569;
             margin-top: 3px;
             font-style: italic;
         }
-        .link-card {
-            background-color: #ebf8ff;
-            border: 1px solid #bee3f8;
-            border-left: 4px solid #3182ce;
-            padding: 8px 12px;
-            margin: 10px 0;
-            font-size: 9pt;
-        }
-        .link-card a {
-            color: #2b6cb0;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #1a365d;
-            color: #ffffff !important;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 9pt;
-            text-decoration: none;
-            margin-right: 6px;
-        }
         .page-break {
             page-break-before: always;
+        }
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
+        }
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <span><b>Experiment No.:</b> 11</span>
-        <span><b>Course:</b> PARS Lab</span>
-        <span><b>Topic:</b> Linear Discriminant Analysis (LDA)</span>
-        <span><b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a></span>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>11</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Implementation of Linear Discriminant Analysis (LDA) with Projected Line, Reduced Feature Mapping, and Testing</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To implement Linear Discriminant Analysis (LDA) from scratch in Python for an engineering pattern classification application involving test sample evaluation, derive Fisher's optimal projection vector $\mathbf{w} = \mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$, and visualize:
-        <b>1) The optimal projected line</b>,
-        <b>2) New reduced features from each class mapped onto the projected line</b>, and
-        <b>3) Testing and decision threshold classification of unseen test samples</b>.
-    </p>
+    <h2>Aim</h2>
+    <p>To formulate, implement, and deploy Linear Discriminant Analysis (LDA) from scratch in pure NumPy without using pre-built machine learning libraries. Unlike unsupervised PCA, the system utilizes class labels to compute Within-Class and Between-Class scatter matrices, solves for Fisher's optimal linear discriminant projection vector, defines the 1D projected discriminant line, maps unseen test samples onto this line, evaluates the optimal decision threshold, and verifies classification in an interactive Flask application.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Linear Discriminant Analysis (LDA):</b> A supervised dimensionality reduction and linear classification method that finds a projection direction maximizing between-class scatter while simultaneously minimizing within-class scatter.</p>
+    <p><b>Within-Class Scatter Matrix S<sub>W</sub>:</b> Measures the total intra-class dispersion of individual samples around their respective class centroids.</p>
+    <p><b>Between-Class Scatter Matrix S<sub>B</sub>:</b> Measures the dispersion and separation between distinct class centroids.</p>
 
-    <h3>1. Fisher's Linear Discriminant Criterion</h3>
-    <p>
-        Unlike PCA which maximizes total variance without considering labels, Linear Discriminant Analysis (LDA) is a supervised dimensionality reduction technique that seeks a projection direction $\mathbf{w}$ maximizing class separability while minimizing intra-class variance:
-    </p>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Class Centroids &amp; Scatter Matrices</h3>
+    <p>For a binary classification task with classes C<sub>1</sub> and C<sub>2</sub> having sample sizes N<sub>1</sub> and N<sub>2</sub>:</p>
     <div class="formula-box">
-        J(w) = ( w^T S_B w ) / ( w^T S_W w )
+        <b>Class Centroids &amp; Global Centroid:</b><br>
+        &mu;<sub>1</sub> = ( 1 / N<sub>1</sub> ) &sum;<sub>x &isin; C<sub>1</sub></sub> x, &nbsp;&nbsp;&nbsp; &mu;<sub>2</sub> = ( 1 / N<sub>2</sub> ) &sum;<sub>x &isin; C<sub>2</sub></sub> x, &nbsp;&nbsp;&nbsp; &mu; = ( 1 / N ) &sum;<sub>i=1</sub><sup>N</sup> x<sup>(i)</sup><br><br>
+        <b>Within-Class Scatter Matrix:</b><br>
+        S<sub>W</sub> = &sum;<sub>x &isin; C<sub>1</sub></sub> ( x - &mu;<sub>1</sub> )( x - &mu;<sub>1</sub> )<sup>T</sup> + &sum;<sub>x &isin; C<sub>2</sub></sub> ( x - &mu;<sub>2</sub> )( x - &mu;<sub>2</sub> )<sup>T</sup> &isin; &real;<sup>d &times; d</sup><br><br>
+        <b>Between-Class Scatter Matrix:</b><br>
+        S<sub>B</sub> = ( &mu;<sub>1</sub> - &mu;<sub>2</sub> )( &mu;<sub>1</sub> - &mu;<sub>2</sub> )<sup>T</sup> &isin; &real;<sup>d &times; d</sup>
     </div>
 
-    <h3>2. Scatter Matrices Formulation</h3>
-    <ul>
-        <li><b>Within-Class Scatter Matrix:</b> $\mathbf{S}_W = \sum_{\mathbf{x} \in \mathcal{C}_1} (\mathbf{x} - \boldsymbol{\mu}_1)(\mathbf{x} - \boldsymbol{\mu}_1)^T + \sum_{\mathbf{x} \in \mathcal{C}_2} (\mathbf{x} - \boldsymbol{\mu}_2)(\mathbf{x} - \boldsymbol{\mu}_2)^T$</li>
-        <li><b>Between-Class Scatter Matrix:</b> $\mathbf{S}_B = (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)(\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)^T$</li>
-    </ul>
-
-    <h3>3. Optimal Projection Direction Vector</h3>
-    <p>
-        Maximizing Rayleigh's quotient yields the closed-form Fisher linear discriminant direction:
-    </p>
+    <h3>2. Fisher's Criterion &amp; Optimal Projection Direction</h3>
+    <p>Fisher's criterion maximizes the Rayleigh quotient of projected scatter:</p>
     <div class="formula-box">
-        w = S_W^(-1) &times; (&mu;_1 - &mu;_2), &nbsp;&nbsp;w_hat = w / ||w||
+        <b>Fisher's Rayleigh Quotient:</b><br>
+        J(w) = ( w<sup>T</sup> S<sub>B</sub> w ) / ( w<sup>T</sup> S<sub>W</sub> w )<br><br>
+        <b>Optimal Closed-Form Discriminant Vector:</b><br>
+        w = S<sub>W</sub><sup>-1</sup> ( &mu;<sub>1</sub> - &mu;<sub>2</sub> )<br><br>
+        <b>Normalized Unit Direction:</b><br>
+        w&#770; = w / || w ||<sub>2</sub>
     </div>
 
-    <h3>4. 1D Projected Line &amp; Decision Rule</h3>
-    <p>
-        The projected discriminant axis passes through the overall mean $\boldsymbol{\mu}$ in direction $\hat{\mathbf{w}}$. The projected 1D coordinate of any sample $\mathbf{x}$ and its mapped 2D position on the line are:
-    </p>
+    <h3>3. 1D Projected Discriminant Line Equation</h3>
+    <p>The discriminant axis passes through the global data centroid &mu; in direction w&#770;:</p>
     <div class="formula-box">
-        1D Coordinate: y = (x - &mu;) &middot; w_hat<br>
-        Mapped 2D Point on Line: x_hat = &mu; + y &times; w_hat<br>
-        Optimal Decision Threshold: y* = ( y_&mu;1 + y_&mu;2 ) / 2
+        <b>Projected Line Equation:</b><br>
+        Line(t) = &mu; + t &times; w&#770;, &nbsp;&nbsp;&nbsp; t &isin; &real;
+    </div>
+
+    <h3>4. 1D Reduced Coordinate, Mapping, &amp; Decision Boundary</h3>
+    <p>For any arbitrary test sample x<sub>test</sub> &isin; &real;<sup>d</sup>:</p>
+    <div class="formula-box">
+        <b>Reduced 1D Feature Coordinate:</b><br>
+        y<sub>test</sub> = ( x<sub>test</sub> - &mu; ) &middot; w&#770; = ( x<sub>test</sub> - &mu; )<sup>T</sup> w&#770; &isin; &real;<br><br>
+        <b>Projected Point on Discriminant Line:</b><br>
+        x&#770;<sub>test</sub> = &mu; + y<sub>test</sub> &times; w&#770; &isin; &real;<sup>d</sup><br><br>
+        <b>Optimal Decision Boundary Threshold:</b><br>
+        y<sup>*</sup> = [ ( &mu;<sub>1</sub> - &mu; )&middot;w&#770; + ( &mu;<sub>2</sub> - &mu; )&middot;w&#770; ] / 2<br><br>
+        <b>Decision Rule:</b><br>
+        If y<sub>test</sub> &ge; y<sup>*</sup> &rarr; Predict Class 1; &nbsp;&nbsp;&nbsp; Else &rarr; Predict Class 2.
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Structured supervised bivariate dataset across two well-defined Gaussian classes.</li>
+        <li>Calculated empirical class centroids, Within-Class scatter matrix S_W, and Between-Class scatter matrix S_B.</li>
+        <li>Computed Fisher's optimal linear discriminant vector w using pure NumPy matrix inversion.</li>
+        <li>Constructed 1D projection equations and established the midpoint optimal classification threshold y*.</li>
+        <li>Implemented testing pipeline mapping unseen test inputs onto the discriminant line and predicting class labels.</li>
+        <li>Deployed interactive Flask dashboard on port 5003 displaying projection plots, discriminant axes, and classification summaries.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup &amp; Mathematical Engine</h3>
-    <p>Configured <code>exp 11/</code> environment containing <code>app.py</code>, <code>templates/</code>, and verified dependencies (Flask, NumPy, Matplotlib, SciPy).</p>
-
-    <h3>Step 2: Class Mean Vectors &amp; Within-Class Scatter Matrix</h3>
-    <p>Synthesized two-class clinical pattern distribution (Healthy vs Diabetic Risk) and formulated $\mathbf{S}_{W1}$, $\mathbf{S}_{W2}$, and total pooled scatter $\mathbf{S}_W$.</p>
-
-    <h3>Step 3: Fisher Optimal Direction Vector Computation</h3>
-    <p>Inverted scatter matrix $\mathbf{S}_W^{-1}$ and computed normalized discriminant vector $\hat{\mathbf{w}}$.</p>
-
-    <h3>Step 4: Orthogonal Feature Mapping onto Discriminant Line</h3>
-    <p>Projected all observations onto the 1D line passing through global centroid $\boldsymbol{\mu}$, calculated optimal separating threshold $y^*$, and mapped points onto the 2D projected line.</p>
-
-    <h3>Step 5: Interactive Testing &amp; Web Deployment on Port 5013</h3>
-    <p>Launched interactive Flask web dashboard on <a href="http://127.0.0.1:5013" target="_blank">http://127.0.0.1:5013</a> supporting real-time patient test coordinates and visual classification.</p>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Fisher's Criterion &amp; Scatter Matrices Summary</h3>
-    <p>Displays class mean vectors &mu;<sub>1</sub>, &mu;<sub>2</sub>, within-class scatter matrix $\mathbf{S}_W$, optimal Fisher direction vector $\hat{\mathbf{w}}$, and optimal 1D decision threshold $y^*$.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 11.1: Fisher Parameters & Scatter Matrices Summary</h3>
+    <p>Displays class centroids, S_W, S_B, Fisher projection vector w, and the calculated decision threshold y*.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_fisher_parameters.png" alt="Output 1 Fisher Parameters">
-        <div class="screenshot-caption">Figure 11.1: Section 1 &mdash; Fisher's criterion parameters and scatter matrices summary.</div>
+        <img src="screenshots/ss1_fisher_parameters.png" alt="Figure 11.1: Fisher Parameters & Scatter Matrices Summary">
+        <div class="screenshot-caption">Figure 11.1: Fisher Parameters & Scatter Matrices Summary</div>
+    </div>
+
+    
+    <h3>Figure 11.2: Interactive Test Sample Controls</h3>
+    <p>Input form allowing users to submit test feature points (x1, x2) for live projection and classification.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_test_controls.png" alt="Figure 11.2: Interactive Test Sample Controls">
+        <div class="screenshot-caption">Figure 11.2: Interactive Test Sample Controls</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 2: Test Sample Classification &amp; Projection Controls</h3>
-    <p>Interactive test patient measurement inputs ($x_1$: Fasting Glucose, $x_2$: Postprandial Glucose), displaying projected 1D coordinate $y_{\text{test}}$, reconstructed 2D position on the line, and automated diagnostic classification.</p>
+    <h3>Figure 11.3: LDA Projected Line, Class Separations & Test Mapping</h3>
+    <p>Visualization showing class distributions, Fisher discriminant line, decision threshold boundary, and test sample projection.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_test_controls.png" alt="Output 2 Test Controls">
-        <div class="screenshot-caption">Figure 11.2: Section 2 &mdash; Test sample classification and projection controls with preset benchmarks.</div>
+        <img src="screenshots/ss3_projection_plot.png" alt="Figure 11.3: LDA Projected Line, Class Separations & Test Mapping">
+        <div class="screenshot-caption">Figure 11.3: LDA Projected Line, Class Separations & Test Mapping</div>
     </div>
 
-    <h3>Output 3: Fisher LDA 2D Projected Line &amp; 1D Separation Plots</h3>
-    <p>Dual-panel visualization: Left panel exhibits 2D patient observations, global centroid &mu;, Fisher optimal discriminant line, orthogonal projection segments, decision threshold point, and active test sample. Right panel displays 1D projected subspace demonstrating optimal class separation.</p>
+    
+    <h3>Figure 11.4: Sample Reduction & Classification Output</h3>
+    <p>Tabulates test sample coordinates, reduced 1D coordinate y, distance from threshold, and predicted class.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss3_projection_plot.png" alt="Output 3 Fisher LDA Projected Line and 1D Subspace">
-        <div class="screenshot-caption">Figure 11.3: Section 3 &mdash; 2D feature space with Fisher projected line and 1D separated feature distribution.</div>
+        <img src="screenshots/ss4_sample_reduction_table.png" alt="Figure 11.4: Sample Reduction & Classification Output">
+        <div class="screenshot-caption">Figure 11.4: Sample Reduction & Classification Output</div>
     </div>
 
-    <div class="page-break"></div>
+    
 
-    <h3>Output 4: Reduced 1D Feature Mappings &amp; Classification Verification</h3>
-    <p>Tabular verification comparing true classes, original patient vectors [$x_1, x_2$], projected 1D coordinates $y$, mapped points on the line, and diagnostic decision statuses for baseline samples and active test queries.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/ss4_sample_reduction_table.png" alt="Output 4 Sample Reduction and Verification Table">
-        <div class="screenshot-caption">Figure 11.4: Section 4 &mdash; Tabular verification of mapped 1D features and classification correctness.</div>
-    </div>
-
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
-
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Fisher Parameters Screenshot (Section 1):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss1_fisher_parameters.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss1_fisher_parameters.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Test Controls Screenshot (Section 2):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss2_test_controls.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss2_test_controls.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Projected Line &amp; Separation Plot Screenshot (Section 3):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss3_projection_plot.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss3_projection_plot.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Sample Reduction &amp; Verification Table Screenshot (Section 4):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss4_sample_reduction_table.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 11/screenshots/ss4_sample_reduction_table.png</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, Linear Discriminant Analysis was implemented from first principles in Python. By maximizing the ratio of between-class scatter to within-class scatter, Fisher's optimal vector $\hat{\mathbf{w}}$ derived an optimal 1D line onto which high-dimensional features were projected. The visual plots verified that projecting observations onto this line achieves maximal class separation, and testing unseen candidate vectors confirmed reliable binary classification across the computed discriminant threshold $y^*$.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 11 demonstrated the power of supervised dimensionality reduction through Linear Discriminant Analysis. By maximizing the ratio of between-class scatter to within-class scatter, LDA successfully discovered the projection vector that achieves maximum class separability, proving its dual utility as both a feature reduction technique and a robust linear classifier.</p>
 
 </body>
 </html>

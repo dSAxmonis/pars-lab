@@ -2,289 +2,283 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Experiment 10 - Principal Component Analysis (PCA) with Testing</title>
+    <title>Experiment 10 - Implementation of Principal Component Analysis (PCA) with Projected Line, Reduced Feature Mapping, and Testing</title>
     <style>
         @page {
             size: A4;
             margin: 12mm 14mm 12mm 14mm;
             @bottom-right {
-                content: "Page " counter(page) " of " counter(pages);
-                font-size: 9pt;
+                content: "Page " counter(page);
+                font-size: 8.5pt;
                 font-family: Arial, sans-serif;
-                color: #555;
+                color: #555555;
             }
         }
         body {
-            font-family: Arial, sans-serif;
-            font-size: 10pt;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
             line-height: 1.42;
-            color: #111;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
-            font-size: 18pt;
-            color: #1a365d;
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #003366;
             text-align: center;
-            margin: 0 0 4px 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            font-size: 12.5pt;
-            color: #1a365d;
-            border-bottom: 2px solid #1a365d;
-            padding-bottom: 3px;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-        h3 {
-            font-size: 10.5pt;
-            color: #2b6cb0;
-            margin-top: 10px;
-            margin-bottom: 4px;
-        }
-        p, li {
-            text-align: justify;
-            margin-top: 3px;
-            margin-bottom: 5px;
-        }
-        ul, ol {
-            margin-top: 3px;
-            margin-bottom: 6px;
-            padding-left: 20px;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
+            font-size: 8.5pt;
+            color: #555555;
             text-align: center;
-            font-size: 10.5pt;
-            color: #4a5568;
-            margin-bottom: 10px;
+            margin: 0 0 8px 0;
         }
-        .meta-bar {
-            background-color: #f7fafc;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            padding: 6px 12px;
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
             font-size: 9pt;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #edf2f7;
-            border-left: 4px solid #2b6cb0;
-            padding: 6px 12px;
-            margin: 6px 0;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 9pt;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .screenshot-container {
             text-align: center;
-            margin: 10px 0;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .screenshot-container img {
             max-width: 98%;
-            border: 1px solid #cbd5e0;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
             border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .screenshot-caption {
             font-size: 8pt;
-            color: #4a5568;
+            color: #475569;
             margin-top: 3px;
             font-style: italic;
         }
-        .link-card {
-            background-color: #ebf8ff;
-            border: 1px solid #bee3f8;
-            border-left: 4px solid #3182ce;
-            padding: 8px 12px;
-            margin: 10px 0;
-            font-size: 9pt;
-        }
-        .link-card a {
-            color: #2b6cb0;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #1a365d;
-            color: #ffffff !important;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 9pt;
-            text-decoration: none;
-            margin-right: 6px;
-        }
         .page-break {
             page-break-before: always;
+        }
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
+        }
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <span><b>Experiment No.:</b> 10</span>
-        <span><b>Course:</b> PARS Lab</span>
-        <span><b>Topic:</b> Principal Component Analysis (PCA)</span>
-        <span><b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a></span>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>10</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Implementation of Principal Component Analysis (PCA) with Projected Line, Reduced Feature Mapping, and Testing</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To implement Principal Component Analysis (PCA) from scratch in Python for an engineering pattern recognition application involving test sample evaluation, derive the primary eigenvector &mathbf;v<sub>1</sub> of the covariance matrix, and visualize:
-        <b>1) The 1st principal component projected line</b>,
-        <b>2) New reduced 1D features mapped directly onto the projected line</b>, and
-        <b>3) Orthogonal projection and reconstruction error evaluation of unseen test samples</b>.
-    </p>
+    <h2>Aim</h2>
+    <p>To implement Principal Component Analysis (PCA) from scratch in pure NumPy without using pre-built machine learning libraries. The application centers the dataset, computes the sample covariance matrix, performs eigenvalue decomposition to identify the maximum variance projection axis, defines the 1D projected line equation, maps test samples onto this line to obtain reduced 1D features, reconstructs original coordinates, and visualizes the complete system in an interactive Flask application.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Principal Component Analysis (PCA):</b> An unsupervised, orthogonal linear transformation technique that reduces dimensionality by projecting data onto orthogonal axes that maximize variance while minimizing reconstruction error.</p>
+    <p><b>Sample Covariance Matrix &Sigma;:</b> Quantifies pairwise linear relationships and joint variability across feature dimensions around the sample mean centroid.</p>
+    <p><b>Eigenvalue Decomposition:</b> Factorizes the covariance matrix &Sigma; into eigenvectors (principal projection directions) and eigenvalues (amount of variance explained along each axis).</p>
 
-    <h3>1. Dimensionality Reduction &amp; Maximum Variance Projection</h3>
-    <p>
-        Principal Component Analysis (PCA) is an unsupervised linear transformation technique that seeks an orthogonal coordinate system where data variance is maximized along successive axes. For a zero-mean centered data matrix $\tilde{\mathbf{X}} = \mathbf{X} - \boldsymbol{\mu}$, the sample covariance matrix is:
-    </p>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Mean Centering &amp; Sample Covariance Matrix</h3>
+    <p>Data matrix X &isin; &real;<sup>n &times; d</sup> is centered around sample mean vector &mu;:</p>
     <div class="formula-box">
-        &Sigma; = ( 1 / (n - 1) ) &times; X_c^T X_c
+        <b>Empirical Centroid:</b><br>
+        &mu; = ( 1 / n ) &times; &sum;<sub>i=1</sub><sup>n</sup> x<sup>(i)</sup><br><br>
+        <b>Zero-Mean Centered Matrix:</b><br>
+        X&#771; = X - 1 &mu;<sup>T</sup><br><br>
+        <b>Sample Covariance Matrix Formulation:</b><br>
+        &Sigma; = ( 1 / ( n - 1 ) ) &times; X&#771;<sup>T</sup> X&#771; &isin; &real;<sup>d &times; d</sup><br><br>
+        <b>Where:</b><br>
+        • n is the total number of training observations.<br>
+        • d is the feature dimensionality (d = 2 for bivariate visual demo).<br>
+        • &Sigma; is symmetric and positive semi-definite.
     </div>
 
-    <h3>2. Eigenvalue Decomposition</h3>
-    <p>
-        The principal directions correspond to eigenvectors satisfying:
-    </p>
+    <h3>2. Eigenvalue Decomposition &amp; Variance Maximization</h3>
+    <p>Solving the characteristic equation identifies orthogonal principal component directions:</p>
     <div class="formula-box">
-        &Sigma; v_i = &lambda;_i v_i &nbsp;&nbsp;(where &lambda;_1 &ge; &lambda;_2 &ge; ... &ge; &lambda;_d &ge; 0)
+        <b>Eigen-System Equation:</b><br>
+        &Sigma; v<sub>k</sub> = &lambda;<sub>k</sub> v<sub>k</sub>, &nbsp;&nbsp;&nbsp; where &lambda;<sub>1</sub> &ge; &lambda;<sub>2</sub> &ge; &hellip; &ge; &lambda;<sub>d</sub> &ge; 0<br><br>
+        <b>Explained Variance Ratio for 1st Principal Component:</b><br>
+        EVR<sub>1</sub> = &lambda;<sub>1</sub> / &sum;<sub>j=1</sub><sup>d</sup> &lambda;<sub>j</sub><br><br>
+        <b>Where:</b><br>
+        • v<sub>1</sub> is the first principal eigenvector (unit direction vector of maximum variance).<br>
+        • &lambda;<sub>1</sub> is the dominant eigenvalue representing empirical variance along v<sub>1</sub>.
     </div>
-    <p>
-        The proportion of total variance preserved by the 1st principal component is given by $\text{Ratio} = \lambda_1 / \sum \lambda_k$.
-    </p>
 
-    <h3>3. Linear Subspace Projected Line Equation</h3>
-    <p>
-        The 1st principal component defines a straight line in the original feature space passing through data centroid $\boldsymbol{\mu}$ along unit direction $\mathbf{v}_1$:
-    </p>
+    <h3>3. 1D Projected Principal Axis (Line Equation)</h3>
+    <p>The 1st principal component defines a straight line in the original feature space passing through centroid &mu;:</p>
     <div class="formula-box">
-        Line(t) = &mu; + t &times; v_1, &nbsp;&nbsp;t &in; R
+        <b>Parametric Projected Line Equation:</b><br>
+        Line(t) = &mu; + t &times; v<sub>1</sub>, &nbsp;&nbsp;&nbsp; t &isin; &real;
     </div>
 
     <h3>4. 1D Feature Mapping &amp; Reconstruction of Test Samples</h3>
-    <p>
-        Any arbitrary test vector $\mathbf{x}_{\text{test}}$ is mapped to a scalar coordinate $z_{\text{test}}$ and reconstructed as $\hat{\mathbf{x}}_{\text{test}}$:
-    </p>
+    <p>For an arbitrary test observation x<sub>test</sub> &isin; &real;<sup>d</sup>:</p>
     <div class="formula-box">
-        1D Coordinate: z_test = (x_test - &mu;) &middot; v_1<br>
-        Reconstructed Point on Line: x_hat_test = &mu; + z_test &times; v_1<br>
-        Orthogonal Reconstruction Residual: Error = || x_test - x_hat_test ||_2
+        <b>Reduced 1D Feature Coordinate (Scalar Score):</b><br>
+        z<sub>test</sub> = ( x<sub>test</sub> - &mu; ) &middot; v<sub>1</sub> = ( x<sub>test</sub> - &mu; )<sup>T</sup> v<sub>1</sub> &isin; &real;<br><br>
+        <b>Reconstructed Coordinate in Original Space:</b><br>
+        x&#770;<sub>test</sub> = &mu; + z<sub>test</sub> &times; v<sub>1</sub> &isin; &real;<sup>d</sup><br><br>
+        <b>Orthogonal Reconstruction Error (Residual):</b><br>
+        E = || x<sub>test</sub> - x&#770;<sub>test</sub> ||<sub>2</sub> = &radic;( &sum;<sub>j=1</sub><sup>d</sup> ( x<sub>test,j</sub> - x&#770;<sub>test,j</sub> )<sup>2</sup> )
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Synthesized benchmark bivariate feature dataset exhibiting correlated variance.</li>
+        <li>Computed sample empirical mean vector and zero-mean centered data matrix.</li>
+        <li>Calculated the covariance matrix and extracted principal eigenvalues and eigenvectors using pure NumPy.</li>
+        <li>Derived parametric line equations for the 1st principal component axis.</li>
+        <li>Implemented real-time 1D projection and reconstruction mapping for arbitrary test coordinates.</li>
+        <li>Deployed interactive Flask dashboard on port 5001 showing projection plots, orthogonal residual drops, and variance ratios.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup &amp; Mathematical Engine</h3>
-    <p>Configured <code>exp 10/</code> environment containing <code>app.py</code>, <code>templates/</code>, and verified dependencies (Flask, NumPy, Matplotlib, SciPy).</p>
-
-    <h3>Step 2: Sample Generation &amp; Centering</h3>
-    <p>Synthesized correlated bivariate industrial sensor readings and computed mean vector $\boldsymbol{\mu} = [\mu_1, \mu_2]^T$.</p>
-
-    <h3>Step 3: Covariance Formulation &amp; Eigen-Analysis</h3>
-    <p>Calculated sample covariance matrix $\mathbf{\Sigma}$ and solved characteristic polynomial $\det(\mathbf{\Sigma} - \lambda \mathbf{I}) = 0$ to extract $\mathbf{v}_1$ and $\mathbf{v}_2$.</p>
-
-    <h3>Step 4: Mapping Features to 1D Projected Line</h3>
-    <p>Orthogonally projected all training vectors onto the 1st PC axis, computing scalar coordinates $z_i$ and 2D points on the line $\hat{\mathbf{x}}_i$.</p>
-
-    <h3>Step 5: Testing &amp; Web Deployment on Port 5012</h3>
-    <p>Launched interactive Flask web server on <a href="http://127.0.0.1:5012" target="_blank">http://127.0.0.1:5012</a> accepting test coordinates, rendering the 2D projected line and 1D reduced subspace distribution.</p>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Learned PCA Parameters &amp; Eigen-Decomposition Summary</h3>
-    <p>Displays data centroid vector &mu;, sample covariance matrix &Sigma;, dominant eigenvalue &lambda;<sub>1</sub> (preserving 94.95% variance), residual eigenvalue &lambda;<sub>2</sub>, and 1st principal component eigenvector v<sub>1</sub>.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 10.1: PCA Statistical Parameters & Decomposition Summary</h3>
+    <p>Displays sample mean vector, covariance matrix, dominant eigenvalue, eigenvector components, and explained variance ratio (88.4%).</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_pca_parameters.png" alt="Output 1 Learned PCA Parameters">
-        <div class="screenshot-caption">Figure 10.1: Section 1 &mdash; Learned PCA parameters and mathematical eigen-decomposition summary.</div>
+        <img src="screenshots/ss1_pca_parameters.png" alt="Figure 10.1: PCA Statistical Parameters & Decomposition Summary">
+        <div class="screenshot-caption">Figure 10.1: PCA Statistical Parameters & Decomposition Summary</div>
+    </div>
+
+    
+    <h3>Figure 10.2: Interactive Test Sample Controls</h3>
+    <p>Input sliders and presets allowing users to submit new test points (x1, x2) for dynamic reduction.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_test_controls.png" alt="Figure 10.2: Interactive Test Sample Controls">
+        <div class="screenshot-caption">Figure 10.2: Interactive Test Sample Controls</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 2: Test Sample Projection &amp; Reconstruction Controls</h3>
-    <p>Interactive input controls for test vector coordinates x<sub>test</sub>, displaying the computed 1D scalar coordinate z<sub>test</sub> = (x<sub>test</sub> - &mu;) &middot; v<sub>1</sub>, reconstructed 2D position on the line x&#770;<sub>test</sub>, and orthogonal reconstruction residual error.</p>
+    <h3>Figure 10.3: PCA Projected Line & Feature Mapping Plot</h3>
+    <p>Matplotlib visualization showing original data scatter, centroid, 1st principal line, and test point projected onto the line with orthogonal residual drop.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_test_controls.png" alt="Output 2 Test Projection Controls">
-        <div class="screenshot-caption">Figure 10.2: Section 2 &mdash; Test sample projection and reconstruction controls with quick benchmark presets.</div>
+        <img src="screenshots/ss3_projection_plot.png" alt="Figure 10.3: PCA Projected Line & Feature Mapping Plot">
+        <div class="screenshot-caption">Figure 10.3: PCA Projected Line & Feature Mapping Plot</div>
     </div>
 
-    <h3>Output 3: PCA 2D Projected Line &amp; 1D Reduced Feature Mapping Plots</h3>
-    <p>Dual-panel visualization: Left panel exhibits original 2D bivariate training data, centroid &mu;, the 1st PC projected line, orthogonal projection segments, and the projected test sample. Right panel shows the collapsed 1D subspace confirming 94.95% preserved variance.</p>
+    
+    <h3>Figure 10.4: Sample Reduction & Reconstruction Table</h3>
+    <p>Tabulates original test coordinates, reduced 1D scalar coordinate z, reconstructed position, and Euclidean reconstruction error.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss3_projection_plot.png" alt="Output 3 PCA 2D Projected Line and 1D Subspace">
-        <div class="screenshot-caption">Figure 10.3: Section 3 &mdash; Bivariate 2D feature space with 1st PC projected line and mapped 1D reduced subspace.</div>
+        <img src="screenshots/ss4_sample_reduction_table.png" alt="Figure 10.4: Sample Reduction & Reconstruction Table">
+        <div class="screenshot-caption">Figure 10.4: Sample Reduction & Reconstruction Table</div>
     </div>
 
-    <div class="page-break"></div>
+    
 
-    <h3>Output 4: Original Samples vs. 1D Reduced Features &amp; Reconstruction Residuals</h3>
-    <p>Detailed mapping table comparing original bivariate training vectors [x<sub>1</sub>, x<sub>2</sub>], mapped 1D scalar coordinates z, mapped points on the line [x&#770;<sub>1</sub>, x&#770;<sub>2</sub>], and orthogonal reconstruction residuals for training samples and active test queries.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/ss4_sample_reduction_table.png" alt="Output 4 Sample Reduction and Residual Table">
-        <div class="screenshot-caption">Figure 10.4: Section 4 &mdash; Tabular mapping of original samples to 1D reduced coordinates and reconstruction residual errors.</div>
-    </div>
-
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
-
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>PCA Parameters Screenshot (Section 1):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss1_pca_parameters.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss1_pca_parameters.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Test Controls Screenshot (Section 2):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss2_test_controls.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss2_test_controls.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Projected Line &amp; Subspace Screenshot (Section 3):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss3_projection_plot.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss3_projection_plot.png</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Sample Mapping &amp; Residuals Table Screenshot (Section 4):</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss4_sample_reduction_table.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 10/screenshots/ss4_sample_reduction_table.png</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, Principal Component Analysis was implemented from first principles in Python. The linear transformation mapped correlated 2D sensor patterns into an optimal 1D subspace along the 1st principal component line $p(t) = \boldsymbol{\mu} + t\mathbf{v}_1$. The testing phase demonstrated that unseen test vectors can be rapidly projected to reduced scalar coordinates $z_{\text{test}} = (\mathbf{x}_{\text{test}} - \boldsymbol{\mu}) \cdot \mathbf{v}_1$ while preserving over 90% of the total dataset variance with minimal reconstruction residual error.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 10 successfully implemented Principal Component Analysis from first principles. By decomposing the empirical covariance matrix, the application established the 1D principal axis that captures maximum variance, demonstrated the mapping of test samples onto reduced coordinates, and verified that PCA achieves optimal orthogonal reconstruction under least-squares criteria.</p>
 
 </body>
 </html>

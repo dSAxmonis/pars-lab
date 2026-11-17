@@ -1,256 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Experiment 7 - Lab Practical File</title>
+    <meta charset="UTF-8">
+    <title>Experiment 7 - Implementation of Linear Regression from Scratch Using Gradient Descent and Cost Curve Analysis in Python</title>
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 11pt;
-            background-color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.42;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
             color: #003366;
-            font-size: 18pt;
             text-align: center;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            color: #003366;
-            font-size: 14pt;
-            border-bottom: 2px solid #003366;
-            padding-bottom: 4px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            page-break-after: avoid;
-        }
-        h3 {
-            color: #004d40;
-            font-size: 12pt;
-            margin-top: 16px;
-            margin-bottom: 8px;
-            page-break-after: avoid;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
-            text-align: center;
+            font-size: 8.5pt;
             color: #555555;
-            font-size: 11pt;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .meta-bar {
             text-align: center;
-            font-size: 10pt;
-            background-color: #f0f4f8;
-            padding: 8px;
-            border: 1px solid #d0dbe5;
-            margin-bottom: 20px;
+            margin: 0 0 8px 0;
         }
-        table {
+        .meta-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
         }
-        table, th, td {
-            border: 1px solid #cccccc;
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
         }
-        th {
-            background-color: #003366;
-            color: #ffffff;
-            padding: 8px 6px;
-            text-align: left;
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
         }
-        td {
-            padding: 6px 8px;
-            vertical-align: top;
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9pt;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #f7f9fa;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-left: 4px solid #003366;
-            padding: 8px 14px;
-            margin: 10px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        .ss-placeholder-box {
-            border: 2px dashed #003366;
-            background-color: #fbfbfb;
-            padding: 40px 20px;
+        .screenshot-container {
             text-align: center;
-            margin: 16px 0;
-            font-size: 12pt;
-            color: #555555;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
-        .badge {
-            display: inline-block;
-            background-color: #181717;
-            color: #ffffff !important;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
         }
         .page-break {
             page-break-before: always;
         }
-        a {
-            color: #0044cc;
-            text-decoration: underline;
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        a:hover {
-            color: #002288;
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
         }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            font-size: 9.5pt;
-            font-family: monospace;
-        }
-        .link-card {
-            background-color: #f8faff;
-            border: 1px solid #cce0ff;
-            border-left: 4px solid #0055ff;
-            padding: 10px 14px;
-            margin: 10px 0;
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <b>Experiment No.:</b> 07 &nbsp;|&nbsp; 
-        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
-        <b>Framework:</b> Python 3.14 / Pure NumPy &nbsp;|&nbsp;
-        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>07</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Implementation of Linear Regression from Scratch Using Gradient Descent and Cost Curve Analysis in Python</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To implement Linear Regression in Python from scratch without using any inbuilt machine learning library functions (such as <code>scikit-learn</code>), optimize parameters (weight $w$ and bias $b$) via Gradient Descent for a real-world predictive application (Real Estate Price Prediction), and plot the Gradient Descent convergence cost curve alongside the fitted regression line.
-    </p>
+    <h2>Aim</h2>
+    <p>To implement Linear Regression from first principles in Python strictly using pure NumPy without relying on pre-built machine learning libraries (such as scikit-learn). The algorithm optimizes weight (w) and bias (b) parameters via Gradient Descent for a real-world predictive regression task (Housing Price Prediction), tracks Mean Squared Error (MSE) decay across iterations, and plots the Gradient Descent cost convergence curve alongside the fitted linear regression line.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Supervised Linear Regression:</b> A parametric regression approach that models the continuous linear relationship between an independent explanatory feature x and a dependent target response variable y.</p>
+    <p><b>Cost Function (Mean Squared Error):</b> A convex loss surface quantifying the average squared discrepancy between model predictions and true observed continuous targets across all training samples.</p>
+    <p><b>Batch Gradient Descent:</b> A first-order iterative optimization algorithm that simultaneously updates parameters in the direction of the negative gradient of the cost function to reach the global minimum.</p>
 
-    <h3>1. Hypothesis &amp; Model Representation</h3>
-    <p>
-        For a scalar explanatory variable $x^{(i)}$, the linear regression hypothesis is represented as:
-    </p>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Linear Regression Hypothesis Representation</h3>
+    <p>For an individual training sample x<sup>(i)</sup>, the linear hypothesis prediction is modeled as:</p>
     <div class="formula-box">
-        y_hat^(i) = w &times; x^(i) + b
+        <b>Linear Hypothesis Equation:</b><br>
+        y&#770;<sup>(i)</sup> = w &times; x<sup>(i)</sup> + b<br><br>
+        <b>Where:</b><br>
+        • x<sup>(i)</sup> is the scalar input feature (e.g., house square footage in 1000s of sq ft).<br>
+        • y&#770;<sup>(i)</sup> is the estimated target prediction (predicted house price in $10,000s).<br>
+        • w is the learnable weight coefficient (slope parameter).<br>
+        • b is the learnable bias parameter (y-intercept).
     </div>
 
-    <h3>2. Cost Function (Mean Squared Error)</h3>
+    <h3>2. Cost Function (Mean Squared Error - MSE)</h3>
+    <p>The optimization objective minimizes the convex squared error surface over m training samples:</p>
     <div class="formula-box">
-        J(w, b) = ( 1 / 2m ) &times; &sum; [ ( y_hat^(i) - y^(i) )^2 ]
+        <b>MSE Cost Function:</b><br>
+        J(w, b) = ( 1 / ( 2&middot;m ) ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( y&#770;<sup>(i)</sup> - y<sup>(i)</sup> )<sup>2</sup> = ( 1 / ( 2&middot;m ) ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( ( w&middot;x<sup>(i)</sup> + b ) - y<sup>(i)</sup> )<sup>2</sup><br><br>
+        <b>Where:</b><br>
+        • m is the total number of training instances.<br>
+        • y<sup>(i)</sup> is the true ground truth target value for sample i.<br>
+        • The factor 1/2 cancels mathematically upon differentiation.
     </div>
 
     <h3>3. Analytical Gradients (Partial Derivatives)</h3>
+    <p>Differentiating J(w, b) with respect to each model parameter yields the analytical gradient vector:</p>
     <div class="formula-box">
-        &part;J / &part;w = ( 1 / m ) &times; &sum; [ ( y_hat^(i) - y^(i) ) &times; x^(i) ]<br>
-        &part;J / &part;b = ( 1 / m ) &times; &sum; [ ( y_hat^(i) - y^(i) ) ]
+        <b>Weight Partial Derivative:</b><br>
+        &part;J / &part;w = ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( y&#770;<sup>(i)</sup> - y<sup>(i)</sup> ) &times; x<sup>(i)</sup><br><br>
+        <b>Bias Partial Derivative:</b><br>
+        &part;J / &part;b = ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( y&#770;<sup>(i)</sup> - y<sup>(i)</sup> )
     </div>
 
     <h3>4. Simultaneous Parameter Update Rule</h3>
+    <p>Parameters are simultaneously updated at each iteration step using learning rate &alpha;:</p>
     <div class="formula-box">
+        <b>Gradient Descent Updates:</b><br>
         w := w - &alpha; &times; ( &part;J / &part;w )<br>
-        b := b - &alpha; &times; ( &part;J / &part;b )
+        b := b - &alpha; &times; ( &part;J / &part;b )<br><br>
+        <b>Where:</b><br>
+        • &alpha; &gt; 0 is the learning rate step size hyperparameter governing convergence velocity.
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Formulated vectorized linear regression arithmetic strictly using pure NumPy arrays without external estimators.</li>
+        <li>Programmed the batch Gradient Descent optimization loop iteratively updating weight w and bias b.</li>
+        <li>Logged Mean Squared Error (MSE) at each epoch to record the monotonic decay convergence history.</li>
+        <li>Deployed an interactive Flask application on port 5009 allowing users to adjust learning rate, number of iterations, test new feature inputs, and inspect dynamic cost curves.</li>
+    </ol>
 
-    <h3>Step 1: Scratch Implementation Framework</h3>
-    <p>Formulated vectorized regression arithmetic strictly using fundamental NumPy operations without inbuilt estimators.</p>
-
-    <h3>Step 2: Gradient Descent Optimization Loop</h3>
-    <p>Executed gradient descent optimization tracking Mean Squared Error decay at each epoch.</p>
-
-    <h3>Step 3: Web Application Deployment</h3>
-    <p>Launched server at <a href="http://127.0.0.1:5009" target="_blank">http://127.0.0.1:5009</a> providing interactive hyperparameter tuning and visualization plots.</p>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Hyperparameter Tuning &amp; Optimization Summary</h3>
-    <p>Displays configurable learning rate, iterations, test input, and resulting optimized parameters ($w^*, b^*$) alongside initial and final converged MSE costs.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 7.1: Hyperparameter Tuning & Optimization Summary</h3>
+    <p>Interactive controls for learning rate, epochs, and input testing alongside converged weight, bias, and final MSE cost values.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_hyperparameters_tuning.png" alt="Output 1 Hyperparameters">
-        <div class="screenshot-caption">Figure 7.1: Section 1 &mdash; Hyperparameter tuning controls and optimization results summary.</div>
+        <img src="screenshots/ss1_hyperparameters_tuning.png" alt="Figure 7.1: Hyperparameter Tuning & Optimization Summary">
+        <div class="screenshot-caption">Figure 7.1: Hyperparameter Tuning & Optimization Summary</div>
+    </div>
+
+    
+    <h3>Figure 7.2: Gradient Descent Convergence Curve & Fitted Model</h3>
+    <p>Dual-panel plot displaying the monotonic decay of MSE cost over iterations (left) and the fitted linear regression line over housing data (right).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_convergence_curve_fit.png" alt="Figure 7.2: Gradient Descent Convergence Curve & Fitted Model">
+        <div class="screenshot-caption">Figure 7.2: Gradient Descent Convergence Curve & Fitted Model</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 2: Gradient Descent Convergence Curve &amp; Fitted Model</h3>
-    <p>Visualizes the monotonic decay of MSE cost $J(w,b)$ across iterations alongside the fitted linear regression line over housing data points.</p>
+    <h3>Figure 7.3: Training Sample Evaluation & Residual Analysis</h3>
+    <p>Tabular display of observed features, ground truth targets, model predictions, and calculated residual errors.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_convergence_curve_fit.png" alt="Output 2 Convergence and Fit">
-        <div class="screenshot-caption">Figure 7.2: Section 2 &mdash; Gradient descent cost convergence curve and fitted linear regression line.</div>
+        <img src="screenshots/ss3_dataset_residuals.png" alt="Figure 7.3: Training Sample Evaluation & Residual Analysis">
+        <div class="screenshot-caption">Figure 7.3: Training Sample Evaluation & Residual Analysis</div>
     </div>
 
-    <h3>Output 3: Real Estate Dataset Samples &amp; Residual Errors</h3>
-    <p>Presents observed housing area values, true prices, model predictions, and absolute residual errors across samples.</p>
-    <div class="screenshot-container">
-        <img src="screenshots/ss3_dataset_residuals.png" alt="Output 3 Dataset Residuals">
-        <div class="screenshot-caption">Figure 7.3: Section 3 &mdash; Dataset sample evaluation and residual prediction error table.</div>
-    </div>
+    
 
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
-
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 7/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 7/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 7/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 7/screenshots/full_page.png</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, Linear Regression was implemented completely from scratch in Python without relying on pre-built machine learning libraries. Utilizing analytical gradient descent equations, optimal weights ($w^*$) and bias ($b^*$) were iteratively discovered for housing valuation data. The resulting Gradient Descent curve demonstrated stable monotonic cost convergence, and the fitted regression model reliably generalized predictions on unseen feature samples.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 7 demonstrated the first-principles implementation of Linear Regression using analytical gradient descent. By deriving exact partial derivatives and simultaneously updating parameters, the algorithm achieved steady monotonic loss convergence toward the global minimum, confirming how mathematical optimization guides regression models to discover optimal parameters from empirical data.</p>
 
 </body>
 </html>

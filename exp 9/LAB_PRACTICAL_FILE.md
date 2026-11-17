@@ -1,84 +1,81 @@
-# EXPERIMENT 9: IMPLEMENTATION OF REGULARIZATION (L1 & L2) FOR PATTERN CLASSIFICATION
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
+
+---
+
+## EXPERIMENT 9
+
+### PRACTICAL NAME:
+**Implementation of Regularization (L1 / Lasso & L2 / Ridge) for Overfitting Prevention and Generalization**
 
 ---
 
 ### AIM:
-To implement regularization techniques (L1 / Lasso and L2 / Ridge) in Python for a non-linear classification task using polynomial feature mapping, analyze the mathematical impact of penalty parameter $\lambda$ on model variance, and generate visualization plots illustrating:
-1. **Decision boundary before and after regularization**, and
-2. **Quantitative performance (Accuracy and Cross-Entropy Loss) before and after applying regularization**.
+To implement L1 (Lasso) and L2 (Ridge) Regularization techniques from scratch in Python to prevent overfitting in high-capacity non-linear classifiers. The application demonstrates the effect of regularization on model variance by generating and plotting: 1) Non-linear decision boundaries before and after applying regularization, and 2) Quantitative performance comparison curves showing training vs. test generalization across varying regularization penalties (lambda).
 
 ---
 
-### THEORY:
-
-#### 1. The Overfitting Problem (High Variance):
-When complex classifiers with high representational capacity (e.g. 6th-order polynomial expansion creating 28 dimensional feature vectors) fit noisy data, weights grow arbitrarily large to classify noise points, resulting in severe over-fitting: high training accuracy with low test accuracy.
-
-#### 2. L2 Regularization (Ridge Regression / Weight Decay):
-Penalizes the sum of squared weights:
-$$\mathcal{J}_{L2}(\mathbf{w}, b) = \mathcal{J}_{CE}(\mathbf{w}, b) + \frac{\lambda}{2m} \sum_{j=1}^{d} w_j^2$$
-Gradient update shrinks weights proportionally towards zero:
-$$w_j := w_j \left(1 - \frac{\alpha \lambda}{m}\right) - \alpha \frac{\partial \mathcal{J}_{CE}}{\partial w_j}$$
-
-#### 3. L1 Regularization (Lasso / Sparse Feature Selection):
-Penalizes the sum of absolute values of weights:
-$$\mathcal{J}_{L1}(\mathbf{w}, b) = \mathcal{J}_{CE}(\mathbf{w}, b) + \frac{\lambda}{m} \sum_{j=1}^{d} |w_j|$$
-Forces non-contributing polynomial weights strictly to zero, effectively selecting the most salient polynomial interactions.
+### DEFINITIONS & CORE CONCEPTS:
+* **The Overfitting Problem (High Variance):** Classifiers with high representational capacity (e.g., 6th-order polynomial expansions) fit noise artifacts, causing high training accuracy but poor generalization on test data.
+* **L2 Regularization (Ridge / Weight Decay):** Penalizes squared weight magnitudes, shrinking weights proportionally toward zero to smooth decision boundaries.
+* **L1 Regularization (Lasso / Sparse Feature Selection):** Penalizes absolute weight magnitudes, driving irrelevant feature weights strictly to zero to perform automated feature selection.
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Polynomial Feature Mapping
+```text
+phi(x1, x2) = [ 1, x1, x2, x1^2, x1*x2, x2^2, ..., x1^6, ..., x2^6 ]^T in R^28
+```
 
-1. **Step 1: Environment & Dependency Setup**
-   - Create directory `exp 9/` containing `app.py`, `templates/`, and `screenshots/`.
-   - Install dependencies: `Flask`, `numpy`, `scikit-learn`, and `matplotlib`.
+#### 2. L2 Regularization (Ridge / Weight Decay)
+```text
+J_L2(w, b) = J_0(w, b) + [ lambda / (2*m) ] * sum_{j=1}^d ( w_j )^2
 
-2. **Step 2: Synthetic Dataset & Polynomial Feature Expansion**
-   - Generate non-linear classification samples and expand to 6th-degree polynomial space ($d=28$).
-   - Partition into 65% training and 35% testing sets.
+Update Rule:
+w_j := w_j * [ 1 - (alpha * lambda / m) ] - alpha * ( del_J0 / del_w_j )
+```
 
-3. **Step 3: Train Unregularized Baseline Model ($\lambda = 0$)**
-   - Fit unconstrained Logistic Regression model; observe complex, oscillatory decision boundaries and high coefficient norm.
+#### 3. L1 Regularization (Lasso / Sparse Selection)
+```text
+J_L1(w, b) = J_0(w, b) + [ lambda / m ] * sum_{j=1}^d | w_j |
 
-4. **Step 4: Train Regularized Models ($\lambda > 0$)**
-   - Apply Ridge ($L_2$) and Lasso ($L_1$) penalties across hyperparameter values.
-   - Evaluate training vs test accuracy and cross-entropy loss metrics.
-
-5. **Step 5: Web Application Deployment on Port 5011**
-   - Launch interactive Flask web server: `python3 "exp 9/app.py"`.
-   - View decision boundaries and performance bar charts.
-
----
-
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 9/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/app.py)
-  - [HTML Template (`exp 9/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/templates/index.html)
-  - [Dependencies (`exp 9/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/requirements.txt)
-  - [Full Page Screenshot (`exp 9/screenshots/full_page.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%209/screenshots/full_page.png)
+Update Rule:
+w_j := w_j - alpha * ( del_J0 / del_w_j ) - alpha * ( lambda / m ) * sgn(w_j)
+```
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Generated synthetic non-linear microchip classification dataset with complex non-convex class boundaries.
+2. Constructed a 6th-degree polynomial feature expansion converting 2 input dimensions into a 28-dimensional space.
+3. Implemented unregularized, L1-regularized (Lasso), and L2-regularized (Ridge) gradient descent optimization loops in pure NumPy.
+4. Evaluated training and holdout test set accuracies across varying regularization penalties (&lambda; &isin; [0.0, 0.001, 0.01, 0.1, 1.0, 10.0]).
+5. Deployed interactive Flask dashboard on port 5011 displaying side-by-side decision boundary contours and train-vs-test generalization curves.
 
-#### 1. Hyperparameter Controls & Preset Benchmarks
-![Output 1 Hyperparameters](screenshots/ss1_hyperparameters_presets.png)
+---
 
-#### 2. Quantitative Performance Evaluation Table
-![Output 2 Metrics Table](screenshots/ss2_performance_metrics_table.png)
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 9.1: Regularization Hyperparameter Controls
+Preset configurations for Overfitting (&lambda;=0), Optimal Regularization (&lambda;=1.0), and Underfitting (&lambda;=100.0).
 
-#### 3. Decision Boundary Plot (Before vs. After Regularization)
-![Output 3 Decision Boundary](screenshots/ss3_decision_boundary_plot.png)
+![Figure 9.1: Regularization Hyperparameter Controls](screenshots/ss1_hyperparameters_presets.png)
 
-#### 4. Performance Comparison Plot (Accuracy & Loss Bar Charts)
-![Output 4 Performance Comparison Plot](screenshots/ss4_performance_comparison_plot.png)
+#### Figure 9.2: Quantitative Performance Comparison Table
+Detailed comparison table showing Train Accuracy, Test Accuracy, L1/L2 penalty costs, and non-zero weight counts.
+
+![Figure 9.2: Quantitative Performance Comparison Table](screenshots/ss2_performance_metrics_table.png)
+
+#### Figure 9.3: Decision Boundaries Before and After Regularization
+Side-by-side contour plots demonstrating how unregularized models create contorted noisy boundaries while regularized models maintain smooth generalizations.
+
+![Figure 9.3: Decision Boundaries Before and After Regularization](screenshots/ss3_decision_boundary_plot.png)
+
+#### Figure 9.4: Performance Curves vs. Regularization Strength
+Validation curves showing training score decrease and test score peak at optimal &lambda;.
+
+![Figure 9.4: Performance Curves vs. Regularization Strength](screenshots/ss4_performance_comparison_plot.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, L1 (Lasso) and L2 (Ridge) regularization were successfully implemented and analyzed. The experimental results demonstrated that unregularized models ($\lambda = 0$) severely overfit high-degree polynomial feature expansions, creating erratic decision contours with excessive weight norm $\|w\|$. Applying L2 regularization with $\lambda = 1.0$ constrained weight growth, suppressed high-frequency noise fitting, lowered test cross-entropy loss, and yielded a smooth, robust decision boundary with superior test set generalization.
+Experiment 9 demonstrated the necessity and mechanics of L1 and L2 regularization in controlling model complexity. The results confirmed that unregularized high-degree models overfit training noise with erratic boundaries, while L2 regularization smoothly constrains parameter magnitudes and L1 regularization induces weight sparsity, both successfully optimizing test set generalization.

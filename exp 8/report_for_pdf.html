@@ -1,252 +1,265 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Experiment 8 - Lab Practical File</title>
+    <meta charset="UTF-8">
+    <title>Experiment 8 - Implementation of Logistic Regression for Binary and Multiclass Classification from Scratch Using Gradient Descent in Python</title>
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 11pt;
-            background-color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.42;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
             color: #003366;
-            font-size: 18pt;
             text-align: center;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            color: #003366;
-            font-size: 14pt;
-            border-bottom: 2px solid #003366;
-            padding-bottom: 4px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            page-break-after: avoid;
-        }
-        h3 {
-            color: #004d40;
-            font-size: 12pt;
-            margin-top: 16px;
-            margin-bottom: 8px;
-            page-break-after: avoid;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
-            text-align: center;
+            font-size: 8.5pt;
             color: #555555;
-            font-size: 11pt;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .meta-bar {
             text-align: center;
-            font-size: 10pt;
-            background-color: #f0f4f8;
-            padding: 8px;
-            border: 1px solid #d0dbe5;
-            margin-bottom: 20px;
+            margin: 0 0 8px 0;
         }
-        table {
+        .meta-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
         }
-        table, th, td {
-            border: 1px solid #cccccc;
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
         }
-        th {
-            background-color: #003366;
-            color: #ffffff;
-            padding: 8px 6px;
-            text-align: left;
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
         }
-        td {
-            padding: 6px 8px;
-            vertical-align: top;
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9pt;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #f7f9fa;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-left: 4px solid #003366;
-            padding: 8px 14px;
-            margin: 10px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        .ss-placeholder-box {
-            border: 2px dashed #003366;
-            background-color: #fbfbfb;
-            padding: 40px 20px;
+        .screenshot-container {
             text-align: center;
-            margin: 16px 0;
-            font-size: 12pt;
-            color: #555555;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
-        .badge {
-            display: inline-block;
-            background-color: #181717;
-            color: #ffffff !important;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
         }
         .page-break {
             page-break-before: always;
         }
-        a {
-            color: #0044cc;
-            text-decoration: underline;
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        a:hover {
-            color: #002288;
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
         }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            font-size: 9.5pt;
-            font-family: monospace;
-        }
-        .link-card {
-            background-color: #f8faff;
-            border: 1px solid #cce0ff;
-            border-left: 4px solid #0055ff;
-            padding: 10px 14px;
-            margin: 10px 0;
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <b>Experiment No.:</b> 08 &nbsp;|&nbsp; 
-        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
-        <b>Framework:</b> Python 3.14 / Pure NumPy &nbsp;|&nbsp;
-        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>08</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Implementation of Logistic Regression for Binary and Multiclass Classification from Scratch Using Gradient Descent in Python</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To implement Logistic Regression in Python from scratch without using any inbuilt machine learning library functions (such as <code>scikit-learn</code>), optimize model parameters via Gradient Descent for both binary class (Sigmoid) and multiclass (Softmax) classification, and plot the respective Gradient Descent loss convergence curves.
-    </p>
+    <h2>Aim</h2>
+    <p>To implement Logistic Regression from first principles in pure NumPy without using pre-built machine learning libraries for both: 1) Binary Classification (using the Sigmoid activation and Binary Cross-Entropy loss) and 2) Multiclass Classification (using the Softmax activation and Categorical Cross-Entropy loss). The system derives analytical gradients, optimizes weights and biases via Gradient Descent, plots cost convergence curves, and displays linear decision boundaries in Flask.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Binary Logistic Regression:</b> A generalized linear model that maps linear feature combinations through the non-linear Sigmoid activation &sigma;(z) &isin; (0, 1) to model class posterior probability P(y=1|x).</p>
+    <p><b>Multiclass (Softmax) Regression:</b> A generalization of logistic regression to K mutually exclusive categories where normalized exponentiated class scores sum to 1.0.</p>
+    <p><b>Cross-Entropy Loss Surface:</b> A strictly convex loss formulation derived from Maximum Likelihood Estimation (MLE) that heavily penalizes confident wrong predictions.</p>
 
-    <h3>1. Binary Logistic Regression</h3>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Binary Logistic Regression Formulations</h3>
+    <p>Linear logit z is squashed into the probability interval (0, 1) via the Sigmoid function:</p>
     <div class="formula-box">
-        Hypothesis: y_hat = &sigma;(z) = 1 / ( 1 + exp(-z) ), where z = <b>w</b>^T <b>x</b> + b<br><br>
-        Binary Cross-Entropy Loss:<br>
-        J(<b>w</b>, b) = - (1/m) &times; &sum; [ y^(i) ln(y_hat^(i)) + (1 - y^(i)) ln(1 - y_hat^(i)) ]
+        <b>Sigmoid Hypothesis:</b><br>
+        y&#770;<sup>(i)</sup> = &sigma;(z<sup>(i)</sup>) = 1 / ( 1 + exp[ - ( w<sup>T</sup> x<sup>(i)</sup> + b ) ] )<br><br>
+        <b>Binary Cross-Entropy Loss:</b><br>
+        J(w, b) = - ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> [ y<sup>(i)</sup> ln(y&#770;<sup>(i)</sup>) + ( 1 - y<sup>(i)</sup> ) ln( 1 - y&#770;<sup>(i)</sup> ) ]<br><br>
+        <b>Analytical Binary Gradients:</b><br>
+        &part;J / &part;w = ( 1 / m ) &times; X<sup>T</sup> ( y&#770; - y ), &nbsp;&nbsp;&nbsp; &part;J / &part;b = ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( y&#770;<sup>(i)</sup> - y<sup>(i)</sup> )<br><br>
+        <b>Where:</b><br>
+        • y&#770;<sup>(i)</sup> &isin; (0, 1) is the predicted posterior probability P(y=1 | x<sup>(i)</sup>).<br>
+        • y<sup>(i)</sup> &isin; {0, 1} is the true binary label.<br>
+        • Decision rule: Class 1 if y&#770;<sup>(i)</sup> &ge; 0.5; else Class 0.
     </div>
 
-    <h3>2. Multiclass (Softmax) Regression</h3>
+    <h3>2. Multiclass (Softmax) Regression Formulations</h3>
+    <p>For K mutually exclusive categories, unnormalized linear score matrix Z = X W + b<sup>T</sup> is normalized:</p>
     <div class="formula-box">
-        Softmax Activation:<br>
-        P_hat_k = exp(z_k) / &sum; exp(z_j)<br><br>
-        Categorical Cross-Entropy Loss:<br>
-        J(<b>W</b>, <b>b</b>) = - (1/m) &times; &sum; &sum; [ Y_ik ln(P_hat_ik) ]
+        <b>Softmax Activation Function:</b><br>
+        P&#770;<sub>ik</sub> = exp( z<sub>ik</sub> ) / &sum;<sub>j=1</sub><sup>K</sup> exp( z<sub>ij</sub> )<br><br>
+        <b>Categorical Cross-Entropy Loss:</b><br>
+        J(W, b) = - ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> &sum;<sub>k=1</sub><sup>K</sup> Y<sub>ik</sub> ln( P&#770;<sub>ik</sub> )<br><br>
+        <b>Multiclass Matrix Gradients:</b><br>
+        &part;J / &part;W = ( 1 / m ) &times; X<sup>T</sup> ( P&#770; - Y ), &nbsp;&nbsp;&nbsp; &part;J / &part;b = ( 1 / m ) &times; &sum;<sub>i=1</sub><sup>m</sup> ( P&#770;<sub>i</sub> - Y<sub>i</sub> )<br><br>
+        <b>Where:</b><br>
+        • W &isin; &real;<sup>d &times; K</sup> is the weight matrix and b &isin; &real;<sup>K</sup> is the class bias vector.<br>
+        • Y &isin; {0, 1}<sup>m &times; K</sup> is the one-hot encoded ground truth matrix.<br>
+        • P&#770; &isin; &real;<sup>m &times; K</sup> is the computed softmax probability matrix satisfying &sum;<sub>k</sub> P&#770;<sub>ik</sub> = 1.0.
     </div>
 
-    <h3>3. Gradients and Parameter Updates</h3>
+    <h3>3. Simultaneous Parameter Update Rules</h3>
     <div class="formula-box">
-        Binary Gradients: &part;J/&part;<b>w</b> = (1/m) <b>X</b>^T (<b>y_hat</b> - <b>y</b>), &part;J/&part;b = (1/m) &sum; (y_hat - y)<br>
-        Multiclass Gradients: &part;J/&part;<b>W</b> = (1/m) <b>X</b>^T (<b>P_hat</b> - <b>Y</b>), &part;J/&part;<b>b</b> = (1/m) &sum; (P_hat - Y)
+        <b>Parameter Updates:</b><br>
+        W := W - &alpha; &times; ( &part;J / &part;W ), &nbsp;&nbsp;&nbsp; b := b - &alpha; &times; ( &part;J / &part;b )
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Implemented pure NumPy vectorization for Sigmoid and numerically stable Softmax activations.</li>
+        <li>Programmed first-principles Gradient Descent loops for Binary Cross-Entropy and Categorical Cross-Entropy objectives.</li>
+        <li>Formulated decision boundary linear equations mapping decision planes in 2D feature coordinates.</li>
+        <li>Built interactive Flask application on port 5010 providing mode toggles (Binary vs. Multiclass), learning rate sliders, and live decision boundary plots.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup</h3>
-    <p>Constructed vectorized tensor pipeline in <code>exp 8/</code> applying pure NumPy mathematics for both binary and softmax regressions.</p>
-
-    <h3>Step 2: Binary &amp; Multiclass Optimization Loop</h3>
-    <p>Formulated forward passes, loss computations, and simultaneous gradient updates tracking convergence histories.</p>
-
-    <h3>Step 3: Web Application Deployment</h3>
-    <p>Launched server at <a href="http://127.0.0.1:5010" target="_blank">http://127.0.0.1:5010</a> with real-time test inference and 4-panel visual dashboard.</p>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Test Sample Prediction Controls</h3>
-    <p>Interactive inputs for binary clinical features (Glucose &amp; BMI) and multiclass floral features (Petal &amp; Sepal Length) alongside active probability outputs.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 8.1: Prediction Controls & Hyperparameter Interface</h3>
+    <p>Interface allowing selection of Binary/Multiclass models, learning rate, iterations, and test sample coordinates.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_prediction_controls.png" alt="Output 1 Prediction Controls">
-        <div class="screenshot-caption">Figure 8.1: Section 1 &mdash; Dual-model test prediction inputs and active classification outputs.</div>
+        <img src="screenshots/ss1_prediction_controls.png" alt="Figure 8.1: Prediction Controls & Hyperparameter Interface">
+        <div class="screenshot-caption">Figure 8.1: Prediction Controls & Hyperparameter Interface</div>
     </div>
 
-    <h3>Output 2: Gradient Descent Optimized Parameters Summary</h3>
-    <p>Overview of model architectures, activation functions, loss objectives, initial vs. converged losses, and training accuracies achieved from scratch.</p>
+    
+    <h3>Figure 8.2: Learned Parameters & Optimization Summary</h3>
+    <p>Displays converged weight vectors, bias terms, training accuracy, and final Cross-Entropy loss.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_parameters_summary.png" alt="Output 2 Parameters Summary">
-        <div class="screenshot-caption">Figure 8.2: Section 2 &mdash; Optimization parameters summary and model convergence statistics.</div>
+        <img src="screenshots/ss2_parameters_summary.png" alt="Figure 8.2: Learned Parameters & Optimization Summary">
+        <div class="screenshot-caption">Figure 8.2: Learned Parameters & Optimization Summary</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 3: Gradient Descent Curves &amp; Decision Boundaries Multi-Panel Plot</h3>
-    <p>Top row visualizes cross-entropy loss convergence curves; bottom row portrays binary linear decision boundary line and multiclass scatter distribution.</p>
+    <h3>Figure 8.3: Cost Descent Curves & Decision Boundaries</h3>
+    <p>Dual visualization showing smooth Cross-Entropy decay curves and the resulting linear decision boundaries separating classes.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss3_descent_curves_boundaries.png" alt="Output 3 Curves and Boundaries">
-        <div class="screenshot-caption">Figure 8.3: Section 3 &mdash; 4-panel visual dashboard showing loss decay curves and decision boundaries.</div>
+        <img src="screenshots/ss3_descent_curves_boundaries.png" alt="Figure 8.3: Cost Descent Curves & Decision Boundaries">
+        <div class="screenshot-caption">Figure 8.3: Cost Descent Curves & Decision Boundaries</div>
     </div>
 
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
+    
 
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%208/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 8/screenshots/full_page.png</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, both Binary and Multiclass Logistic Regression were constructed from scratch in Python without leveraging black-box libraries. Utilizing gradient descent on cross-entropy loss surfaces, parameters converged smoothly with the Binary model achieving 95% accuracy and the Multiclass Softmax model achieving 94% accuracy on floral recognition. The respective Gradient Descent curves exhibited continuous error decay, and decision boundaries demonstrated clear separation between competing classes.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 8 verified the mathematical elegance of Logistic Regression implemented from first principles. By leveraging the Sigmoid function for binary tasks and the Softmax function for multiclass problems, the experiment confirmed how convex Cross-Entropy minimization via analytical gradients guarantees stable convergence to optimal decision boundaries separating non-overlapping feature spaces.</p>
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-# PATTERN ANALYSIS AND RECOGNITION SYSTEMS (PARS) LAB MANUAL
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
 
 ---
 
@@ -10,89 +10,86 @@
 ---
 
 ### AIM:
-To prepare an interactive web application using Flask in Python to implement Bayesian classification for both Single-Feature Multiple-Class and Multiple-Features Multiple-Class scenarios, compute prior, likelihood, and posterior probabilities, and classify test samples using the Maximum A Posteriori (MAP) decision rule.
+To design, formulate, and deploy an interactive Flask web application to perform pattern classification using the Bayesian framework for both 1) Single Feature Multi-Class models and 2) Multiple Features Multi-Class models. The system fits Gaussian class-conditional likelihoods, calculates posterior class probabilities, and classifies arbitrary user-supplied test samples according to the Maximum A Posteriori (MAP) decision rule.
 
 ---
 
-### THEORY:
-
-#### 1. Bayesian Decision Theory
-Bayesian decision theory provides a statistical foundation for pattern recognition under uncertainty. Given an observed feature vector $\mathbf{x} \in \mathbb{R}^d$ and a discrete set of classes $\Omega = \{\omega_1, \omega_2, \dots, \omega_C\}$, Bayes' Theorem yields the posterior probability:
-$$P(\omega_i|\mathbf{x}) = \frac{p(\mathbf{x}|\omega_i) P(\omega_i)}{p(\mathbf{x})} = \frac{p(\mathbf{x}|\omega_i) P(\omega_i)}{\sum_{j=1}^C p(\mathbf{x}|\omega_j) P(\omega_j)}$$
-where:
-- $P(\omega_i)$ is the **Prior Probability** of class $\omega_i$.
-- $p(\mathbf{x}|\omega_i)$ is the **Class-Conditional Probability Density (Likelihood)**.
-- $p(\mathbf{x}) = \sum_{j=1}^C p(\mathbf{x}|\omega_j) P(\omega_j)$ is the **Evidence (Marginal Probability)**.
-- $P(\omega_i|\mathbf{x})$ is the **Posterior Probability** (probability that $\mathbf{x}$ belongs to $\omega_i$ given observation $\mathbf{x}$).
-
-#### 2. Single Feature Multiple Class (Univariate Gaussian)
-When considering a single scalar feature $x \in \mathbb{R}$ (e.g., Petal Length), the class-conditional density is modeled as a univariate normal distribution:
-$$p(x|\omega_i) = \frac{1}{\sigma_i \sqrt{2\pi}} \exp\left(-\frac{(x - \mu_i)^2}{2\sigma_i^2}\right)$$
-Parameters are estimated via Maximum Likelihood Estimation:
-$$\mu_i = \frac{1}{N_i} \sum_{k=1}^{N_i} x_k, \quad \sigma_i^2 = \frac{1}{N_i - 1} \sum_{k=1}^{N_i} (x_k - \mu_i)^2$$
-
-#### 3. Multiple Features Multiple Class (Multivariate Gaussian)
-For $d$-dimensional feature vectors $\mathbf{x} = [x_1, x_2, \dots, x_d]^T \in \mathbb{R}^d$ (e.g., Petal Length & Sepal Length, $d=2$), the joint likelihood is governed by a multivariate normal density:
-$$p(\mathbf{x}|\omega_i) = \frac{1}{(2\pi)^{d/2} |\mathbf{\Sigma}_i|^{1/2}} \exp\left(-\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu}_i)^T \mathbf{\Sigma}_i^{-1} (\mathbf{x} - \boldsymbol{\mu}_i)\right)$$
-where $\boldsymbol{\mu}_i \in \mathbb{R}^d$ is the class mean vector, and $\mathbf{\Sigma}_i \in \mathbb{R}^{d \times d}$ is the covariance matrix capturing inter-feature dependencies:
-$$\mathbf{\Sigma}_i = \frac{1}{N_i - 1} \sum_{k=1}^{N_i} (\mathbf{x}_k - \boldsymbol{\mu}_i)(\mathbf{x}_k - \boldsymbol{\mu}_i)^T$$
-
-#### 4. Bayes Decision Rule (Maximum A Posteriori - MAP)
-Under zero-one loss, the optimal decision minimizes the probability of error by assigning $\mathbf{x}$ to the class with the highest posterior probability:
-$$\hat{\omega} = \arg\max_{\omega_i \in \Omega} P(\omega_i|\mathbf{x}) = \arg\max_{\omega_i \in \Omega} \left[ p(\mathbf{x}|\omega_i) P(\omega_i) \right]$$
+### DEFINITIONS & CORE CONCEPTS:
+* **Bayesian Pattern Classification:** A statistical decision-theoretic framework that minimizes classification error by combining prior probabilities with feature likelihoods.
+* **Class-Conditional Likelihood:** The probability density of observing feature x given true class omega_k, modeled via univariate or multivariate Normal distributions.
+* **Maximum A Posteriori (MAP) Rule:** Assigns candidate sample x to the class maximizing posterior probability P(omega_k | x).
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Bayes' Theorem for Pattern Classification
+```text
+P(omega_k | x) = [ p(x | omega_k) * P(omega_k) ] / p(x)
+where p(x) = sum_{j=1}^K [ p(x | omega_j) * P(omega_j) ]
 
-1. **Step 1: Environment & Dependency Setup**
-   - Create project directory `exp 4/` with subfolders `templates/` and `screenshots/`.
-   - Install dependencies: `Flask`, `numpy`, `pandas`, `scipy`, `scikit-learn`, and `matplotlib`.
+Where:
+• P(omega_k | x) is the posterior probability of class omega_k given sample x.
+• p(x | omega_k) is the class-conditional probability density function (likelihood).
+• P(omega_k) is the prior probability of class omega_k.
+• p(x) is the evidence normalization factor.
+```
 
-2. **Step 2: Gaussian Parameter Estimation (MLE)**
-   - Partition the training dataset (Iris) into 3 classes ($\omega_1$: Setosa, $\omega_2$: Versicolor, $\omega_3$: Virginica).
-   - Estimate univariate mean $\mu_i$ and variance $\sigma_i^2$ for Single Feature ($x_1$).
-   - Estimate mean vectors $\boldsymbol{\mu}_i$ and covariance matrices $\mathbf{\Sigma}_i$ for Multiple Features ($x_1, x_2$).
+#### 2. Univariate Gaussian Likelihood (Single Feature)
+```text
+p(x | omega_k) = ( 1 / sqrt( 2 * pi * sigma_k^2 ) ) * exp( - ( x - mu_k )^2 / ( 2 * sigma_k^2 ) )
 
-3. **Step 3: Bayesian Classification Inference**
-   - Evaluate univariate Gaussian likelihood $p(x|\omega_i)$ and multivariate Gaussian likelihood $p(\mathbf{x}|\omega_i)$.
-   - Compute total evidence $p(\mathbf{x})$ and normalize to calculate exact posterior probabilities $P(\omega_i|\mathbf{x})$.
+Where:
+• mu_k is the class mean and sigma_k^2 is the class variance.
+```
 
-4. **Step 4: Interactive Web Application Deployment**
-   - Implement interactive Flask routes on port 5006 accepting user-supplied test sample coordinates.
-   - Render 1D probability density bell curves and 2D scatter decision boundaries.
+#### 3. Multivariate Gaussian Likelihood (Multiple Features)
+```text
+p(x | omega_k) = ( 1 / [ (2*pi)^(d/2) * |Sigma_k|^(1/2) ] ) * exp( - 0.5 * (x - mu_k)^T * Sigma_k^(-1) * (x - mu_k) )
+
+Where:
+• mu_k in R^d is the class centroid vector.
+• Sigma_k in R^{d x d} is the class covariance matrix.
+• |Sigma_k| is the covariance determinant.
+• (x - mu_k)^T Sigma_k^(-1) (x - mu_k) is the squared Mahalanobis distance.
+```
+
+#### 4. MAP Decision Rule
+```text
+omega^* = argmax_k [ ln p(x | omega_k) + ln P(omega_k) ]
+```
 
 ---
 
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 4/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/app.py)
-  - [HTML Template (`exp 4/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/templates/index.html)
-  - [Dependencies (`exp 4/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/requirements.txt)
-  - [Lab Manual Report (`exp 4/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%204/LAB_PRACTICAL_FILE.md)
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Constructed training dataset from Fisher's Iris data spanning 3 distinct flower classes.
+2. Estimated maximum likelihood Gaussian parameters: class scalar means and variances for Single Feature (Petal Length), and mean vectors and covariance matrices for Multiple Features (Sepal Length, Sepal Width, Petal Length, Petal Width).
+3. Formulated univariate and multivariate Gaussian likelihood evaluators with numerical stability safeguards.
+4. Built interactive Flask application on port 5007 accepting test sample inputs, computing real-time posterior probabilities, and rendering decision curves.
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 4.1: Learned Statistical Class Parameters
+Displays empirical class priors, univariate Gaussian means/variances, and full 4x4 multivariate covariance matrices across classes.
 
-#### 1. Learned Gaussian Model Parameters & Class Priors
-![Output 1 Learned Parameters](screenshots/ss1_learned_params.png)
+![Figure 4.1: Learned Statistical Class Parameters](screenshots/ss1_learned_params.png)
 
-#### 2. Interactive Test Sample Input Form & Benchmark Presets
-![Output 2 Interactive Form](screenshots/ss2_interactive_input.png)
+#### Figure 4.2: Interactive Sample Input Interface
+Slider and numeric entry controls allowing users to supply arbitrary continuous test features for real-time classification.
 
-#### 3. Single-Feature and Multi-Feature Bayesian Classification Results
-![Output 3 Classification Results](screenshots/ss3_classification_results.png)
+![Figure 4.2: Interactive Sample Input Interface](screenshots/ss2_interactive_input.png)
 
-#### 4. Bayesian Decision Visualization Plots (1D Curves & 2D Scatter)
-![Output 4 Decision Plots](screenshots/ss4_decision_plots.png)
+#### Figure 4.3: Real-Time Posterior Probabilities & MAP Output
+Shows resulting likelihoods, normalized posterior probabilities summing to 1.0, and final predicted class label.
+
+![Figure 4.3: Real-Time Posterior Probabilities & MAP Output](screenshots/ss3_classification_results.png)
+
+#### Figure 4.4: Univariate Gaussian Curves & 2D Decision Boundaries
+Visualization of bell-shaped probability density curves showing class overlap and 2D bivariate Gaussian contour decision boundaries.
+
+![Figure 4.4: Univariate Gaussian Curves & 2D Decision Boundaries](screenshots/ss4_decision_plots.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, an interactive Bayesian pattern classification system was developed using Flask in Python. The implementation successfully evaluated both Single-Feature Multiple-Class (univariate Gaussian) and Multiple-Features Multiple-Class (multivariate Gaussian) architectures. Prior probabilities, class-conditional likelihoods, and posterior probabilities were computed under Bayes' rule. The Maximum A Posteriori (MAP) decision criterion was demonstrated interactively, revealing how incorporating multiple dimensions (e.g. covariance between features) sharpens class boundaries and resolves ambiguities in overlapping regions.
+Experiment 4 verified the theoretical rigor and practical efficacy of Bayesian pattern classification. By evaluating both Single Feature (univariate Gaussian) and Multiple Feature (multivariate Gaussian with full covariance matrices) models, the application demonstrated how Mahalanobis distance and class covariance geometry govern optimal decision surfaces under the Maximum A Posteriori (MAP) rule, achieving optimal error minimization.

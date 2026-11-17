@@ -1,261 +1,272 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Experiment 6 - Lab Practical File</title>
+    <meta charset="UTF-8">
+    <title>Experiment 6 - Bayesian Risk Minimization for Three Classes and Three Actions Using Flask</title>
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 11pt;
-            background-color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.42;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
             color: #003366;
-            font-size: 18pt;
             text-align: center;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            color: #003366;
-            font-size: 14pt;
-            border-bottom: 2px solid #003366;
-            padding-bottom: 4px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            page-break-after: avoid;
-        }
-        h3 {
-            color: #004d40;
-            font-size: 12pt;
-            margin-top: 16px;
-            margin-bottom: 8px;
-            page-break-after: avoid;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
-            text-align: center;
+            font-size: 8.5pt;
             color: #555555;
-            font-size: 11pt;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .meta-bar {
             text-align: center;
-            font-size: 10pt;
-            background-color: #f0f4f8;
-            padding: 8px;
-            border: 1px solid #d0dbe5;
-            margin-bottom: 20px;
+            margin: 0 0 8px 0;
         }
-        table {
+        .meta-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
         }
-        table, th, td {
-            border: 1px solid #cccccc;
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
         }
-        th {
-            background-color: #003366;
-            color: #ffffff;
-            padding: 8px 6px;
-            text-align: left;
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
         }
-        td {
-            padding: 6px 8px;
-            vertical-align: top;
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9pt;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #f7f9fa;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-left: 4px solid #003366;
-            padding: 8px 14px;
-            margin: 10px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        .ss-placeholder-box {
-            border: 2px dashed #003366;
-            background-color: #fbfbfb;
-            padding: 40px 20px;
+        .screenshot-container {
             text-align: center;
-            margin: 16px 0;
-            font-size: 12pt;
-            color: #555555;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
-        .badge {
-            display: inline-block;
-            background-color: #181717;
-            color: #ffffff !important;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
         }
         .page-break {
             page-break-before: always;
         }
-        a {
-            color: #0044cc;
-            text-decoration: underline;
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        a:hover {
-            color: #002288;
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
         }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            font-size: 9.5pt;
-            font-family: monospace;
-        }
-        .link-card {
-            background-color: #f8faff;
-            border: 1px solid #cce0ff;
-            border-left: 4px solid #0055ff;
-            padding: 10px 14px;
-            margin: 10px 0;
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <b>Experiment No.:</b> 06 &nbsp;|&nbsp; 
-        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
-        <b>Framework:</b> Python 3.14 / Flask &nbsp;|&nbsp;
-        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>06</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Bayesian Risk Minimization for Three Classes and Three Actions Using Flask</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To prepare an interactive web application using Flask in Python to implement Bayesian Risk Minimization for at least three classes and three actions, evaluate the conditional risk given an arbitrary loss matrix, and trigger and dynamically reflect optimal action consequences on the page.
-    </p>
+    <h2>Aim</h2>
+    <p>To formulate, implement, and deploy an interactive Flask web application to perform Bayesian Risk Minimization for a pattern classification problem consisting of at least three classes (&omega;<sub>1</sub>, &omega;<sub>2</sub>, &omega;<sub>3</sub>) and three permissible operational actions (&alpha;<sub>1</sub>, &alpha;<sub>2</sub>, &alpha;<sub>3</sub>). Given a user-defined loss matrix, the system calculates conditional risk for each action, triggers the minimum-risk action, and reflects the decision and risk landscape dynamically in the web interface.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Bayesian Decision Theory &amp; Risk:</b> In real-world decision making, the costs of different errors are rarely equal (e.g., misdiagnosing a malignant disease is far more catastrophic than a false positive). Bayesian Risk Minimization incorporates asymmetric loss matrices to choose actions that minimize expected cost rather than merely misclassification rate.</p>
+    <p><b>Loss Matrix &Lambda;:</b> A formal matrix where &lambda;(&alpha;<sub>i</sub> | &omega;<sub>j</sub>) defines the quantitative penalty of taking action &alpha;<sub>i</sub> when the true state of nature is &omega;<sub>j</sub>.</p>
+    <p><b>Conditional Risk R(&alpha;<sub>i</sub> | x):</b> The expected loss incurred by deciding on action &alpha;<sub>i</sub> given feature observation x, calculated by weighting loss penalties by posterior class probabilities.</p>
 
-    <h3>1. Bayesian Risk &amp; Loss Matrix Formulation</h3>
-    <p>
-        Real-world classification tasks frequently encounter asymmetric consequences across error modalities. Bayesian Risk Minimization incorporates a formal Loss Matrix $\Lambda = [\lambda(\alpha_i | \omega_j)]$ measuring the quantifiable penalty of electing action $\alpha_i$ when the true underlying state of nature is $\omega_j$.
-    </p>
-
-    <h3>2. Conditional Risk (Expected Loss)</h3>
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Conditional Risk (Expected Loss) Formulation</h3>
+    <p>For an observation x with posterior class probabilities P(&omega;<sub>j</sub> | x), the conditional risk for action &alpha;<sub>i</sub> is:</p>
     <div class="formula-box">
-        R(&alpha;_i | <b>x</b>) = &sum; [ &lambda;(&alpha;_i | &omega;_j) &times; P(&omega;_j | <b>x</b>) ]
+        <b>Conditional Risk Formula:</b><br>
+        R(&alpha;<sub>i</sub> | x) = &sum;<sub>j=1</sub><sup>3</sup> &lambda;(&alpha;<sub>i</sub> | &omega;<sub>j</sub>) &times; P(&omega;<sub>j</sub> | x)<br><br>
+        <b>Expanded Formulation for 3 Classes:</b><br>
+        R(&alpha;<sub>i</sub> | x) = [ &lambda;(&alpha;<sub>i</sub> | &omega;<sub>1</sub>)&middot;P(&omega;<sub>1</sub> | x) ] + [ &lambda;(&alpha;<sub>i</sub> | &omega;<sub>2</sub>)&middot;P(&omega;<sub>2</sub> | x) ] + [ &lambda;(&alpha;<sub>i</sub> | &omega;<sub>3</sub>)&middot;P(&omega;<sub>3</sub> | x) ]<br><br>
+        <b>Where:</b><br>
+        • &alpha;<sub>i</sub> &isin; { &alpha;<sub>1</sub>, &alpha;<sub>2</sub>, &alpha;<sub>3</sub> } represents the candidate action.<br>
+        • &omega;<sub>j</sub> &isin; { &omega;<sub>1</sub>, &omega;<sub>2</sub>, &omega;<sub>3</sub> } represents the true underlying state of nature.<br>
+        • &lambda;(&alpha;<sub>i</sub> | &omega;<sub>j</sub>) is the loss entry in row i, column j of the loss matrix.<br>
+        • P(&omega;<sub>j</sub> | x) is the posterior probability of class &omega;<sub>j</sub>, satisfying &sum;<sub>j=1</sub><sup>3</sup> P(&omega;<sub>j</sub> | x) = 1.0.
     </div>
 
-    <h3>3. Optimal Bayes Decision Rule</h3>
+    <h3>2. Loss Matrix Specification (&Lambda;)</h3>
+    <p>The asymmetric 3&times;3 loss matrix penalizes misclassifications according to operational severity:</p>
     <div class="formula-box">
-        &alpha;* = argmin_&alpha; [ R(&alpha;_i | <b>x</b>) ]
+        <b>Loss Matrix Structure:</b><br>
+        &Lambda; = <br>
+        [ [ &lambda;(&alpha;<sub>1</sub>|&omega;<sub>1</sub>)=0,  &lambda;(&alpha;<sub>1</sub>|&omega;<sub>2</sub>)=10, &lambda;(&alpha;<sub>1</sub>|&omega;<sub>3</sub>)=50 ],<br>
+        &nbsp;&nbsp;[ &lambda;(&alpha;<sub>2</sub>|&omega;<sub>1</sub>)=5,  &lambda;(&alpha;<sub>2</sub>|&omega;<sub>2</sub>)=0,  &lambda;(&alpha;<sub>2</sub>|&omega;<sub>3</sub>)=20 ],<br>
+        &nbsp;&nbsp;[ &lambda;(&alpha;<sub>3</sub>|&omega;<sub>1</sub>)=30, &lambda;(&alpha;<sub>3</sub>|&omega;<sub>2</sub>)=15, &lambda;(&alpha;<sub>3</sub>|&omega;<sub>3</sub>)=0  ] ]<br><br>
+        <b>Where:</b><br>
+        • Diagonal elements &lambda;(&alpha;<sub>i</sub> | &omega;<sub>i</sub>) = 0 represent zero penalty for correct actions.<br>
+        • Off-diagonal elements represent asymmetric penalties (e.g., severe cost 50 for choosing action 1 when true class is 3).
     </div>
 
-    <h3>4. Loss Matrix Parameters Applied:</h3>
+    <h3>3. Minimum Risk Decision Rule</h3>
+    <p>The optimal Bayesian decision selects the action that achieves the minimum conditional risk:</p>
     <div class="formula-box">
-        Loss Matrix &Lambda;:<br>
-        &bull; &alpha;_1 (Approve): &lambda;(&omega;_1)=0,  &lambda;(&omega;_2)=25, &lambda;(&omega;_3)=100<br>
-        &bull; &alpha;_2 (Review):  &lambda;(&omega;_1)=10, &lambda;(&omega;_2)=2,  &lambda;(&omega;_3)=15<br>
-        &bull; &alpha;_3 (Block):   &lambda;(&omega;_1)=50, &lambda;(&omega;_2)=20, &lambda;(&omega;_3)=0
+        <b>Optimal Action Selection:</b><br>
+        &alpha;<sup>*</sup> = argmin<sub>i &isin; {1, 2, 3}</sub> R(&alpha;<sub>i</sub> | x)
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Defined a 3-class, 3-action clinical / operational decision domain with verifiable asymmetric loss penalties.</li>
+        <li>Implemented posterior probability ingestion accepting observation vectors and normalizing evidence.</li>
+        <li>Coded pure NumPy matrix multiplication evaluating conditional risk vectors R across all candidate actions.</li>
+        <li>Programmed threshold logic triggering the optimal minimum-risk action and highlighting affected UI states.</li>
+        <li>Deployed interactive Flask dashboard on port 5002 with editable loss matrices, probability sliders, and risk comparison plots.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup</h3>
-    <p>Constructed <code>exp 6/</code> directory with Flask web server and NumPy mathematical risk calculation routines.</p>
-
-    <h3>Step 2: Loss Matrix &amp; Action Consequence Pipeline</h3>
-    <p>Constructed 3-class, 3-action loss matrix and mapped decisions to operational web triggers (Automated Clearance, 2FA Escrow, and Security Shield Lockdown).</p>
-
-    <h3>Step 3: Web Application Deployment</h3>
-    <p>Launched server at <a href="http://127.0.0.1:5008" target="_blank">http://127.0.0.1:5008</a> with interactive posterior sliders, benchmark presets, and risk visualization plot.</p>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Loss Matrix Specification</h3>
-    <p>Displays the asymmetric penalty parameters &lambda;(&alpha;_i | &omega;_j) across the 3 decision actions and 3 states of nature.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 6.1: Configurable 3x3 Loss Matrix</h3>
+    <p>Interactive matrix input displaying asymmetric cost values for all 9 action-state combinations.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_loss_matrix.png" alt="Output 1 Loss Matrix">
-        <div class="screenshot-caption">Figure 6.1: Section 1 &mdash; Asymmetric loss matrix configuration table.</div>
+        <img src="screenshots/ss1_loss_matrix.png" alt="Figure 6.1: Configurable 3x3 Loss Matrix">
+        <div class="screenshot-caption">Figure 6.1: Configurable 3x3 Loss Matrix</div>
     </div>
 
-    <h3>Output 2: Test Sample Posterior Probabilities &amp; Benchmark Scenarios</h3>
-    <p>Interactive inputs for posterior probabilities alongside pre-configured operational benchmark test cases.</p>
+    
+    <h3>Figure 6.2: Posterior Probability Sliders & Inputs</h3>
+    <p>Dynamic controls allowing adjustment of posterior class probabilities satisfying the unit-sum constraint.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_posteriors_benchmarks.png" alt="Output 2 Posteriors">
-        <div class="screenshot-caption">Figure 6.2: Section 2 &mdash; Input posterior distribution and quick-select benchmark scenarios.</div>
+        <img src="screenshots/ss2_posteriors_benchmarks.png" alt="Figure 6.2: Posterior Probability Sliders & Inputs">
+        <div class="screenshot-caption">Figure 6.2: Posterior Probability Sliders & Inputs</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 3: Conditional Risk Minimization Computation</h3>
-    <p>Mathematical expansion calculating expected loss R(&alpha;_i | x) for each candidate action to determine the optimal decision.</p>
+    <h3>Figure 6.3: Computed Conditional Risks & Minimum-Risk Decision</h3>
+    <p>Table displaying expected losses R(alpha_i|x) for each action and highlighting the triggered optimal action.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss3_risk_computation.png" alt="Output 3 Risk Computation">
-        <div class="screenshot-caption">Figure 6.3: Section 3 &mdash; Conditional risk evaluation breakdown and optimal action selection.</div>
+        <img src="screenshots/ss3_risk_computation.png" alt="Figure 6.3: Computed Conditional Risks & Minimum-Risk Decision">
+        <div class="screenshot-caption">Figure 6.3: Computed Conditional Risks & Minimum-Risk Decision</div>
     </div>
 
-    <h3>Output 4: Conditional Risk Comparison Plot</h3>
-    <p>Bar chart visualizing the risk values across available actions, highlighting the minimum-risk choice.</p>
+    
+    <h3>Figure 6.4: Action Risk Landscape Bar Chart</h3>
+    <p>Comparative bar plot illustrating the risk disparity between conservative, moderate, and aggressive actions.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss4_risk_plot.png" alt="Output 4 Risk Plot">
-        <div class="screenshot-caption">Figure 6.4: Section 4 &mdash; Comparative bar chart of conditional risks across actions.</div>
+        <img src="screenshots/ss4_risk_plot.png" alt="Figure 6.4: Action Risk Landscape Bar Chart">
+        <div class="screenshot-caption">Figure 6.4: Action Risk Landscape Bar Chart</div>
     </div>
 
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
-    </div>
+    
 
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 6/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 6/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 6/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%206/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 6/screenshots/full_page.png</a>
-            </li>
-        </ul>
-    </div>
-
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, a Bayesian Risk Minimization engine was developed and deployed using Flask in Python. Given an asymmetric loss matrix across three classes and three decision actions, conditional risks were dynamically computed from input posterior probabilities. The system verified that selecting actions based on minimal expected loss $\alpha^* = \arg\min R(\alpha_i | \mathbf{x})$ successfully triggered corresponding operational workflows (automated clearance, step-up verification, and security lockout), all reflected visually in real time on the web dashboard.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 6 demonstrated the critical importance of Bayesian Risk Minimization in asymmetric decision environments. By incorporating non-uniform loss matrices, the application illustrated how an action associated with a lower posterior probability can be rationally chosen if alternative choices carry catastrophic error penalties, successfully operationalizing the principle of minimum expected risk.</p>
 
 </body>
 </html>

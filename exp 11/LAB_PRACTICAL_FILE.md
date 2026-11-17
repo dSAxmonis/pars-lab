@@ -1,100 +1,83 @@
-# EXPERIMENT 11: LINEAR DISCRIMINANT ANALYSIS (LDA) WITH TESTING
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
+
+---
+
+## EXPERIMENT 11
+
+### PRACTICAL NAME:
+**Implementation of Linear Discriminant Analysis (LDA) with Projected Line, Reduced Feature Mapping, and Testing**
 
 ---
 
 ### AIM:
-To implement Linear Discriminant Analysis (LDA) from scratch in Python for an engineering pattern classification application involving test sample evaluation, derive Fisher's optimal projection vector $\mathbf{w} = \mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$, and visualize:
-1. **The optimal projected line**,
-2. **New reduced features from each class mapped onto the projected line**, and
-3. **Testing and decision threshold classification of unseen test samples**.
+To formulate, implement, and deploy Linear Discriminant Analysis (LDA) from scratch in pure NumPy without using pre-built machine learning libraries. Unlike unsupervised PCA, the system utilizes class labels to compute Within-Class and Between-Class scatter matrices, solves for Fisher's optimal linear discriminant projection vector, defines the 1D projected discriminant line, maps unseen test samples onto this line, evaluates the optimal decision threshold, and verifies classification in an interactive Flask application.
 
 ---
 
-### THEORY:
-
-#### 1. Fisher's Discriminant Criterion:
-Linear Discriminant Analysis (LDA) is a supervised dimensionality reduction algorithm that projects high-dimensional observations onto a lower-dimensional subspace maximizing between-class variance relative to within-class variance:
-$$\max_{\mathbf{w}} J(\mathbf{w}) = \frac{\mathbf{w}^T \mathbf{S}_B \mathbf{w}}{\mathbf{w}^T \mathbf{S}_W \mathbf{w}}$$
-
-#### 2. Scatter Matrices:
-- **Within-Class Scatter Matrix:**
-  $$\mathbf{S}_W = \sum_{\mathbf{x} \in \mathcal{C}_1} (\mathbf{x} - \boldsymbol{\mu}_1)(\mathbf{x} - \boldsymbol{\mu}_1)^T + \sum_{\mathbf{x} \in \mathcal{C}_2} (\mathbf{x} - \boldsymbol{\mu}_2)(\mathbf{x} - \boldsymbol{\mu}_2)^T$$
-- **Between-Class Scatter Matrix:**
-  $$\mathbf{S}_B = (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)(\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)^T$$
-
-#### 3. Optimal Projection Direction:
-Differentiating Rayleigh's quotient yields Fisher's optimal linear discriminant direction:
-$$\mathbf{w} = \mathbf{S}_W^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2), \quad \hat{\mathbf{w}} = \frac{\mathbf{w}}{\|\mathbf{w}\|}$$
-
-#### 4. 1D Projected Line & Classification Rule:
-The projected discriminant axis passes through the global mean $\boldsymbol{\mu}$ in direction $\hat{\mathbf{w}}$. The projected coordinate of any candidate vector $\mathbf{x}$ and its reconstructed 2D position on the line are:
-$$y = (\mathbf{x} - \boldsymbol{\mu}) \cdot \hat{\mathbf{w}}$$
-$$\hat{\mathbf{x}} = \boldsymbol{\mu} + y \hat{\mathbf{w}}$$
-$$\text{Threshold: } y^* = \frac{y_{\boldsymbol{\mu}_1} + y_{\boldsymbol{\mu}_2}}{2}$$
-A test sample is categorized as Class 1 if its projected score falls on the side of $\boldsymbol{\mu}_1$ relative to $y^*$, and Class 2 otherwise.
+### DEFINITIONS & CORE CONCEPTS:
+* **Linear Discriminant Analysis (LDA):** Supervised dimensionality reduction and classification method finding a projection axis that maximizes between-class variance relative to within-class variance.
+* **Within-Class Scatter Matrix S_W:** Sums intra-class dispersion of samples around their class centroids.
+* **Between-Class Scatter Matrix S_B:** Quantifies spatial separation between distinct class centroids.
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Scatter Matrices
+```text
+S_W = sum_{x in C_1} ( x - mu_1 )( x - mu_1 )^T + sum_{x in C_2} ( x - mu_2 )( x - mu_2 )^T
+S_B = ( mu_1 - mu_2 )( mu_1 - mu_2 )^T
+```
 
-1. **Step 1: Environment & Mathematical Setup**
-   - Create directory `exp 11/` containing `app.py`, `templates/`, and `screenshots/`.
-   - Configure dependencies: `Flask`, `numpy`, `scipy`, and `matplotlib`.
+#### 2. Fisher's Optimal Projection Vector
+```text
+J(w) = ( w^T S_B w ) / ( w^T S_W w )
+Optimal Vector: w = S_W^(-1) * ( mu_1 - mu_2 )
+Normalized:     w_hat = w / ||w||_2
+```
 
-2. **Step 2: Class Mean Vectors & Scatter Formulation**
-   - Synthesize two-class clinical pattern dataset.
-   - Compute centroids $\boldsymbol{\mu}_1, \boldsymbol{\mu}_2, \boldsymbol{\mu}$, within-class scatter $\mathbf{S}_W$, and between-class scatter $\mathbf{S}_B$.
-
-3. **Step 3: Fisher Optimal Direction Vector Computation**
-   - Invert within-class scatter $\mathbf{S}_W^{-1}$ and compute unit discriminant vector $\hat{\mathbf{w}}$.
-   - Calculate optimal separating threshold $y^*$.
-
-4. **Step 4: Orthogonal Feature Mapping onto Projected Line**
-   - Project observations onto the 1D line passing through global centroid $\boldsymbol{\mu}$.
-   - Reconstruct 2D mapped coordinates along the discriminant axis.
-
-5. **Step 5: Testing & Web Server Deployment on Port 5013**
-   - Launch interactive Flask web server: `python3 "exp 11/app.py"`.
-   - Supply arbitrary test measurements and observe real-time 1D/2D classification output.
-
----
-
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 11/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/app.py)
-  - [HTML Template (`exp 11/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/templates/index.html)
-  - [Dependencies (`exp 11/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/requirements.txt)
-  - [Fisher Parameters Screenshot (`exp 11/screenshots/ss1_fisher_parameters.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss1_fisher_parameters.png)
-  - [Test Controls Screenshot (`exp 11/screenshots/ss2_test_controls.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss2_test_controls.png)
-  - [Projected Line Plot Screenshot (`exp 11/screenshots/ss3_projection_plot.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss3_projection_plot.png)
-  - [Sample Verification Table Screenshot (`exp 11/screenshots/ss4_sample_reduction_table.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2011/screenshots/ss4_sample_reduction_table.png)
+#### 3. 1D Projected Line & Mapping
+```text
+Line(t) = mu + t * w_hat,    t in R
+1D Coordinate:    y_test = ( x_test - mu )^T * w_hat
+Projected Point:  x_hat_test = mu + y_test * w_hat
+Threshold:        y^* = [ (mu_1 - mu)^T * w_hat + (mu_2 - mu)^T * w_hat ] / 2
+Classification:   If y_test >= y^* => Class 1, else Class 2.
+```
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Structured supervised bivariate dataset across two well-defined Gaussian classes.
+2. Calculated empirical class centroids, Within-Class scatter matrix S_W, and Between-Class scatter matrix S_B.
+3. Computed Fisher's optimal linear discriminant vector w using pure NumPy matrix inversion.
+4. Constructed 1D projection equations and established the midpoint optimal classification threshold y*.
+5. Implemented testing pipeline mapping unseen test inputs onto the discriminant line and predicting class labels.
+6. Deployed interactive Flask dashboard on port 5003 displaying projection plots, discriminant axes, and classification summaries.
 
-#### 1. Section 1: Fisher's Criterion & Scatter Matrices Summary
-> **File:** `exp 11/screenshots/ss1_fisher_parameters.png`  
-![Section 1 Fisher Parameters](screenshots/ss1_fisher_parameters.png)
+---
 
-#### 2. Section 2: Test Sample Classification & Projection Controls
-> **File:** `exp 11/screenshots/ss2_test_controls.png`  
-![Section 2 Test Controls](screenshots/ss2_test_controls.png)
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 11.1: Fisher Parameters & Scatter Matrices Summary
+Displays class centroids, S_W, S_B, Fisher projection vector w, and the calculated decision threshold y*.
 
-#### 3. Section 3: Fisher LDA 2D Projected Line & 1D Separation Plots
-> **File:** `exp 11/screenshots/ss3_projection_plot.png`  
-![Section 3 Projected Line and 1D Subspace](screenshots/ss3_projection_plot.png)
+![Figure 11.1: Fisher Parameters & Scatter Matrices Summary](screenshots/ss1_fisher_parameters.png)
 
-#### 4. Section 4: Reduced 1D Feature Mappings & Classification Verification
-> **File:** `exp 11/screenshots/ss4_sample_reduction_table.png`  
-![Section 4 Sample Verification Table](screenshots/ss4_sample_reduction_table.png)
+#### Figure 11.2: Interactive Test Sample Controls
+Input form allowing users to submit test feature points (x1, x2) for live projection and classification.
+
+![Figure 11.2: Interactive Test Sample Controls](screenshots/ss2_test_controls.png)
+
+#### Figure 11.3: LDA Projected Line, Class Separations & Test Mapping
+Visualization showing class distributions, Fisher discriminant line, decision threshold boundary, and test sample projection.
+
+![Figure 11.3: LDA Projected Line, Class Separations & Test Mapping](screenshots/ss3_projection_plot.png)
+
+#### Figure 11.4: Sample Reduction & Classification Output
+Tabulates test sample coordinates, reduced 1D coordinate y, distance from threshold, and predicted class.
+
+![Figure 11.4: Sample Reduction & Classification Output](screenshots/ss4_sample_reduction_table.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, Linear Discriminant Analysis was implemented from first principles in Python. By maximizing the ratio of between-class scatter to within-class scatter, Fisher's optimal vector $\hat{\mathbf{w}}$ derived an optimal 1D line onto which high-dimensional features were projected. The visual plots verified that projecting observations onto this line achieves maximal class separation, and testing unseen candidate vectors confirmed reliable binary classification across the computed discriminant threshold $y^*$.
+Experiment 11 demonstrated the power of supervised dimensionality reduction through Linear Discriminant Analysis. By maximizing the ratio of between-class scatter to within-class scatter, LDA successfully discovered the projection vector that achieves maximum class separability, proving its dual utility as both a feature reduction technique and a robust linear classifier.

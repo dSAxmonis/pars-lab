@@ -1,4 +1,4 @@
-# PATTERN ANALYSIS AND RECOGNITION SYSTEMS (PARS) LAB MANUAL
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
 
 ---
 
@@ -10,110 +10,95 @@
 ---
 
 ### AIM:
-To prepare an interactive web application using Flask in Python to extract and store two datasets (CIFAR-10 image dataset and Iris tabular dataset), inspect and describe their feature representations, and generate and display performance evaluation plots.
+To develop an interactive Flask web application to programmatically extract and store the two datasets studied in Experiment 1 (CIFAR-10 image dataset and Iris tabular dataset), persist them locally in structured formats, compute and display comprehensive descriptive feature statistics, and generate baseline classification performance evaluation plots.
 
 ---
 
-### THEORY:
-
-#### 1. Dataset Extraction & Ingestion
-- **Definition:** The automated retrieval of raw sensory or structured data from secondary storage, APIs, or remote web repositories into primary memory for analysis.
-- **Image Data Extraction:** Parsing raw binary byte streams or image formats (JPEG/PNG) and decoding them into multi-dimensional numerical arrays.
-- **Tabular Data Extraction:** Ingesting structured relational tables containing defined columns (attributes/features) and rows (instances).
-
-#### 2. Data Persistence & Storage
-- **File System Storage:** Storing high-dimensional unstructured visual data as hierarchical directories organized by class labels (`data/cifar10/images/<class_name>/`).
-- **Structured Storage (CSV):** Serializing numerical attributes and tabular matrices into comma-separated values (CSV) for lightweight local persistence and fast querying.
-
-#### 3. Feature Representation
-- **Image Features:** An image sample $I$ is represented as a 3D tensor:
-  $$I \in \mathbb{R}^{H \times W \times C}$$
-  where $H = \text{Height}$ (32), $W = \text{Width}$ (32), and $C = \text{Color Channels}$ (3 for RGB). Each sample comprises $32 \times 32 \times 3 = 3072$ features with intensity domain $[0, 255]$.
-- **Tabular Features:** A structured dataset with $N$ instances and $d$ features is represented as an input feature matrix $\mathbf{X} \in \mathbb{R}^{N \times d}$ and target label vector $\mathbf{y} \in \{0, 1, \dots, K-1\}^N$.
-
-#### 4. Performance Metrics & Mathematical Formulas:
-
-- **Accuracy:** The proportion of total correct predictions over all evaluations:
-  $$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
-
-- **Precision (Positive Predictive Value):** The fraction of relevant instances among retrieved instances:
-  $$\text{Precision} = \frac{TP}{TP + FP}$$
-
-- **Recall (Sensitivity / True Positive Rate):** The fraction of relevant instances correctly classified:
-  $$\text{Recall} = \frac{TP}{TP + FN}$$
-
-- **F1-Score:** Harmonic mean of precision and recall providing a balanced assessment for imbalanced distributions:
-  $$\text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2TP}{2TP + FP + FN}$$
-
-- **Categorical Cross-Entropy Loss (Log Loss):**
-  $$\mathcal{L}_{CE} = - \sum_{k=1}^{K} y_k \log(\hat{y}_k)$$
-
-- **Confusion Matrix:**
-  $$\mathbf{C} = \begin{bmatrix} TP & FN \\ FP & TN \end{bmatrix}$$
+### DEFINITIONS & CORE CONCEPTS:
+* **Automated Ingestion & Multimodal Persistence:** Raw sensory and structured data are fetched into memory, decoded, and persisted locally to eliminate redundant bandwidth. Images are organized into class-hierarchical directories, while tabular relations are serialized into comma-separated values (CSV).
+* **Descriptive Statistical Profiling:** Evaluates central tendency (mean, median) and dispersion (standard deviation, interquartile range) across feature dimensions to uncover outliers and scale differences.
+* **Supervised Performance Evaluation:** Assesses generalization accuracy through contingency matrices (confusion matrices) and derived harmonic metrics.
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Classification Performance Metrics
+```text
+Accuracy = ( TP + TN ) / ( TP + TN + FP + FN )
+Precision = TP / ( TP + FP )
+Recall = TP / ( TP + FN )
+F1-Score = 2 * ( Precision * Recall ) / ( Precision + Recall ) = ( 2 * TP ) / ( 2 * TP + FP + FN )
 
-1. **Step 1: Environment & Project Directory Setup**
-   - Create a dedicated folder `exp 2` with subdirectories `templates/`, `data/`, and `static/`.
-   - Install required packages: `Flask`, `scikit-learn`, `pandas`, `matplotlib`, `numpy`, and `Pillow`.
-   - **Screenshot:**  
-     ![Step 1 Setup](exp%202/screenshots/step1_setup.png)
+Where:
+• TP = True Positives (correctly identified positive cases).
+• TN = True Negatives (correctly identified negative cases).
+• FP = False Positives (Type I error).
+• FN = False Negatives (Type II error).
+```
 
-2. **Step 2: Dataset Extraction & Local Persistence**
-   - Implement data extraction routines in [`exp 2/app.py`](file:///Users/monis/Downloads/core%20subject/pars%20lab/exp%202/app.py):
-     - Download CIFAR-10 images across all 10 classes and persist to `exp 2/data/cifar10/images/<class_name>/`.
-     - Extract CIFAR-10 metadata and save to `exp 2/data/cifar10/cifar10_metadata.csv`.
-     - Load Iris tabular dataset from Scikit-Learn and persist locally to `exp 2/data/tabular/iris_dataset.csv`.
-   - **Screenshot:**  
-     ![Step 2 Extraction & Storage](exp%202/screenshots/step2_extraction_storage.png)
+#### 2. Multi-Class Macro-Averaging
+```text
+Macro-F1 = ( 1 / K ) * sum_{k=1}^K F1_k
 
-3. **Step 3: Web Server Execution & Route Configuration**
-   - Execute the server: `python3 "exp 2/app.py"`.
-   - Open browser at `http://127.0.0.1:5000` to review extraction status, feature descriptions, sample images, and performance plots.
-   - **Screenshot:**  
-     ![Step 6 Running Server](exp%202/screenshots/step6_flask_running.png)
+Where:
+• K is the total number of classes (K = 10 for CIFAR-10, K = 3 for Iris).
+• F1_k is the one-vs-rest F1 score computed for class k.
+```
 
----
-
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 2/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/app.py)
-  - [HTML Template (`exp 2/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/templates/index.html)
-  - [Dependencies (`exp 2/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/requirements.txt)
-  - [Lab Manual Report (`LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/LAB_PRACTICAL_FILE.md)
+#### 3. Feature Scaling & Standardization
+```text
+Min-Max Normalization:    x_norm = ( x - x_min ) / ( x_max - x_min ) in [0, 1]
+Z-Score Standardization:  z = ( x - mu ) / sigma
+```
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Implemented automated dataset ingestion pipeline fetching raw CIFAR-10 image samples and Fisher's Iris tabular records.
+2. Serialized datasets locally into structured directory hierarchies (images sorted by class folders) and standard CSV files.
+3. Computed descriptive statistical profiles across all continuous dimensions (mean, standard deviation, quartiles, and range bounds).
+4. Evaluated classification performance using confusion matrices, precision, recall, and macro-F1 benchmarks.
+5. Deployed interactive Flask dashboard on port 5005 displaying dataset statistics, sample browsers, and dynamic performance plots.
 
-#### 1. Flask Web Dashboard — Extraction & Storage Status
-![Output 1 Storage Status](screenshots/ss1_storage_status.png)
+---
 
-#### 2. CIFAR-10 Image Dataset — Feature Description & Class Samples
-![Output 2 CIFAR Features](screenshots/ss2_cifar_features.png)
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 2.1: Storage Status & Ingestion Verification
+Displays local disk persistence verification, showing organized directory paths, sample counts, and storage formats.
 
-![Output 2 CIFAR Samples](screenshots/ss3_cifar_samples.png)
+![Figure 2.1: Storage Status & Ingestion Verification](screenshots/ss1_storage_status.png)
 
-#### 3. CIFAR-10 Dataset — Performance Plots & Evaluation Metrics
-![Output 3 CIFAR Performance](screenshots/ss4_cifar_performance.png)
+#### Figure 2.2: CIFAR-10 Feature Specifications & Dimensions
+Outlines the 3D tensor specifications (32x32x3 = 3,072 features) and RGB channel distribution summaries.
 
-#### 4. Iris Tabular Dataset — Feature Description & Statistical Analysis
-![Output 4 Iris Features & Statistics](screenshots/ss5_iris_features_stats.png)
+![Figure 2.2: CIFAR-10 Feature Specifications & Dimensions](screenshots/ss2_cifar_features.png)
 
-#### 5. Iris Dataset — Classifier Performance Comparison & Confusion Matrix
-![Output 5 Iris Classifier Performance](screenshots/ss6_iris_performance.png)
+#### Figure 2.3: CIFAR-10 Class Sample Browser
+Visual inspection of raw image samples across 10 balanced object classes extracted from local storage.
 
-#### 6. Local Storage Directory Verification
-![Output 6 Storage Verification Table](screenshots/ss7_storage_verification.png)
+![Figure 2.3: CIFAR-10 Class Sample Browser](screenshots/ss3_cifar_samples.png)
+
+#### Figure 2.4: CIFAR-10 Baseline Classifier Performance Plot
+Comparative accuracy and macro-F1 performance benchmarks across multiple baseline classifiers on CIFAR-10.
+
+![Figure 2.4: CIFAR-10 Baseline Classifier Performance Plot](screenshots/ss4_cifar_performance.png)
+
+#### Figure 2.5: Iris Morphological Feature Statistics
+Tabular display of means, standard deviations, and quartile ranges for the 4 continuous geometric flower dimensions.
+
+![Figure 2.5: Iris Morphological Feature Statistics](screenshots/ss5_iris_features_stats.png)
+
+#### Figure 2.6: Iris Classification Performance & Confusion Matrix
+Bar charts and evaluation metrics displaying high-accuracy separability achieved across Iris flower species.
+
+![Figure 2.6: Iris Classification Performance & Confusion Matrix](screenshots/ss6_iris_performance.png)
+
+#### Figure 2.7: Local File Storage Architecture
+Confirms file system hierarchy, CSV tabular datasets, and persisted visual assets ready for modeling.
+
+![Figure 2.7: Local File Storage Architecture](screenshots/ss7_storage_verification.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, an end-to-end web-based pipeline was successfully designed and executed using Flask in Python. Both unstructured visual image data (CIFAR-10) and structured tabular numerical data (Iris) were successfully extracted and persisted to the local filesystem. Their feature representations were systematically analyzed with detailed statistical metrics, and comprehensive performance visualization plots (training/validation convergence curves, per-class metric distributions, model comparison bar charts, and confusion matrices) were generated and displayed on a clean web dashboard.
+Experiment 2 successfully demonstrated complete automated workflows for multimodal dataset ingestion, local persistence, statistical feature profiling, and classification performance benchmarking. By structuring high-dimensional visual tensors (d=3,072) alongside low-dimensional tabular matrices (d=4), the application verified how distinct storage paradigms and statistical evaluation metrics (Accuracy, Precision, Recall, Macro-F1) provide comprehensive insights into pattern classification readiness.

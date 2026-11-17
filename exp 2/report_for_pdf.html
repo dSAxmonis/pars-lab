@@ -1,328 +1,303 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Experiment 2 - Lab Practical File</title>
+    <meta charset="UTF-8">
+    <title>Experiment 2 - Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization using Flask</title>
     <style>
         @page {
             size: A4;
-            margin: 18mm 15mm 18mm 15mm;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
         }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #222222;
-            line-height: 1.5;
-            font-size: 11pt;
-            background-color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            line-height: 1.42;
+            color: #1a1a1a;
             margin: 0;
             padding: 0;
         }
-        h1 {
+        .header-univ {
+            font-size: 13pt;
+            font-weight: bold;
             color: #003366;
-            font-size: 18pt;
             text-align: center;
-            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
         }
-        h2 {
-            color: #003366;
-            font-size: 14pt;
-            border-bottom: 2px solid #003366;
-            padding-bottom: 4px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-            page-break-after: avoid;
-        }
-        h3 {
-            color: #004d40;
-            font-size: 12pt;
-            margin-top: 16px;
-            margin-bottom: 8px;
-            page-break-after: avoid;
+        .header-dept {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
         }
         .header-sub {
-            text-align: center;
+            font-size: 8.5pt;
             color: #555555;
-            font-size: 11pt;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .meta-bar {
             text-align: center;
-            font-size: 10pt;
-            background-color: #f0f4f8;
-            padding: 8px;
-            border: 1px solid #d0dbe5;
-            margin-bottom: 20px;
+            margin: 0 0 8px 0;
         }
-        table {
+        .meta-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 10pt;
-            page-break-inside: avoid;
+            margin-bottom: 10px;
+            font-size: 8.5pt;
         }
-        table, th, td {
-            border: 1px solid #cccccc;
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 3.5px 7px;
+            background-color: #f8fafc;
         }
-        th {
-            background-color: #003366;
-            color: #ffffff;
-            padding: 8px 6px;
-            text-align: left;
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
         }
-        td {
-            padding: 6px 8px;
-            vertical-align: top;
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        h2 {
+            font-size: 10.5pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9pt;
+            color: #004d40;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        p {
+            margin: 2px 0 4px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 2px 0 4px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 2px;
+            text-align: justify;
         }
         .formula-box {
-            background-color: #f7f9fa;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-left: 4px solid #003366;
-            padding: 8px 14px;
-            margin: 10px 0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
+            padding: 6px 10px;
+            margin: 5px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.4;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .screenshot-container {
             text-align: center;
-            margin: 12px 0 18px 0;
+            margin: 6px 0 8px 0;
             page-break-inside: avoid;
+            break-inside: avoid;
         }
         .screenshot-container img {
             max-width: 98%;
-            border: 1px solid #999999;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+            max-height: 375px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .screenshot-caption {
-            font-size: 9pt;
-            color: #555555;
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
             font-style: italic;
-            margin-top: 4px;
-        }
-        .ss-placeholder-box {
-            border: 2px dashed #003366;
-            background-color: #fbfbfb;
-            padding: 25px 20px;
-            text-align: center;
-            margin: 14px 0;
-            font-size: 10.5pt;
-            color: #555555;
-            page-break-inside: avoid;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #181717;
-            color: #ffffff !important;
-            padding: 5px 12px;
-            font-size: 9.5pt;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
         }
         .page-break {
             page-break-before: always;
         }
-        a {
-            color: #0044cc;
-            text-decoration: underline;
+        table.ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        a:hover {
-            color: #002288;
+        table.ref-table th, table.ref-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 6px;
+            text-align: left;
         }
-        code {
-            background-color: #eee;
-            padding: 2px 4px;
-            font-size: 9.5pt;
-            font-family: monospace;
-        }
-        .link-card {
-            background-color: #f8faff;
-            border: 1px solid #cce0ff;
-            border-left: 4px solid #0055ff;
-            padding: 10px 14px;
-            margin: 10px 0;
+        table.ref-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- COVER / HEADER -->
-    <h1>Pattern Analysis &amp; Recognition Systems Lab</h1>
-    <p class="header-sub"><b>Practical File Submission &mdash; Academic Session</b></p>
-    <div class="meta-bar">
-        <b>Experiment No.:</b> 02 &nbsp;|&nbsp; 
-        <b>Course:</b> PARS Lab &nbsp;|&nbsp; 
-        <b>Framework:</b> Python 3.14 / Flask / Scikit-Learn &nbsp;|&nbsp;
-        <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">dSAxmonis/pars-lab</a>
-    </div>
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>02</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
 
     <h2>Practical Name</h2>
     <p><b>Web-Based Dataset Extraction, Storage, Feature Analysis, and Performance Visualization using Flask</b></p>
 
-    <h2>AIM</h2>
-    <p>
-        To prepare an interactive web application using Flask in Python to extract and store two datasets studied in Experiment 1 (CIFAR-10 image dataset and Iris tabular dataset), inspect and describe their feature representations, and generate and display model performance evaluation plots.
-    </p>
+    <h2>Aim</h2>
+    <p>To develop an interactive Flask web application to programmatically extract and store the two datasets studied in Experiment 1 (CIFAR-10 image dataset and Iris tabular dataset), persist them locally in structured formats, compute and display comprehensive descriptive feature statistics, and generate baseline classification performance evaluation plots.</p>
 
-    <h2>THEORY</h2>
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p><b>Automated Ingestion &amp; Multimodal Persistence:</b> Raw sensory and structured data are fetched into memory, decoded, and persisted locally to eliminate redundant network bandwidth. High-dimensional visual data is structured into class-hierarchical directories, while tabular relations are serialized into comma-separated value (CSV) formats.</p>
+    <p><b>Descriptive Statistical Profiling:</b> Features are quantitatively analyzed through measures of central tendency (mean, median), dispersion (variance, standard deviation, interquartile range), and boundary limits (min, max) to detect outliers, class skewness, and scaling disparities.</p>
+    <p><b>Supervised Performance Evaluation:</b> Quantifies the ability of predictive models to generalize decision boundaries across unseen samples using contingency matrices (confusion matrices) and derived harmonic metrics.</p>
 
-    <h3>1. Dataset Extraction &amp; Ingestion</h3>
-    <p>
-        Dataset extraction refers to the programmatic acquisition of raw visual or structured attributes from remote servers or storage repositories. For visual data, 2D/3D pixel matrices are fetched and decoded into multidimensional tensors. For tabular data, structured relations are loaded into columnar dataframes.
-    </p>
-
-    <h3>2. Data Persistence &amp; Storage</h3>
-    <p>
-        Extracted data must be saved locally to avoid redundant bandwidth overhead:
-    </p>
-    <ul>
-        <li><b>Image Data:</b> Stored in structured class-level filesystem directories (<code>exp 2/data/cifar10/images/&lt;class&gt;/</code>) with a centralized CSV metadata catalog.</li>
-        <li><b>Tabular Data:</b> Persisted as standard Comma-Separated Values (<code>exp 2/data/tabular/iris_dataset.csv</code>).</li>
-    </ul>
-
-    <h3>3. Feature Representation</h3>
-    <ul>
-        <li><b>Image Features:</b> Formatted as a 3D matrix $I \in \mathbb{R}^{H \times W \times C}$ (for CIFAR-10: $32 \times 32 \times 3 = 3072$ features per sample) with pixel values in $[0, 255]$.</li>
-        <li><b>Tabular Features:</b> Formatted as a real-valued matrix $\mathbf{X} \in \mathbb{R}^{N \times d}$ ($150 \times 4$ for Iris) with target labels $\mathbf{y} \in \{0, 1, 2\}$.</li>
-    </ul>
-
-    <h3>4. Performance Metrics &amp; Mathematical Formulas</h3>
-
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Classification Performance Metrics (Confusion Matrix Formulation)</h3>
+    <p>Given binary contingency outcomes where TP = True Positives, TN = True Negatives, FP = False Positives, and FN = False Negatives:</p>
     <div class="formula-box">
-        <b>1. Accuracy:</b><br>
-        Accuracy = (TP + TN) / (TP + TN + FP + FN)
+        <b>Classification Accuracy:</b><br>
+        Accuracy = ( TP + TN ) / ( TP + TN + FP + FN )<br><br>
+        <b>Precision (Positive Predictive Value):</b><br>
+        Precision = TP / ( TP + FP )<br><br>
+        <b>Recall (Sensitivity / True Positive Rate):</b><br>
+        Recall = TP / ( TP + FN )<br><br>
+        <b>F1-Score (Harmonic Mean):</b><br>
+        F1 = 2 &times; ( Precision &times; Recall ) / ( Precision + Recall ) = 2&middot;TP / ( 2&middot;TP + FP + FN )<br><br>
+        <b>Where:</b><br>
+        • TP = Positive instances correctly classified as positive.<br>
+        • TN = Negative instances correctly classified as negative.<br>
+        • FP = Negative instances incorrectly classified as positive (Type I error).<br>
+        • FN = Positive instances incorrectly classified as negative (Type II error).
     </div>
 
+    <h3>2. Multi-Class Macro-Averaging</h3>
+    <p>For K-class evaluation, macro-averaged metrics aggregate unweighted performance across all individual classes:</p>
     <div class="formula-box">
-        <b>2. Precision (Positive Predictive Value):</b><br>
-        Precision = TP / (TP + FP)
+        <b>Macro-Averaged F1-Score:</b><br>
+        Macro-F1 = ( 1 / K ) &times; &sum;<sub>k=1</sub><sup>K</sup> F1<sub>k</sub><br><br>
+        <b>Where:</b><br>
+        • K is the number of mutually exclusive classes (K = 10 for CIFAR-10; K = 3 for Iris).<br>
+        • F1<sub>k</sub> is the binary F1-score evaluated treating class k as positive and all other classes as negative.
     </div>
 
+    <h3>3. Continuous Feature Standardization &amp; Normalization</h3>
+    <p>Feature scaling transforms heterogeneous dimensions onto commensurate numerical intervals:</p>
     <div class="formula-box">
-        <b>3. Recall (Sensitivity / True Positive Rate):</b><br>
-        Recall = TP / (TP + FN)
-    </div>
-
-    <div class="formula-box">
-        <b>4. F1-Score (Harmonic Mean):</b><br>
-        F1-Score = 2 &times; (Precision &times; Recall) / (Precision + Recall) = 2TP / (2TP + FP + FN)
-    </div>
-
-    <div class="formula-box">
-        <b>5. Categorical Cross-Entropy Loss:</b><br>
-        L_CE = - &sum; [y_k &times; ln(y_hat_k)]
-    </div>
-
-    <div class="formula-box">
-        <b>6. Confusion Matrix:</b><br>
-        C = [[TP, FN], [FP, TN]]
+        <b>Min-Max Normalization:</b><br>
+        x<sub>norm</sub> = ( x - x<sub>min</sub> ) / ( x<sub>max</sub> - x<sub>min</sub> ) &isin; [0, 1]<br><br>
+        <b>Z-Score Standardization:</b><br>
+        z = ( x - &mu; ) / &sigma;<br><br>
+        <b>Where:</b><br>
+        • x is the raw scalar observation.<br>
+        • x<sub>min</sub>, x<sub>max</sub> are the minimum and maximum observed attribute bounds.<br>
+        • &mu; is the empirical feature mean and &sigma; is the empirical standard deviation.
     </div>
 
     <div class="page-break"></div>
 
-    <h2>STEPS &amp; EXECUTION</h2>
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Implemented automated dataset ingestion pipeline fetching raw CIFAR-10 image samples and Fisher's Iris tabular records.</li>
+        <li>Serialized datasets locally into structured directory hierarchies (images sorted by class folders) and standard CSV files.</li>
+        <li>Computed descriptive statistical profiles across all continuous dimensions (mean, standard deviation, quartiles, and range bounds).</li>
+        <li>Evaluated classification performance using confusion matrices, precision, recall, and macro-F1 benchmarks.</li>
+        <li>Deployed interactive Flask dashboard on port 5005 displaying dataset statistics, sample browsers, and dynamic performance plots.</li>
+    </ol>
 
-    <h3>Step 1: Environment Setup &amp; Dependency Verification</h3>
-    <p>Configured Python environment under <code>exp 2/</code>, and verified dependencies (Flask, scikit-learn, pandas, matplotlib, pillow).</p>
-
-    <h3>Step 2: Dataset Extraction &amp; Local Disk Storage</h3>
-    <p>Executed extraction logic inside <code>app.py</code> to download CIFAR-10 images into designated class subfolders, generate metadata index <code>cifar10_metadata.csv</code>, and export the Iris dataset to CSV format.</p>
-
-    <h3>Step 3: Web Server Deployment</h3>
-    <p>Launched the Flask application server on <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a> to dynamically generate performance plots and display dataset summaries.</p>
-
-    <div class="page-break"></div>
-
-    <h2>OUTPUT / ATTACHED SCREENSHOTS</h2>
-
-    <h3>Output 1: Dataset Extraction &amp; Storage Summary</h3>
-    <p>The web dashboard confirms extraction and local filesystem storage for both datasets.</p>
+    <h2>Experimental Results &amp; Visual Verification</h2>
+    <h3>Figure 2.1: Storage Status & Ingestion Verification</h3>
+    <p>Displays local disk persistence verification, showing organized directory paths, sample counts, and storage formats.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss1_storage_status.png" alt="Output 1 Storage Status">
-        <div class="screenshot-caption">Figure 2.1: Section 1 &mdash; Extraction source, format, and storage status for CIFAR-10 and Iris datasets.</div>
+        <img src="screenshots/ss1_storage_status.png" alt="Figure 2.1: Storage Status & Ingestion Verification">
+        <div class="screenshot-caption">Figure 2.1: Storage Status & Ingestion Verification</div>
     </div>
 
-    <h3>Output 2: CIFAR-10 Image Dataset &mdash; Features &amp; Sample Classes</h3>
-    <p>Displays image tensor dimensions ($32 \times 32 \times 3$), pixel domains, and visual thumbnails across all 10 visual classes.</p>
+    
+    <h3>Figure 2.2: CIFAR-10 Feature Specifications & Dimensions</h3>
+    <p>Outlines the 3D tensor specifications (32x32x3 = 3,072 features) and RGB channel distribution summaries.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss2_cifar_features.png" alt="Output 2 CIFAR Features">
-        <div class="screenshot-caption">Figure 2.2: Section 2 &mdash; CIFAR-10 spatial specifications and feature properties.</div>
-    </div>
-    <div class="screenshot-container">
-        <img src="screenshots/ss3_cifar_samples.png" alt="Output 2 CIFAR Samples">
-        <div class="screenshot-caption">Figure 2.3: CIFAR-10 extracted sample thumbnail gallery across 10 visual classes.</div>
+        <img src="screenshots/ss2_cifar_features.png" alt="Figure 2.2: CIFAR-10 Feature Specifications & Dimensions">
+        <div class="screenshot-caption">Figure 2.2: CIFAR-10 Feature Specifications & Dimensions</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 3: CIFAR-10 Model Performance Visualization</h3>
-    <p>Visualizes training/validation convergence curves alongside individual precision and recall across visual categories.</p>
+    <h3>Figure 2.3: CIFAR-10 Class Sample Browser</h3>
+    <p>Visual inspection of raw image samples across 10 balanced object classes extracted from local storage.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss4_cifar_performance.png" alt="Output 3 CIFAR Performance">
-        <div class="screenshot-caption">Figure 2.4: Performance evaluation plots (Accuracy/Loss curves and per-class metrics).</div>
+        <img src="screenshots/ss3_cifar_samples.png" alt="Figure 2.3: CIFAR-10 Class Sample Browser">
+        <div class="screenshot-caption">Figure 2.3: CIFAR-10 Class Sample Browser</div>
     </div>
 
-    <h3>Output 4: Iris Tabular Dataset &mdash; Feature Descriptions &amp; Statistics</h3>
-    <p>Presents full descriptive statistics (Mean, Std Dev, Min, Max, Quantiles) and biological domain descriptions for each floral attribute.</p>
+    
+    <h3>Figure 2.4: CIFAR-10 Baseline Classifier Performance Plot</h3>
+    <p>Comparative accuracy and macro-F1 performance benchmarks across multiple baseline classifiers on CIFAR-10.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss5_iris_features_stats.png" alt="Output 4 Iris Stats">
-        <div class="screenshot-caption">Figure 2.5: Section 3 &mdash; Descriptive statistics table and feature domain breakdown for Iris dataset.</div>
+        <img src="screenshots/ss4_cifar_performance.png" alt="Figure 2.4: CIFAR-10 Baseline Classifier Performance Plot">
+        <div class="screenshot-caption">Figure 2.4: CIFAR-10 Baseline Classifier Performance Plot</div>
     </div>
 
     <div class="page-break"></div>
-
-    <h3>Output 5: Iris Classifier Performance Comparison &amp; Confusion Matrix</h3>
-    <p>Evaluates supervised classifiers (Logistic Regression, Decision Tree, Random Forest, SVM) with a comparison chart, multi-class confusion matrix, and performance metrics table.</p>
+    <h3>Figure 2.5: Iris Morphological Feature Statistics</h3>
+    <p>Tabular display of means, standard deviations, and quartile ranges for the 4 continuous geometric flower dimensions.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss6_iris_performance.png" alt="Output 5 Iris Classifier Performance">
-        <div class="screenshot-caption">Figure 2.6: Iris dataset classifier performance comparison chart, confusion matrix, and evaluation metrics table.</div>
+        <img src="screenshots/ss5_iris_features_stats.png" alt="Figure 2.5: Iris Morphological Feature Statistics">
+        <div class="screenshot-caption">Figure 2.5: Iris Morphological Feature Statistics</div>
     </div>
 
-    <h3>Output 6: Local File Storage Directory Verification</h3>
-    <p>Displays confirmation of persisted directory artifacts and file formats across the local filesystem.</p>
+    
+    <h3>Figure 2.6: Iris Classification Performance & Confusion Matrix</h3>
+    <p>Bar charts and evaluation metrics displaying high-accuracy separability achieved across Iris flower species.</p>
     <div class="screenshot-container">
-        <img src="screenshots/ss7_storage_verification.png" alt="Output 6 Storage Verification Table">
-        <div class="screenshot-caption">Figure 2.7: Section 4 &mdash; Local storage verification table confirming filesystem paths and formats.</div>
+        <img src="screenshots/ss6_iris_performance.png" alt="Figure 2.6: Iris Classification Performance & Confusion Matrix">
+        <div class="screenshot-caption">Figure 2.6: Iris Classification Performance & Confusion Matrix</div>
     </div>
 
-    <h2>CODE REPOSITORY &amp; CLICKABLE ARTIFACT LINKS</h2>
-    <div class="link-card">
-        <p><b>GitHub Repository (Clickable):</b></p>
-        <p>
-            <a class="badge" href="https://github.com/dSAxmonis/pars-lab" target="_blank">&nbsp;&nbsp;GitHub: dSAxmonis/pars-lab&nbsp;&nbsp;</a>
-        </p>
-        <p>URL: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">https://github.com/dSAxmonis/pars-lab</a></p>
+    <div class="page-break"></div>
+    <h3>Figure 2.7: Local File Storage Architecture</h3>
+    <p>Confirms file system hierarchy, CSV tabular datasets, and persisted visual assets ready for modeling.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss7_storage_verification.png" alt="Figure 2.7: Local File Storage Architecture">
+        <div class="screenshot-caption">Figure 2.7: Local File Storage Architecture</div>
     </div>
 
-    <div class="link-card">
-        <p><b>Direct Source Code Files:</b></p>
-        <ul>
-            <li>
-                <b>Flask Server Application:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/app.py" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/app.py</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>HTML Template:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/templates/index.html" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/templates/index.html</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Dependencies:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/requirements.txt" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/requirements.txt</a>
-            </li>
-            <li style="margin-top: 6px;">
-                <b>Full Page Screenshot:</b><br>
-                <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%202/screenshots/full_page.png" target="_blank">https://github.com/dSAxmonis/pars-lab/blob/main/exp 2/screenshots/full_page.png</a>
-            </li>
-        </ul>
-    </div>
+    
 
-    <h2>CONCLUSION</h2>
-    <p>
-        In this experiment, an end-to-end web-based pipeline was successfully designed and deployed using Flask in Python. Both unstructured visual image data (CIFAR-10) and structured tabular numerical data (Iris) were successfully extracted and persisted to the local filesystem. Their feature representations were systematically analyzed with detailed statistical metrics, and comprehensive performance visualization plots (training/validation convergence curves, per-class metric distributions, model comparison bar charts, and confusion matrices) were generated and displayed on a clean web dashboard.
-    </p>
+    <h2>Conclusion</h2>
+    <p>Experiment 2 successfully demonstrated complete automated workflows for multimodal dataset ingestion, local persistence, statistical feature profiling, and classification performance benchmarking. By structuring high-dimensional visual tensors (d=3,072) alongside low-dimensional tabular matrices (d=4), the application verified how distinct storage paradigms and statistical evaluation metrics (Accuracy, Precision, Recall, Macro-F1) provide comprehensive insights into pattern classification readiness.</p>
 
 </body>
 </html>

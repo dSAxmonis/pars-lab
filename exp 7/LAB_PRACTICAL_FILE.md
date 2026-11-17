@@ -1,4 +1,4 @@
-# PATTERN ANALYSIS AND RECOGNITION SYSTEMS (PARS) LAB MANUAL
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
 
 ---
 
@@ -10,84 +10,75 @@
 ---
 
 ### AIM:
-To implement Linear Regression in Python from scratch without using any inbuilt machine learning library functions (such as `scikit-learn`), optimize parameters (weight $w$ and bias $b$) via Gradient Descent for a real-world predictive application (Real Estate Price Prediction), and plot the Gradient Descent convergence cost curve alongside the fitted regression line.
+To implement Linear Regression from first principles in Python strictly using pure NumPy without relying on pre-built machine learning libraries (such as scikit-learn). The algorithm optimizes weight (w) and bias (b) parameters via Gradient Descent for a real-world predictive regression task (Housing Price Prediction), tracks Mean Squared Error (MSE) decay across iterations, and plots the Gradient Descent cost convergence curve alongside the fitted linear regression line.
 
 ---
 
-### THEORY:
-
-#### 1. Linear Regression Model Representation
-Linear Regression models the relationship between a dependent target scalar variable $y$ and an explanatory feature vector $\mathbf{x}$. For a univariate feature $x$, the hypothesis function is expressed as:
-$$\hat{y}^{(i)} = w x^{(i)} + b$$
-where $w$ is the slope weight parameter, and $b$ is the intercept bias parameter.
-
-#### 2. Loss Function (Mean Squared Error)
-The quality of parameter estimates is quantified by the Mean Squared Error (MSE) objective function:
-$$J(w, b) = \frac{1}{2m} \sum_{i=1}^{m} \left(\hat{y}^{(i)} - y^{(i)}\right)^2 = \frac{1}{2m} \sum_{i=1}^{m} \left(w x^{(i)} + b - y^{(i)}\right)^2$$
-The constant $\frac{1}{2}$ is introduced to cancel during partial differentiation.
-
-#### 3. Gradient Descent Optimization
-To find the parameters minimizing $J(w, b)$, parameters are initialized arbitrarily ($w_0 = 0, b_0 = 0$) and iteratively adjusted opposite the direction of the gradient:
-
-- **Partial Derivative with respect to $w$:**
-  $$\frac{\partial J}{\partial w} = \frac{1}{m} \sum_{i=1}^{m} \left(\hat{y}^{(i)} - y^{(i)}\right) x^{(i)}$$
-
-- **Partial Derivative with respect to $b$:**
-  $$\frac{\partial J}{\partial b} = \frac{1}{m} \sum_{i=1}^{m} \left(\hat{y}^{(i)} - y^{(i)}\right)$$
-
-- **Simultaneous Parameter Update Rule:**
-  $$w := w - \alpha \frac{\partial J}{\partial w}$$
-  $$b := b - \alpha \frac{\partial J}{\partial b}$$
-  where $\alpha > 0$ represents the learning rate hyperparameter.
-
-#### 4. Gradient Descent Convergence Curve
-At each iteration $t$, the cost $J_t(w, b)$ is tracked. A properly configured learning rate ensures monotonic convergence towards the global minimum:
-$$\lim_{t \to \infty} \nabla J(w_t, b_t) = \mathbf{0}$$
+### DEFINITIONS & CORE CONCEPTS:
+* **Supervised Linear Regression:** A parametric regression algorithm modeling the linear dependency between an explanatory feature x and a continuous target y.
+* **Cost Function (Mean Squared Error):** A convex loss landscape measuring the average squared prediction error across training instances.
+* **Batch Gradient Descent:** A first-order optimization method iteratively shifting weights in the negative gradient direction to find the global cost minimum.
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Linear Regression Hypothesis
+```text
+y_hat^(i) = w * x^(i) + b
 
-1. **Step 1: Environment & Mathematical Engine Setup**
-   - Create directory `exp 7/` with Flask web server and NumPy array processing routines.
-   - Prohibit external regression packages (`sklearn.linear_model`).
+Where:
+• x^(i) is the input feature of sample i.
+• y_hat^(i) is the predicted scalar output.
+• w is the learnable weight (slope).
+• b is the learnable bias (y-intercept).
+```
 
-2. **Step 2: Mathematical Gradient & Cost Implementation**
-   - Code `compute_cost(X, y, w, b)` and `compute_gradients(X, y, w, b)` strictly using vectorized arithmetic.
-   - Implement optimization loop tracking cost per epoch.
+#### 2. Cost Function (Mean Squared Error)
+```text
+J(w, b) = ( 1 / (2*m) ) * sum_{i=1}^m ( y_hat^(i) - y^(i) )^2
 
-3. **Step 3: Web Server Deployment & Visualization**
-   - Run Flask server on port 5009 (`python3 "exp 7/app.py"`).
-   - Display dual plots: Gradient Descent MSE decay curve and Fitted Regression Line against actual housing points.
+Where:
+• m is the number of training samples.
+• y^(i) is the true ground truth target.
+```
+
+#### 3. Analytical Gradients & Update Rule
+```text
+del_J / del_w = ( 1 / m ) * sum_{i=1}^m ( y_hat^(i) - y^(i) ) * x^(i)
+del_J / del_b = ( 1 / m ) * sum_{i=1}^m ( y_hat^(i) - y^(i) )
+
+Simultaneous Parameter Updates:
+w := w - alpha * ( del_J / del_w )
+b := b - alpha * ( del_J / del_b )
+```
 
 ---
 
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 7/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/app.py)
-  - [HTML Template (`exp 7/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/templates/index.html)
-  - [Dependencies (`exp 7/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/requirements.txt)
-  - [Lab Manual Report (`exp 7/LAB_PRACTICAL_FILE.md`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%207/LAB_PRACTICAL_FILE.md)
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Formulated vectorized linear regression arithmetic strictly using pure NumPy arrays without external estimators.
+2. Programmed the batch Gradient Descent optimization loop iteratively updating weight w and bias b.
+3. Logged Mean Squared Error (MSE) at each epoch to record the monotonic decay convergence history.
+4. Deployed an interactive Flask application on port 5009 allowing users to adjust learning rate, number of iterations, test new feature inputs, and inspect dynamic cost curves.
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 7.1: Hyperparameter Tuning & Optimization Summary
+Interactive controls for learning rate, epochs, and input testing alongside converged weight, bias, and final MSE cost values.
 
-#### 1. Hyperparameter Tuning Controls & Optimization Summary
-![Output 1 Hyperparameters](screenshots/ss1_hyperparameters_tuning.png)
+![Figure 7.1: Hyperparameter Tuning & Optimization Summary](screenshots/ss1_hyperparameters_tuning.png)
 
-#### 2. Gradient Descent Convergence Curve & Fitted Model Plot
-![Output 2 Convergence and Fit](screenshots/ss2_convergence_curve_fit.png)
+#### Figure 7.2: Gradient Descent Convergence Curve & Fitted Model
+Dual-panel plot displaying the monotonic decay of MSE cost over iterations (left) and the fitted linear regression line over housing data (right).
 
-#### 3. Real Estate Dataset Samples & Residual Errors Table
-![Output 3 Dataset Residuals](screenshots/ss3_dataset_residuals.png)
+![Figure 7.2: Gradient Descent Convergence Curve & Fitted Model](screenshots/ss2_convergence_curve_fit.png)
+
+#### Figure 7.3: Training Sample Evaluation & Residual Analysis
+Tabular display of observed features, ground truth targets, model predictions, and calculated residual errors.
+
+![Figure 7.3: Training Sample Evaluation & Residual Analysis](screenshots/ss3_dataset_residuals.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, Linear Regression was implemented completely from scratch in Python without relying on pre-built machine learning libraries. Utilizing analytical gradient descent equations, optimal weights ($w^*$) and bias ($b^*$) were iteratively discovered for housing valuation data. The resulting Gradient Descent curve demonstrated stable monotonic cost convergence, and the fitted regression model reliably generalized predictions on unseen feature samples.
+Experiment 7 demonstrated the first-principles implementation of Linear Regression using analytical gradient descent. By deriving exact partial derivatives and simultaneously updating parameters, the algorithm achieved steady monotonic loss convergence toward the global minimum, confirming how mathematical optimization guides regression models to discover optimal parameters from empirical data.

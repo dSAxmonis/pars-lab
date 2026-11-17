@@ -1,97 +1,86 @@
-# EXPERIMENT 10: PRINCIPAL COMPONENT ANALYSIS (PCA) WITH TESTING
+# PATTERN ANALYSIS AND RECOMMENDER SYSTEMS (PARS) LAB MANUAL
+
+---
+
+## EXPERIMENT 10
+
+### PRACTICAL NAME:
+**Implementation of Principal Component Analysis (PCA) with Projected Line, Reduced Feature Mapping, and Testing**
 
 ---
 
 ### AIM:
-To implement Principal Component Analysis (PCA) from scratch in Python for an engineering pattern recognition application involving test sample evaluation, derive the primary eigenvector $\mathbf{v}_1$ of the covariance matrix, and visualize:
-1. **The 1st principal component projected line**,
-2. **New reduced 1D features mapped directly onto the projected line**, and
-3. **Orthogonal projection and reconstruction error evaluation of unseen test samples**.
+To implement Principal Component Analysis (PCA) from scratch in pure NumPy without using pre-built machine learning libraries. The application centers the dataset, computes the sample covariance matrix, performs eigenvalue decomposition to identify the maximum variance projection axis, defines the 1D projected line equation, maps test samples onto this line to obtain reduced 1D features, reconstructs original coordinates, and visualizes the complete system in an interactive Flask application.
 
 ---
 
-### THEORY:
-
-#### 1. Maximum Variance Linear Subspace:
-Given zero-mean centered training samples $\tilde{\mathbf{X}} = \mathbf{X} - \boldsymbol{\mu}$, PCA finds an orthogonal unit direction $\mathbf{v}_1$ that maximizes the empirical variance of projected points:
-$$\max_{\|\mathbf{v}\|=1} \mathbf{v}^T \mathbf{\Sigma} \mathbf{v}$$
-where sample covariance matrix is:
-$$\mathbf{\Sigma} = \frac{1}{n-1} \tilde{\mathbf{X}}^T \tilde{\mathbf{X}}$$
-
-#### 2. Eigen-Decomposition:
-The stationary points of the Rayleigh quotient correspond to the eigenvectors of $\mathbf{\Sigma}$:
-$$\mathbf{\Sigma} \mathbf{v}_1 = \lambda_1 \mathbf{v}_1$$
-where $\lambda_1$ represents the variance retained along $\mathbf{v}_1$. The explained variance ratio is $\lambda_1 / (\lambda_1 + \lambda_2)$.
-
-#### 3. 1D Projected Line & Feature Mapping:
-The 1st principal component line is defined as:
-$$\mathbf{p}(t) = \boldsymbol{\mu} + t \mathbf{v}_1, \quad t \in \mathbb{R}$$
-For any vector $\mathbf{x}$, its reduced 1D scalar feature coordinate and its mapped position on the line are:
-$$z = (\mathbf{x} - \boldsymbol{\mu}) \cdot \mathbf{v}_1$$
-$$\hat{\mathbf{x}} = \boldsymbol{\mu} + z \mathbf{v}_1$$
-The orthogonal reconstruction residual is $\|\mathbf{x} - \hat{\mathbf{x}}\|_2$.
+### DEFINITIONS & CORE CONCEPTS:
+* **Principal Component Analysis (PCA):** An unsupervised orthogonal linear transformation method projecting data onto axes maximizing variance and minimizing reconstruction error.
+* **Sample Covariance Matrix Sigma:** Measures joint feature dispersion and linear covariance around the empirical centroid.
+* **Eigenvalue Decomposition:** Resolves the covariance matrix into eigenvectors (principal directions) and eigenvalues (retained variance magnitudes).
 
 ---
 
-### STEPS:
+### MATHEMATICAL FORMULATIONS:
+#### 1. Mean Centering & Covariance Matrix
+```text
+mu = ( 1 / n ) * sum_{i=1}^n x^(i)
+X_tilde = X - 1 * mu^T
+Sigma = ( 1 / (n - 1) ) * X_tilde^T * X_tilde in R^{d x d}
+```
 
-1. **Step 1: Environment Setup & Project Directory Structure**
-   - Create project directory `exp 10/` with subfolders `templates/` and `screenshots/`.
-   - Configure dependencies: `Flask`, `numpy`, `scipy`, and `matplotlib`.
+#### 2. Eigen-System & Explained Variance
+```text
+Sigma * v_k = lambda_k * v_k,    lambda_1 >= lambda_2 >= ... >= lambda_d >= 0
+Explained Variance Ratio: EVR_1 = lambda_1 / sum_{j=1}^d lambda_j
+```
 
-2. **Step 2: Mathematical PCA Engine Implementation**
-   - Compute data centroid $\boldsymbol{\mu}$, center training observations, and calculate $2 \times 2$ covariance matrix $\mathbf{\Sigma}$.
-   - Solve characteristic eigenvalue equation $\mathbf{\Sigma} \mathbf{v} = \lambda \mathbf{v}$ and sort eigenvalues descendingly.
+#### 3. 1D Projected Principal Axis Equation
+```text
+Line(t) = mu + t * v_1,    t in R
+```
 
-3. **Step 3: 1D Feature Mapping along Projected Line**
-   - Project all training vectors onto the 1st principal component axis.
-   - Reconstruct 2D coordinate positions along the line and quantify retained variance.
-
-4. **Step 4: Interactive Testing & Reconstruction**
-   - Evaluate arbitrary test sample $\mathbf{x}_{\text{test}}$, compute scalar score $z_{\text{test}}$, project onto line, and report Euclidean residual error.
-
-5. **Step 5: Web Server Deployment on Port 5012**
-   - Launch Flask application: `python3 "exp 10/app.py"`.
-   - Inspect dual-panel projection plot and tabular residual outputs.
-
----
-
-### CODE FILES & REPOSITORY:
-
-- **GitHub Repository Link (Clickable):**  
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github)](https://github.com/dSAxmonis/pars-lab)  
-  [https://github.com/dSAxmonis/pars-lab](https://github.com/dSAxmonis/pars-lab)
-
-- **Source Code Links:**
-  - [Flask Server (`exp 10/app.py`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/app.py)
-  - [HTML Template (`exp 10/templates/index.html`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/templates/index.html)
-  - [Dependencies (`exp 10/requirements.txt`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/requirements.txt)
-  - [PCA Parameters Screenshot (`exp 10/screenshots/ss1_pca_parameters.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss1_pca_parameters.png)
-  - [Test Controls Screenshot (`exp 10/screenshots/ss2_test_controls.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss2_test_controls.png)
-  - [Projected Line Plot Screenshot (`exp 10/screenshots/ss3_projection_plot.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss3_projection_plot.png)
-  - [Sample Mapping Table Screenshot (`exp 10/screenshots/ss4_sample_reduction_table.png`)](https://github.com/dSAxmonis/pars-lab/blob/main/exp%2010/screenshots/ss4_sample_reduction_table.png)
+#### 4. 1D Coordinate & Reconstruction
+```text
+Reduced 1D Coordinate:  z_test = ( x_test - mu )^T * v_1
+Reconstructed Position: x_hat_test = mu + z_test * v_1
+Orthogonal Residual:    E = || x_test - x_hat_test ||_2
+```
 
 ---
 
-### OUTPUT / SCREENSHOTS:
+### ALGORITHMIC METHODOLOGY & IMPLEMENTATION STEPS:
+1. Synthesized benchmark bivariate feature dataset exhibiting correlated variance.
+2. Computed sample empirical mean vector and zero-mean centered data matrix.
+3. Calculated the covariance matrix and extracted principal eigenvalues and eigenvectors using pure NumPy.
+4. Derived parametric line equations for the 1st principal component axis.
+5. Implemented real-time 1D projection and reconstruction mapping for arbitrary test coordinates.
+6. Deployed interactive Flask dashboard on port 5001 showing projection plots, orthogonal residual drops, and variance ratios.
 
-#### 1. Section 1: Learned PCA Parameters & Eigen-Decomposition Summary
-> **File:** `exp 10/screenshots/ss1_pca_parameters.png`  
-![Section 1 PCA Parameters](screenshots/ss1_pca_parameters.png)
+---
 
-#### 2. Section 2: Test Sample Projection & Reconstruction Controls
-> **File:** `exp 10/screenshots/ss2_test_controls.png`  
-![Section 2 Test Controls](screenshots/ss2_test_controls.png)
+### EXPERIMENTAL RESULTS & VISUAL VERIFICATION:
+#### Figure 10.1: PCA Statistical Parameters & Decomposition Summary
+Displays sample mean vector, covariance matrix, dominant eigenvalue, eigenvector components, and explained variance ratio (88.4%).
 
-#### 3. Section 3: PCA 2D Projected Line & 1D Reduced Feature Mapping Plots
-> **File:** `exp 10/screenshots/ss3_projection_plot.png`  
-![Section 3 Projected Line and 1D Subspace](screenshots/ss3_projection_plot.png)
+![Figure 10.1: PCA Statistical Parameters & Decomposition Summary](screenshots/ss1_pca_parameters.png)
 
-#### 4. Section 4: Original Samples vs. 1D Reduced Features & Reconstruction Residuals
-> **File:** `exp 10/screenshots/ss4_sample_reduction_table.png`  
-![Section 4 Sample Reduction Table](screenshots/ss4_sample_reduction_table.png)
+#### Figure 10.2: Interactive Test Sample Controls
+Input sliders and presets allowing users to submit new test points (x1, x2) for dynamic reduction.
+
+![Figure 10.2: Interactive Test Sample Controls](screenshots/ss2_test_controls.png)
+
+#### Figure 10.3: PCA Projected Line & Feature Mapping Plot
+Matplotlib visualization showing original data scatter, centroid, 1st principal line, and test point projected onto the line with orthogonal residual drop.
+
+![Figure 10.3: PCA Projected Line & Feature Mapping Plot](screenshots/ss3_projection_plot.png)
+
+#### Figure 10.4: Sample Reduction & Reconstruction Table
+Tabulates original test coordinates, reduced 1D scalar coordinate z, reconstructed position, and Euclidean reconstruction error.
+
+![Figure 10.4: Sample Reduction & Reconstruction Table](screenshots/ss4_sample_reduction_table.png)
 
 ---
 
 ### CONCLUSION:
-In this experiment, Principal Component Analysis was implemented from first principles in Python. The linear transformation mapped correlated 2D sensor patterns into an optimal 1D subspace along the 1st principal component line $p(t) = \boldsymbol{\mu} + t\mathbf{v}_1$. The testing phase demonstrated that unseen test vectors can be rapidly projected to reduced scalar coordinates $z_{\text{test}} = (\mathbf{x}_{\text{test}} - \boldsymbol{\mu}) \cdot \mathbf{v}_1$ while preserving over 90% of the total dataset variance with minimal reconstruction residual error.
+Experiment 10 successfully implemented Principal Component Analysis from first principles. By decomposing the empirical covariance matrix, the application established the 1D principal axis that captures maximum variance, demonstrated the mapping of test samples onto reduced coordinates, and verified that PCA achieves optimal orthogonal reconstruction under least-squares criteria.
