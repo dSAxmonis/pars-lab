@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 13: Collaborative-Based Recommender System Using Flask</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222" style="font-family: Arial, sans-serif; margin: 20px;">
+
+    <!-- ============================================================================== -->
+    <!-- HEADER -->
+    <!-- ============================================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 13</font></h1>
+        <h3><font color="#555555">Implementation of User-Item Collaborative Recommender System Using Flask &amp; Pure NumPy</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp; 
+            <b>Framework:</b> Flask / Pure NumPy (From Scratch) &nbsp;|&nbsp;
+            <b>Port:</b> 5013
+        </p>
+        <p>
+            <b>Student Name:</b> Monis &nbsp;|&nbsp; 
+            <b>Roll Number:</b> 2023UIT3027 &nbsp;|&nbsp; 
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp; 
+            <b>Session:</b> 2026&ndash;2027 &nbsp;|&nbsp; 
+            <b>Institution:</b> NSUT New Delhi
+        </p>
+        <p>
+            <b>GitHub Repository:</b> 
+            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">
+                https://github.com/dSAxmonis/pars-lab
+            </a>
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- ============================================================================== -->
+    <!-- AIM & OBJECTIVE SUMMARY TABLE -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left"><font color="#ffffff">EXPERIMENT AIM &amp; MATHEMATICAL OBJECTIVE</font></th>
+        </tr>
+        <tr>
+            <td width="15%" align="center" bgcolor="#e6f0fa"><b>Experiment Aim</b></td>
+            <td>
+                <b>To implement a collaborative-based recommender system for any application (Movies Recommender System) from scratch using Flask and pure NumPy without machine learning libraries.</b>
+            </td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td align="center" bgcolor="#e6f0fa"><b>Core Algorithm</b></td>
+            <td>
+                <b>User-Item Collaborative Filtering:</b> Compute User-User Pearson correlation similarity matrix 
+                <code>r(u, v) = &Sigma;((R_u - &mu;_u)(R_v - &mu;_v)) / (&radic;&Sigma;(R_u - &mu;_u)&sup2; &radic;&Sigma;(R_v - &mu;_v)&sup2;)</code> 
+                across co-rated items. Predict unrated movies using Resnick's mean-centered weighted average of top-K similar peers:
+                <code>&Rcirc;(a, i) = &mu;_a + &Sigma;(sim(a, v) &times; (R_{v,i} - &mu;_v)) / &Sigma;|sim(a, v)|</code>.
+            </td>
+        </tr>
+        <tr>
+            <td align="center" bgcolor="#e6f0fa"><b>Validation Metric</b></td>
+            <td>
+                Leave-One-Out validation on known active user ratings comparing <b>Actual Ratings vs Predicted Ratings</b> with <b>Mean Absolute Error (MAE)</b> and <b>Root Mean Squared Error (RMSE)</b>.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 1: ACTIVE USER & ENGINE CONTROLS -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left"><font color="#ffffff">SECTION 1: ACTIVE USER SELECTION &amp; COLLABORATIVE FILTERING PARAMETERS</font></th>
+        </tr>
+        <tr>
+            <td width="55%" valign="top">
+                <form method="POST" action="/">
+                    <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="35%"><b>Select Active User:</b></td>
+                            <td>
+                                <select name="active_user_idx" style="font-size: 11pt; padding: 4px; width: 260px;" onchange="this.form.submit()">
+                                    {% for u in user_profiles %}
+                                    <option value="{{ u.id }}" {% if u.id == active_user_idx %}selected{% endif %}>
+                                        {{ u.avatar }} {{ u.name }} &mdash; {{ u.persona }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Top-K Neighbors (K):</b></td>
+                            <td>
+                                <select name="k_neighbors" style="font-size: 11pt; padding: 4px; width: 90px;">
+                                    <option value="2" {% if k_neighbors == 2 %}selected{% endif %}>K = 2</option>
+                                    <option value="3" {% if k_neighbors == 3 %}selected{% endif %}>K = 3</option>
+                                    <option value="4" {% if k_neighbors == 4 %}selected{% endif %}>K = 4</option>
+                                    <option value="5" {% if k_neighbors == 5 %}selected{% endif %}>K = 5</option>
+                                </select>
+                                &nbsp;
+                                <font size="2" color="#666666">(Number of most correlated peers used for prediction)</font>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Genre Filter:</b></td>
+                            <td>
+                                <select name="genre_filter" style="font-size: 11pt; padding: 4px; width: 140px;">
+                                    <option value="ALL" {% if genre_filter == 'ALL' %}selected{% endif %}>All Genres</option>
+                                    <option value="Action" {% if genre_filter == 'Action' %}selected{% endif %}>Action</option>
+                                    <option value="Sci-Fi" {% if genre_filter == 'Sci-Fi' %}selected{% endif %}>Sci-Fi</option>
+                                    <option value="Drama" {% if genre_filter == 'Drama' %}selected{% endif %}>Drama</option>
+                                    <option value="Comedy" {% if genre_filter == 'Comedy' %}selected{% endif %}>Comedy</option>
+                                    <option value="Horror" {% if genre_filter == 'Horror' %}selected{% endif %}>Horror</option>
+                                    <option value="Romance" {% if genre_filter == 'Romance' %}selected{% endif %}>Romance</option>
+                                    <option value="Thriller" {% if genre_filter == 'Thriller' %}selected{% endif %}>Thriller</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <br>
+                                <button type="submit" style="background-color: #003366; color: #ffffff; padding: 7px 18px; font-size: 11pt; font-weight: bold; cursor: pointer; border: 1px solid #002244;">
+                                    Run Collaborative Filtering Engine
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+
+            <td width="45%" valign="top" bgcolor="#fcfcfc">
+                <b>Current Active User Overview:</b><br><br>
+                <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 4px;">
+                    <font size="3"><b>{{ active_user_avatar }} {{ active_user_name }}</b></font><br>
+                    <font size="2" color="#555555">Persona: <i>{{ active_user_persona }}</i></font><br>
+                    <hr size="1" color="#bbf7d0">
+                    &bull; <b>Total Movies Rated:</b> {{ eval_metrics.rated_count }} of 20<br>
+                    &bull; <b>Active User Mean Rating (&mu;<sub>a</sub>):</b> {{ active_mean }} ★<br>
+                    &bull; <b>Candidate Unrated Movies:</b> {{ 20 - eval_metrics.rated_count }} available for recommendation<br>
+                    &bull; <b>Holdout Validation MAE:</b> <font color="#008000"><b>{{ eval_metrics.mae }}</b></font> | <b>RMSE:</b> <font color="#008000"><b>{{ eval_metrics.rmse }}</b></font>
+                </div>
+                <br>
+                <b>Quick Persona Rating Presets:</b><br>
+                <form method="POST" action="/" style="margin-top: 5px;">
+                    <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                    <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                    <button type="submit" name="action" value="preset_scifi" style="padding: 3px 8px; font-size: 9pt; cursor: pointer;">Seed as Sci-Fi Fan</button>
+                    <button type="submit" name="action" value="preset_romance" style="padding: 3px 8px; font-size: 9pt; cursor: pointer;">Seed as Romance Lover</button>
+                    <button type="submit" name="action" value="preset_horror" style="padding: 3px 8px; font-size: 9pt; cursor: pointer;">Seed as Horror Buff</button>
+                    <button type="submit" name="action" value="reset_defaults" style="padding: 3px 8px; font-size: 9pt; cursor: pointer; background-color: #fee2e2;">Reset All</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 2: MOVIE INSPECTION DRAWER (IF SELECTED) -->
+    <!-- ============================================================================== -->
+    {% if selected_movie %}
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e293b">
+            <th colspan="2" align="left"><font color="#ffffff">SECTION 2: INSPECTED MOVIE DETAILS &amp; MATHEMATICAL EXPLANATION</font></th>
+        </tr>
+        <tr>
+            <td width="20%" align="center" valign="middle" bgcolor="{{ selected_movie.color }}">
+                <font size="6" color="#ffffff">{{ selected_movie.icon }}</font><br>
+                <font size="5" color="#ffffff"><b>{{ selected_movie.initials }}</b></font><br>
+                <font size="2" color="#ffffff">{{ selected_movie.year }}</font>
+            </td>
+            <td width="80%" valign="top">
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    <tr>
+                        <td colspan="2">
+                            <font size="4" color="#003366"><b>{{ selected_movie.title }} ({{ selected_movie.year }})</b></font> &nbsp;
+                            <span style="background-color: #f1f5f9; padding: 2px 6px; border: 1px solid #cbd5e1; font-size: 9pt;">
+                                {{ ", ".join(selected_movie.genres) }}
+                            </span> &nbsp;
+                            <span style="background-color: #fef3c7; padding: 2px 6px; border: 1px solid #fde68a; font-size: 9pt; font-weight: bold;">
+                                IMDb: {{ selected_movie.rating }} ★
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="18%"><b>Director:</b></td>
+                        <td>{{ selected_movie.director }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Cast:</b></td>
+                        <td>{{ selected_movie.cast }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Plot Keywords:</b></td>
+                        <td><i>{{ selected_movie.plot_keywords }}</i></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><b>Synopsis:</b></td>
+                        <td>{{ selected_movie.description }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><hr size="1" color="#e2e8f0"></td>
+                    </tr>
+                    <tr>
+                        <td><b>Active User Rating:</b></td>
+                        <td>
+                            {% if selected_movie.user_rating > 0 %}
+                                <font color="#15803d" size="3"><b>{{ selected_movie.user_rating }} ★ (Watched)</b></font>
+                            {% else %}
+                                <font color="#b45309" size="3"><b>Unwatched / Not Rated Yet</b></font>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>CF Predicted Rating:</b></td>
+                        <td>
+                            <font color="#4338ca" size="3"><b>{{ selected_movie.pred_rating }} ★</b></font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><b>Peer Explanation:</b></td>
+                        <td>
+                            <font color="#334155">{{ selected_movie.explanation }}</font>
+                            {% if selected_movie.contributors %}
+                            <br>
+                            <table border="1" cellpadding="3" cellspacing="0" style="margin-top: 6px; font-size: 9pt;" bgcolor="#f8fafc">
+                                <tr bgcolor="#e2e8f0">
+                                    <th>Similar Peer</th>
+                                    <th>Pearson Correlation (r)</th>
+                                    <th>Peer Rating</th>
+                                    <th>Peer Mean (&mu;)</th>
+                                    <th>Rating Deviation (R - &mu;)</th>
+                                </tr>
+                                {% for c in selected_movie.contributors %}
+                                <tr>
+                                    <td><b>{{ c.user_name }}</b></td>
+                                    <td align="center"><font color="#16a34a"><b>{{ c.similarity }}</b></font></td>
+                                    <td align="center"><b>{{ c.rated_val }} ★</b></td>
+                                    <td align="center">{{ c.user_mean }}</td>
+                                    <td align="center">{{ "%+.2f"|format(c.rated_val - c.user_mean) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <br><br>
+    {% endif %}
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 3: FULL MOVIE CATALOG (CLICKABLE INTERACTIVE CARDS) -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left"><font color="#ffffff">SECTION 3: COMPLETE MOVIES CATALOG &amp; INTERACTIVE RATING PORTAL (20 MOVIES)</font></th>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc">
+                <font size="2" color="#475569">
+                    <b>Instructions:</b> Browse all 20 catalog films below. 
+                    Click <b>"Inspect Movie"</b> to examine plot attributes and peer contribution formulas, or select a rating from the dropdown and click <b>"Rate"</b> to update the active user's rating in real-time.
+                    Movies with a green badge have already been rated by the active user; movies with an amber badge display the Collaborative Filtering predicted score.
+                </font>
+            </td>
+        </tr>
+        <tr>
+            <td align="center" style="padding: 15px;">
+                <!-- Grid of Movie Cards: 4 columns x 5 rows -->
+                <table border="0" cellpadding="8" cellspacing="12" width="100%">
+                    {% for row_movies in catalog|batch(4) %}
+                    <tr>
+                        {% for movie in row_movies %}
+                        <td width="25%" valign="top" style="border: 1px solid #cbd5e1; background-color: #ffffff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); padding: 10px;">
+                            <!-- Movie Poster Placeholder -->
+                            <div style="background-color: {{ movie.color }}; color: #ffffff; text-align: center; padding: 18px 6px; border-radius: 3px; margin-bottom: 8px;">
+                                <span style="font-size: 26pt;">{{ movie.icon }}</span><br>
+                                <span style="font-size: 14pt; font-weight: bold; letter-spacing: 1px;">{{ movie.initials }}</span><br>
+                                <span style="font-size: 9pt; opacity: 0.9;">{{ movie.year }}</span>
+                            </div>
+
+                            <!-- Movie Metadata -->
+                            <div style="min-height: 52px;">
+                                <font size="3" color="#003366"><b>{{ movie.title }}</b></font><br>
+                                <font size="1" color="#64748b">{{ movie.genres_str }}</font>
+                            </div>
+
+                            <div style="font-size: 8.5pt; color: #475569; margin: 4px 0;">
+                                <b>Dir:</b> {{ movie.director }}<br>
+                                <b>IMDb:</b> <font color="#b45309"><b>{{ movie.imdb_rating }} ★</b></font>
+                            </div>
+
+                            <!-- Rating Status -->
+                            <div style="margin: 8px 0; padding: 5px; border-radius: 3px; font-size: 8.5pt; text-align: center;
+                                        background-color: {% if movie.has_rated %}#ecfdf5{% else %}#fffbeb{% endif %};
+                                        border: 1px solid {% if movie.has_rated %}#a7f3d0{% else %}#fde68a{% endif %};">
+                                {% if movie.has_rated %}
+                                    <font color="#047857"><b>Watched &amp; Rated: {{ movie.user_rating }} ★</b></font>
+                                {% else %}
+                                    <font color="#b45309"><b>Predicted: {{ movie.pred_rating }} ★</b></font>
+                                {% endif %}
+                            </div>
+
+                            <!-- Interactive Actions Form -->
+                            <form method="POST" action="/" style="margin-top: 6px;">
+                                <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                                <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                                <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                                <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                                
+                                <table border="0" cellpadding="2" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td>
+                                            <select name="new_rating" style="font-size: 8.5pt; padding: 2px; width: 100%;">
+                                                <option value="5.0" {% if movie.user_rating == 5.0 %}selected{% endif %}>5.0 ★ (Masterpiece)</option>
+                                                <option value="4.5" {% if movie.user_rating == 4.5 %}selected{% endif %}>4.5 ★ (Excellent)</option>
+                                                <option value="4.0" {% if movie.user_rating == 4.0 %}selected{% endif %}>4.0 ★ (Very Good)</option>
+                                                <option value="3.5" {% if movie.user_rating == 3.5 %}selected{% endif %}>3.5 ★ (Good)</option>
+                                                <option value="3.0" {% if movie.user_rating == 3.0 %}selected{% endif %}>3.0 ★ (Average)</option>
+                                                <option value="2.5" {% if movie.user_rating == 2.5 %}selected{% endif %}>2.5 ★ (Mediocre)</option>
+                                                <option value="2.0" {% if movie.user_rating == 2.0 %}selected{% endif %}>2.0 ★ (Poor)</option>
+                                                <option value="1.0" {% if movie.user_rating == 1.0 %}selected{% endif %}>1.0 ★ (Terrible)</option>
+                                                <option value="0.0" {% if movie.user_rating == 0.0 %}selected{% endif %}>0.0 (Unrated / Unwatch)</option>
+                                            </select>
+                                        </td>
+                                        <td width="35%" align="right">
+                                            <button type="submit" name="action" value="rate_movie" style="background-color: #003366; color: #ffffff; border: none; padding: 3px 6px; font-size: 8.5pt; cursor: pointer; border-radius: 2px;">
+                                                Rate
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" align="center" style="padding-top: 4px;">
+                                            <button type="submit" name="selected_movie_id" value="{{ movie.id }}" style="background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 3px 8px; font-size: 8pt; cursor: pointer; border-radius: 2px; width: 100%;">
+                                                🔍 Inspect Movie Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 4: TOP RECOMMENDATIONS FOR ACTIVE USER -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="7" align="left"><font color="#ffffff">SECTION 4: TOP RECOMMENDED MOVIES FOR {{ active_user_name|upper }} (UNWATCHED ITEMS)</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa">
+            <th align="center" width="5%">Rank</th>
+            <th align="center" width="7%">Poster</th>
+            <th align="left" width="22%">Movie Title &amp; Year</th>
+            <th align="center" width="16%">Genres</th>
+            <th align="center" width="13%">Predicted Rating (&Rcirc;)</th>
+            <th align="left" width="25%">Peer Recommendation Reason</th>
+            <th align="center" width="12%">Action</th>
+        </tr>
+        {% if unwatched_recommendations %}
+            {% for rec in unwatched_recommendations[:7] %}
+            <tr bgcolor="{% if loop.index % 2 == 0 %}#fafafa{% else %}#ffffff{% endif %}">
+                <td align="center"><font size="3" color="#003366"><b>#{{ loop.index }}</b></font></td>
+                <td align="center">
+                    <div style="background-color: {{ rec.color }}; color: #ffffff; padding: 4px 6px; border-radius: 3px; font-weight: bold; font-size: 9pt;">
+                        {{ rec.icon }} {{ rec.initials }}
+                    </div>
+                </td>
+                <td align="left">
+                    <b>{{ rec.title }}</b> ({{ rec.year }})<br>
+                    <font size="1" color="#666666">Dir: {{ rec.director }} | IMDb: {{ rec.imdb_rating }} ★</font>
+                </td>
+                <td align="center">{{ rec.genres_str }}</td>
+                <td align="center">
+                    <font size="3" color="#b45309"><b>{{ rec.pred_rating }} ★</b></font>
+                </td>
+                <td align="left" style="font-size: 8.5pt;">
+                    {{ rec.explanation }}
+                </td>
+                <td align="center">
+                    <form method="POST" action="/">
+                        <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                        <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                        <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                        <input type="hidden" name="selected_movie_id" value="{{ rec.id }}">
+                        <button type="submit" style="background-color: #f1f5f9; border: 1px solid #94a3b8; padding: 3px 6px; font-size: 8pt; cursor: pointer;">
+                            Inspect Details
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="7" align="center"><i>No unwatched movies matching the current genre filter.</i></td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 5: VALIDATION - PREDICTED VS ACTUAL RATINGS TABLE -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="7" align="left"><font color="#ffffff">SECTION 5: VALIDATION &amp; BENCHMARK &mdash; PREDICTED VS ACTUAL RATINGS ON KNOWN ITEMS</font></th>
+        </tr>
+        <tr>
+            <td colspan="7" bgcolor="#f8fafc">
+                <font size="2" color="#475569">
+                    <b>Holdout Leave-One-Out Cross-Validation:</b> For each movie the active user has already rated, the collaborative filtering engine generates a blind prediction &Rcirc;(a, i) using similar peers, and computes the residual error e = (R - &Rcirc;).
+                </font>
+            </td>
+        </tr>
+        <tr bgcolor="#e6f0fa">
+            <th align="center" width="5%">#</th>
+            <th align="left" width="25%">Movie Title</th>
+            <th align="center" width="18%">Genre(s)</th>
+            <th align="center" width="13%">Actual Rating (R)</th>
+            <th align="center" width="13%">Predicted Rating (&Rcirc;)</th>
+            <th align="center" width="13%">Residual Error (e)</th>
+            <th align="center" width="13%">Absolute Error (|e|)</th>
+        </tr>
+        {% if eval_records %}
+            {% for r in eval_records %}
+            <tr bgcolor="{% if loop.index % 2 == 0 %}#fafafa{% else %}#ffffff{% endif %}">
+                <td align="center">{{ loop.index }}</td>
+                <td align="left"><b>{{ r.title }}</b></td>
+                <td align="center"><font size="2">{{ r.genres }}</font></td>
+                <td align="center"><font color="#1d4ed8"><b>{{ r.actual }} ★</b></font></td>
+                <td align="center"><font color="#ea580c"><b>{{ r.predicted }} ★</b></font></td>
+                <td align="center">
+                    <font color="{% if r.error < 0 %}#b91c1c{% else %}#15803d{% endif %}">
+                        {{ "%+.2f"|format(r.error) }}
+                    </font>
+                </td>
+                <td align="center"><b>{{ r.abs_error }}</b></td>
+            </tr>
+            {% endfor %}
+            <tr bgcolor="#f1f5f9">
+                <td colspan="4" align="right"><b>Aggregated Validation Error Metrics (N = {{ eval_metrics.rated_count }}):</b></td>
+                <td colspan="3" align="left">
+                    &nbsp;&bull; <b>Mean Absolute Error (MAE):</b> <font color="#008000"><b>{{ eval_metrics.mae }}</b></font> &nbsp;|&nbsp;
+                    &bull; <b>Root Mean Squared Error (RMSE):</b> <font color="#008000"><b>{{ eval_metrics.rmse }}</b></font>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" align="center"><i>No movies currently rated by active user to perform validation on. Rate some movies above!</i></td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 6: MATPLOTLIB DIAGNOSTIC VISUALIZATIONS -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left"><font color="#ffffff">SECTION 6: COLLABORATIVE FILTERING ALGORITHM VISUALIZATION PLOTS</font></th>
+        </tr>
+        <tr>
+            <td align="center" bgcolor="#fcfcfc" style="padding: 18px;">
+                <!-- FIGURE 1 -->
+                <b>Figure 13.1: Collaborative Filtering Internals &mdash; User-User Pearson Similarity Matrix &amp; Peer Strengths</b><br><br>
+                <img src="data:image/png;base64,{{ plot1_base64 }}" alt="Similarity Matrix Heatmap and Neighbor Scores" style="border: 1px solid #cbd5e1; max-width: 98%; height: auto;"><br>
+                <div align="left" style="width: 94%; font-size: 9pt; color: #555555; margin-top: 8px;">
+                    <b>Plot Explanation (Figure 13.1):</b><br>
+                    &bull; <b>Left Panel (Heatmap):</b> Pairwise Pearson Correlation coefficient r(u, v) between all 9 users across co-rated movies. Red hues indicate high positive correlation, blue indicates negative taste divergence.<br>
+                    &bull; <b>Right Panel (Peer Similarity Ranking):</b> Displays correlation coefficients of all community members relative to the active user (<b>{{ active_user_name }}</b>). The top K={{ k_neighbors }} highest-correlated peers used for rating prediction are highlighted in green.
+                </div>
+
+                <br><br><hr size="1" color="#e2e8f0" width="95%"><br>
+
+                <!-- FIGURE 2 -->
+                <b>Figure 13.2: Recommender Performance &mdash; Predicted vs Actual Validation &amp; Top Recommended Scores</b><br><br>
+                <img src="data:image/png;base64,{{ plot2_base64 }}" alt="Predicted vs Actual and Top Recommendations" style="border: 1px solid #cbd5e1; max-width: 98%; height: auto;"><br>
+                <div align="left" style="width: 94%; font-size: 9pt; color: #555555; margin-top: 8px;">
+                    <b>Plot Explanation (Figure 13.2):</b><br>
+                    &bull; <b>Left Panel (Validation):</b> Direct side-by-side comparison of Actual Ratings (Blue) versus CF Predicted Ratings (Orange) on movies the user already evaluated, with delta residuals (&Delta;) annotated per title.<br>
+                    &bull; <b>Right Panel (Recommendations):</b> Highest predicted score candidates among unwatched catalog titles ready to be recommended to the active user.
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 7: USER-ITEM RATINGS MATRIX TABLE -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="6" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="21" align="left"><font color="#ffffff">SECTION 7: COMPLETE USER-ITEM RATINGS MATRIX R (9 USERS &times; 20 MOVIES)</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" style="font-size: 8pt;">
+            <th align="left">User</th>
+            {% for m in movies_database %}
+            <th align="center" title="{{ m.title }} ({{ m.year }})">{{ m.initials }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in ratings_table_rows %}
+        <tr bgcolor="{% if row.is_active %}#eff6ff{% elif loop.index % 2 == 0 %}#fafafa{% else %}#ffffff{% endif %}" style="font-size: 8.5pt;">
+            <td align="left">
+                <b>{{ row.avatar }} {{ row.name }}</b>
+                {% if row.is_active %}<font color="#2563eb"><b>[ACTIVE]</b></font>{% endif %}
+            </td>
+            {% for val in row.ratings %}
+            <td align="center" bgcolor="{% if val != '-' and row.is_active %}#dbeafe{% elif val != '-' %}#f0fdf4{% else %}#ffffff{% endif %}">
+                {% if val != '-' %}
+                    <b>{{ val }}</b>
+                {% else %}
+                    <font color="#94a3b8">-</font>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- SECTION 8: PEARSON USER-USER SIMILARITY MATRIX TABLE -->
+    <!-- ============================================================================== -->
+    <table border="1" cellpadding="6" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="10" align="left"><font color="#ffffff">SECTION 8: NUMERICAL PEARSON USER-USER SIMILARITY MATRIX S (9 &times; 9)</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" style="font-size: 8.5pt;">
+            <th align="left">User Profile</th>
+            {% for name in sim_table_header %}
+            <th align="center">{{ name }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sim_table_rows %}
+        <tr bgcolor="{% if row.is_active %}#eff6ff{% elif loop.index % 2 == 0 %}#fafafa{% else %}#ffffff{% endif %}" style="font-size: 8.5pt;">
+            <td align="left">
+                <b>{{ row.avatar }} {{ row.name }}</b>
+                {% if row.is_active %}<font color="#2563eb"><b>[ACTIVE]</b></font>{% endif %}
+            </td>
+            {% for score in row.scores %}
+            <td align="center" bgcolor="{% if score == 1.0 %}#e2e8f0{% elif score > 0.4 %}#dcfce7{% elif score < -0.2 %}#fee2e2{% else %}#ffffff{% endif %}">
+                <font color="{% if score > 0.4 %}#15803d{% elif score < -0.2 %}#b91c1c{% else %}#334155{% endif %}">
+                    <b>{{ "%+.2f"|format(score) }}</b>
+                </font>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================================== -->
+    <!-- FOOTER -->
+    <!-- ============================================================================== -->
+    <table border="0" cellpadding="8" cellspacing="0" width="92%" align="center">
+        <tr>
+            <td align="center">
+                <hr width="100%" size="1" color="#cbd5e1">
+                <font size="2" color="#64748b">
+                    <b>PARS Lab Practical File Submission</b> &nbsp;|&nbsp;
+                    <b>Netaji Subhas University of Technology (NSUT)</b> &nbsp;|&nbsp;
+                    Academic Session: 2026&ndash;2027<br>
+                    <b>Author:</b> Monis (Roll No: 2023UIT3027) &nbsp;|&nbsp;
+                    <b>Lab Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+                    <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; text-decoration: none;">dSAxmonis/pars-lab</a>
+                </font>
+            </td>
+        </tr>
+    </table>
+    <br>
+
+</body>
+</html>

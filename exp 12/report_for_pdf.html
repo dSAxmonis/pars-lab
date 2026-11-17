@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 12 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>12 (Practical X)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Content-Based Recommender System for Movies Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To implement an end-to-end Content-Based Recommender System from scratch in Python using Flask. The system extracts multi-attribute features (genres, director, cast, keywords) from a movie catalog, computes TF-IDF feature weights and pairwise cosine similarities, constructs user preference profiles, and generates personalized movie recommendations.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Content-Based Filtering recommends items to a user by comparing the attributes of candidate items with the features of items that the user liked in the past. In a movie recommendation platform, each movie is described by its content features (such as genre, director, actors, and plot keywords). The system creates a profile of user tastes based on their viewing history and recommends new movies that share similar characteristics.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Movie Feature Representation</h3>
+<p>Each movie in the catalog is represented as a feature vector containing all its descriptive attributes (genres, director, cast, and plot keywords):</p>
+<div class="formula-box"><b>Movie Feature Vector:</b>
+X<sub>i</sub> = [ w<sub>i,1</sub>, w<sub>i,2</sub>, w<sub>i,3</sub>, ..., w<sub>i,K</sub> ]
+
+<b>Where:</b>
+• <b>X<sub>i</sub>:</b> Feature vector representing movie <i>i</i>.
+• <b>w<sub>i,k</sub>:</b> Numerical weight or presence of feature/keyword <i>k</i> in movie <i>i</i>.
+• <b>K:</b> Total number of distinct metadata keywords across the entire catalog.</div>
+<h3>2. TF-IDF Weighting (Term Frequency - Inverse Document Frequency)</h3>
+<p>To determine how important a keyword is to a specific movie, TF-IDF weighting is applied. Features that appear frequently in a movie get high Term Frequency (TF), while features common to all movies (like generic words) receive low Inverse Document Frequency (IDF):</p>
+<div class="formula-box"><b>Term Frequency (TF):</b>
+TF(t, Movie i) = (Count of keyword t in Movie i) / (Total keywords in Movie i)
+
+<b>Inverse Document Frequency (IDF):</b>
+IDF(t) = ln( (1 + Total Movies in Catalog) / (1 + Movies with keyword t) ) + 1.0
+
+<b>TF-IDF Feature Weight:</b>
+w<sub>i,k</sub> = TF(keyword k, Movie i) &times; IDF(keyword k)</div>
+<h3>3. Cosine Similarity Measure</h3>
+<p>To determine how similar two movies are in content, the Cosine Similarity between their normalized feature vectors is computed. A score of 1.0 indicates identical content, while 0.0 indicates completely dissimilar content:</p>
+<div class="formula-box"><b>Cosine Similarity Formula:</b>
+Similarity(Movie A, Movie B) = ( X<sub>A</sub> &middot; X<sub>B</sub> ) / ( ||X<sub>A</sub>|| &times; ||X<sub>B</sub>|| )
+                             = &sum;<sub>k=1</sub><sup>K</sup> ( w<sub>A,k</sub> &times; w<sub>B,k</sub> ) / [ &radic;(&sum; w<sub>A,k</sub><sup>2</sup>) &times; &radic;(&sum; w<sub>B,k</sub><sup>2</sup>) ]
+
+<b>Where:</b>
+• <b>X<sub>A</sub> &middot; X<sub>B</sub>:</b> Dot product measuring overlapping features between Movie A and Movie B.
+• <b>||X<sub>A</sub>||, ||X<sub>B</sub>||:</b> Euclidean lengths (magnitudes) used to normalize for varying keyword counts.</div>
+<h3>4. User Taste Profile & Rating Prediction</h3>
+<p>An active user's preference profile is constructed by computing the weighted average of feature vectors of movies the user has rated positively. The predicted rating for an unseen movie is proportional to its similarity to the user profile:</p>
+<div class="formula-box"><b>User Profile Vector:</b>
+P<sub>u</sub> = &sum;<sub>rated movies i</sub> ( Rating<sub>u,i</sub> - Average Rating<sub>u</sub> ) &times; X<sub>i</sub>
+
+<b>Predicted Star Rating for Unseen Movie j:</b>
+Predicted Rating(u, j) = Average Rating<sub>u</sub> + Scale &times; Cosine( P<sub>u</sub>, X<sub>j</sub> )</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed a benchmark dataset of 20 movies spanning Action, Sci-Fi, Drama, Comedy, Horror, Romance, and Thriller genres.</li>
+<li>Tokenized movie metadata (genres, directors, actors, plot keywords) into a vocabulary of 219 features and computed TF-IDF weights using pure NumPy.</li>
+<li>Formulated the 20x20 pairwise Cosine Similarity Matrix between all catalog movies to identify top content matches.</li>
+<li>Constructed personalized user profile vectors based on past ratings to predict star ratings for unrated titles.</li>
+<li>Built an interactive Flask web application displaying the full movie catalog grid with live recommendation generation.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 12.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 12.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 12.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 12.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 12.2: Recommendations">
+        <div class="screenshot-caption">Figure 12.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 12.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 12.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 12.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 12.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 12.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 12.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The Content-Based Recommender System was successfully implemented from scratch without external libraries. By transforming movie metadata into normalized TF-IDF feature vectors, the cosine similarity metric accurately captured cinematic themes and stylistic alignments (e.g., matching Inception with The Matrix). The user profile centroid model reliably predicted ratings for unseen movies, demonstrating effective personalized recommendations.</p>
+
+</body>
+</html>

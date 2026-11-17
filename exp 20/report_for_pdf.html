@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 20 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>20 (Practical XVIII)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Knowledge-Based Recommender System (Score & Weight Modeling) Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To design, formulate, and implement a Knowledge-Based Recommender System based on Multi-Attribute Utility Theory (MAUT) from first principles in Python using Flask. The system models domain attribute scores (Acting, Visuals, Story, and Pace) for all catalog items, accepts user-defined importance weights and constraint filters, and computes personalized utility scores to generate ranked recommendations.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Knowledge-Based Recommender Systems recommend items based on explicit knowledge about user requirements, item characteristics, and domain-specific recommendation rules. Rather than relying on historical rating patterns or crowd wisdom, they operate by evaluating how well candidate items satisfy a user's specified functional needs and preference criteria. This renders them exceptionally effective for complex, high-involvement domains or scenarios with zero historical user interaction data.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Multi-Attribute Utility Theory (MAUT) Criteria Modeling</h3>
+<p>Each movie in the catalog is evaluated across four core cinematic domain dimensions on a scale from 1 to 10:</p>
+<div class="formula-box"><b>Movie Attribute Dimensions:</b>
+• <b>Acting Score (a<sub>j,1</sub>):</b> Quality of lead and supporting performances (1 to 10).
+• <b>Visuals Score (a<sub>j,2</sub>):</b> Cinematography, visual effects, and set design (1 to 10).
+• <b>Story Score (a<sub>j,3</sub>):</b> Narrative depth, plot coherence, and scriptwriting (1 to 10).
+• <b>Pace Score (a<sub>j,4</sub>):</b> Editing rhythm, tempo, and storytelling momentum (1 to 10).
+
+<b>Attribute Vector for Movie j:</b>
+A<sub>j</sub> = [ Acting<sub>j</sub>, Visuals<sub>j</sub>, Story<sub>j</sub>, Pace<sub>j</sub> ]</div>
+<h3>2. User Preference Weights & Normalization</h3>
+<p>The user specifies their subjective importance weight for each attribute (e.g., Story = 5, Acting = 4, Visuals = 2, Pace = 1). The system normalizes these weights so they sum to 1.0 (100%):</p>
+<div class="formula-box"><b>Normalized Weight Formula:</b>
+w<sub>k</sub><sup>*</sup> = w<sub>k</sub> / ( w<sub>acting</sub> + w<sub>visuals</sub> + w<sub>story</sub> + w<sub>pace</sub> )
+
+<b>Sum of Normalized Weights:</b>
+w<sub>acting</sub><sup>*</sup> + w<sub>visuals</sub><sup>*</sup> + w<sub>story</sub><sup>*</sup> + w<sub>pace</sub><sup>*</sup> = 1.0</div>
+<h3>3. Overall Utility Score Calculation</h3>
+<p>The overall utility score of a movie is computed as the weighted sum of its attribute scores multiplied by the user's normalized weights:</p>
+<div class="formula-box"><b>Total Utility Score Formula:</b>
+Utility(j) = &sum;<sub>k=1</sub><sup>4</sup> ( w<sub>k</sub><sup>*</sup> &times; Attribute Score<sub>k</sub>(j) )
+           = ( w<sub>acting</sub><sup>*</sup> &times; Acting<sub>j</sub> ) + ( w<sub>visuals</sub><sup>*</sup> &times; Visuals<sub>j</sub> ) + ( w<sub>story</sub><sup>*</sup> &times; Story<sub>j</sub> ) + ( w<sub>pace</sub><sup>*</sup> &times; Pace<sub>j</sub> )
+
+<b>Predicted Star Rating:</b>
+Predicted Star Rating(j) = 1.0 + [ 0.4 &times; Utility(j) ]    (maps 0-10 utility to 1.0-5.0 stars)</div>
+<h3>4. Hard Constraint Filtering</h3>
+<p>Before ranking by utility score, hard constraints filter out any movies that fail mandatory user criteria:</p>
+<div class="formula-box"><b>Hard Constraint Rules:</b>
+1. Release Year &ge; User's Minimum Year
+2. IMDb Rating &ge; User's Minimum Rating
+3. Movie Genre &isin; User's Selected Genres
+
+<b>Result:</b>
+Only movies that satisfy ALL hard constraints are scored and recommended.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed a 20-movie knowledge catalog scoring each film across four verified domain criteria: Acting, Visuals, Story, and Pace (scale 0–10).</li>
+<li>Implemented the Multi-Attribute Utility Theory (MAUT) weighted summation engine strictly in pure NumPy.</li>
+<li>Engineered multi-predicate hard constraint filtering verifying release year thresholds, minimum IMDb scores, and genre requirements.</li>
+<li>Developed an attribute vector cosine similarity module matching candidate movie profiles to active focal selections.</li>
+<li>Deployed an interactive Flask application on port 5020 with weight sliders, constraint filters, utility bar charts, and attribute heatmaps.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 20.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 20.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 20.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 20.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 20.2: Recommendations">
+        <div class="screenshot-caption">Figure 20.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 20.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 20.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 20.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 20.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 20.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 20.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The Knowledge-Based Recommender System was successfully constructed and validated. By grounding recommendations in explicit domain knowledge and user-defined criteria weights, the system provided completely deterministic, auditable, and personalized recommendations. Hard constraint filtering effectively prevented inadmissible options from surfacing, confirming the robustness of utility-based recommendation in zero-history environments.</p>
+
+</body>
+</html>

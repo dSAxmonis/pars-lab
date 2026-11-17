@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 12: Content-Based Recommender System</title>
+</head>
+<body bgcolor="#f5f7fa" text="#222222">
+
+    <!-- PAGE HEADER -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 12</font></h1>
+        <h3><font color="#555555">CONTENT-BASED MOVIE RECOMMENDER SYSTEM USING FLASK &amp; NUMPY</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027<br>
+            <b>Student:</b> Monis &nbsp;|&nbsp;
+            <b>Roll Number:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Institution:</b> Netaji Subhas University of Technology (NSUT)
+        </p>
+        <p>
+            <b>GitHub Repository:</b> 
+            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank">
+                <font color="#003366"><b>https://github.com/dSAxmonis/pars-lab</b></font>
+            </a> &nbsp;|&nbsp;
+            <font color="#ffffff" style="background-color: #003366; padding: 3px 8px; font-weight: bold; font-size: 11px;">CONTENT-BASED FILTERING</font>
+        </p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- AIM & OBJECTIVE SUMMARY -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th><font color="#ffffff">EXPERIMENT AIM &amp; SCOPE</font></th>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc">
+                <font size="3">
+                <b>Aim:</b> To implement a comprehensive <b>Content-Based Recommender System</b> from scratch using Python (NumPy) and Flask for a real-world movie streaming application catalog. The system performs:
+                <ul>
+                    <li>Feature extraction and sublinear <b>TF-IDF term weighting</b> across movie genres, directors, cast members, and plot keywords.</li>
+                    <li>Row-wise <b>L2 Euclidean normalization</b> and high-dimensional <b>pairwise Cosine Similarity Matrix computation</b> ($M \times M$).</li>
+                    <li>Interactive <b>Item-to-Item content recommendation</b> with feature attribution (shared genres/tags).</li>
+                    <li>Personalized <b>User Content Profile modeling</b> ($\mathbf{p}_u$) and rating prediction ($\hat{r}_{uj}$) for unseen movies across 8 distinct user personas.</li>
+                    <li>Full internal visualization via 4-panel diagnostic plots (Heatmap, Top-N bar charts, TF-IDF weights, Rating sparsity).</li>
+                </ul>
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    {% if user_feedback_msg %}
+    <br>
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ecfdf5">
+        <tr>
+            <td align="center">
+                <font color="#065f46" size="3"><b>✓ {{ user_feedback_msg }}</b></font>
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+
+    <br><br>
+
+    <!-- SECTION 1: INTERACTIVE MOVIE CATALOG (20 BENCHMARK MOVIES) -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="4">
+                <font color="#ffffff">SECTION 1: INTERACTIVE MOVIE CATALOG ({{ total_movies }} BENCHMARK TITLES ACROSS 7+ GENRES)</font>
+            </th>
+        </tr>
+        <tr bgcolor="#e6f0fa">
+            <td colspan="4" align="center">
+                <b>Genre Filter:</b> &nbsp;
+                {% for g in all_genres %}
+                    {% if g == active_genre_filter %}
+                        <font color="#ffffff" style="background-color: #003366; padding: 4px 9px; font-weight: bold; border-radius: 3px;">{{ g }}</font>
+                    {% else %}
+                        <a href="/?genre_filter={{ g }}&movie_id={{ selected_movie_id }}&user_id={{ selected_user_id }}" style="text-decoration: none;">
+                            <font color="#003366" style="background-color: #e2e8f0; padding: 4px 9px; border-radius: 3px;">{{ g }}</font>
+                        </a>
+                    {% endif %}
+                    &nbsp;
+                {% endfor %}
+            </td>
+        </tr>
+
+        <!-- Movie Catalog Grid: 4 items per row -->
+        {% for row in filtered_movies|batch(4) %}
+        <tr>
+            {% for m in row %}
+            <td width="25%" valign="top" bgcolor="{% if m.id == selected_movie.id %}#fef3c7{% else %}#ffffff{% endif %}" style="border: {% if m.id == selected_movie.id %}3px solid #d97706{% else %}1px solid #cbd5e1{% endif %}; padding: 10px;">
+                <center>
+                    <!-- Poster Placeholder Box -->
+                    <div style="background-color: {{ m.color }}; color: #ffffff; width: 100%; height: 110px; border-radius: 6px; display: table;">
+                        <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                            <font size="6">{{ m.emoji }}</font><br>
+                            <font size="2" color="#ffffff"><b>{{ m.title }}</b></font><br>
+                            <font size="1" color="#cbd5e1">({{ m.year }}) &bull; IMDb: ★ {{ m.rating }}</font>
+                        </div>
+                    </div>
+                </center>
+                
+                <br>
+                <font size="2">
+                    <b>Title:</b> <b>{{ m.title }}</b> ({{ m.year }})<br>
+                    <b>Director:</b> {{ m.director }}<br>
+                    <b>Genres:</b> 
+                    {% for g in m.genres %}
+                        <font color="#003366"><b>[{{ g }}]</b></font>
+                    {% endfor %}
+                    <br>
+                    <b>Cast:</b> {{ m.cast|join(', ') }}<br>
+                    <b>Keywords:</b> <font color="#555555"><i>{{ m.plot_keywords[:4]|join(', ') }}</i></font><br>
+                </font>
+
+                <hr size="1" color="#e2e8f0">
+
+                <center>
+                    <!-- Form to Select Movie -->
+                    <form method="POST" action="/" style="margin-bottom: 6px;">
+                        <input type="hidden" name="action" value="select_movie">
+                        <input type="hidden" name="movie_id" value="{{ m.id }}">
+                        <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                        <input type="hidden" name="genre_filter" value="{{ active_genre_filter }}">
+                        {% if m.id == selected_movie.id %}
+                            <button type="button" disabled style="background-color: #d97706; color: white; border: none; padding: 6px 12px; font-weight: bold; border-radius: 4px; cursor: default;">
+                                ✓ CURRENTLY SELECTED
+                            </button>
+                        {% else %}
+                            <button type="submit" style="background-color: #003366; color: white; border: none; padding: 6px 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">
+                                🎬 Recommend Similar
+                            </button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Quick Star Rating Submission -->
+                    <form method="POST" action="/" style="margin: 0;">
+                        <input type="hidden" name="action" value="rate_movie">
+                        <input type="hidden" name="rate_movie_id" value="{{ m.id }}">
+                        <input type="hidden" name="movie_id" value="{{ selected_movie_id }}">
+                        <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                        <input type="hidden" name="genre_filter" value="{{ active_genre_filter }}">
+                        <font size="1">Rate as <b>{{ selected_user.name.split()[0] }}</b>:</font>
+                        <select name="star_rating" style="padding: 2px; font-size: 11px;">
+                            <option value="5">★★★★★ (5)</option>
+                            <option value="4">★★★★☆ (4)</option>
+                            <option value="3">★★★☆☆ (3)</option>
+                            <option value="2">★★☆☆☆ (2)</option>
+                            <option value="1">★☆☆☆☆ (1)</option>
+                        </select>
+                        <button type="submit" style="background-color: #047857; color: white; border: none; padding: 3px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; cursor: pointer;">
+                            Submit
+                        </button>
+                    </form>
+                </center>
+            </td>
+            {% endfor %}
+            <!-- Pad empty cells if last row has less than 4 -->
+            {% if row|length < 4 %}
+                {% for _ in range(4 - row|length) %}
+                    <td width="25%" bgcolor="#ffffff">&nbsp;</td>
+                {% endfor %}
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 2: CONTENT-BASED RECOMMENDATION RESULTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="6">
+                <font color="#ffffff">SECTION 2: CONTENT-BASED SIMILARITY RECOMMENDATIONS (SELECTED: '{{ selected_movie.title }}')</font>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="6" bgcolor="#f0fdf4">
+                <table width="100%" border="0" cellpadding="4" cellspacing="0">
+                    <tr>
+                        <td width="15%" align="center" valign="middle">
+                            <div style="background-color: {{ selected_movie.color }}; color: #ffffff; width: 100px; height: 90px; border-radius: 6px; display: table;">
+                                <div style="display: table-cell; vertical-align: middle; text-align: center;">
+                                    <font size="6">{{ selected_movie.emoji }}</font><br>
+                                    <font size="1"><b>#{{ selected_movie.id }}</b></font>
+                                </div>
+                            </div>
+                        </td>
+                        <td width="85%" valign="top">
+                            <font size="3" color="#004d40"><b>Query Movie: {{ selected_movie.title }} ({{ selected_movie.year }})</b></font><br>
+                            <font size="2">
+                                <b>Director:</b> {{ selected_movie.director }} &nbsp;|&nbsp;
+                                <b>IMDb Rating:</b> ★ {{ selected_movie.rating }}/10 &nbsp;|&nbsp;
+                                <b>Genres:</b> {{ selected_movie.genres|join(', ') }}<br>
+                                <b>Cast:</b> {{ selected_movie.cast|join(', ') }}<br>
+                                <b>Description:</b> {{ selected_movie.description }}<br>
+                                <b>Dominant Content Keywords (TF-IDF):</b>
+                                {% for kw in selected_movie_keywords %}
+                                    <font color="#047857"><b>[{{ kw.term }} ({{ kw.weight }})]</b></font>&nbsp;
+                                {% endfor %}
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr bgcolor="#e0f2f1">
+            <th align="center" width="6%">Rank</th>
+            <th align="left" width="26%">Recommended Title &amp; Year</th>
+            <th align="left" width="20%">Genres</th>
+            <th align="center" width="16%">Cosine Similarity Score</th>
+            <th align="left" width="22%">Shared Content Attribution (Match Reasons)</th>
+            <th align="center" width="10%">Action</th>
+        </tr>
+
+        {% for rec in item_recommendations %}
+        <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="center"><font size="3"><b>#{{ loop.index }}</b></font></td>
+            <td>
+                <b><font size="3" color="#003366">{{ rec.movie.emoji }} {{ rec.movie.title }}</font></b> 
+                ({{ rec.movie.year }})<br>
+                <font size="1" color="#555555">Dir: {{ rec.movie.director }} &bull; IMDb: ★ {{ rec.movie.rating }}</font>
+            </td>
+            <td>
+                {% for g in rec.movie.genres %}
+                    <font size="1" color="#047857"><b>[{{ g }}]</b></font>
+                {% endfor %}
+            </td>
+            <td align="center">
+                <font size="3" color="#047857"><b>{{ rec.similarity }}</b></font> 
+                ({{ rec.sim_percent }}%)
+                <div style="background-color: #e2e8f0; width: 100px; height: 8px; border-radius: 4px; margin: 4px auto;">
+                    <div style="background-color: #047857; width: {{ rec.sim_percent }}%; height: 8px; border-radius: 4px;"></div>
+                </div>
+            </td>
+            <td>
+                {% if rec.reasons %}
+                    {% for r in rec.reasons %}
+                        <font size="1" color="#1e3a8a">&bull; {{ r }}</font><br>
+                    {% endfor %}
+                {% else %}
+                    <font size="1" color="#888888">Latent keyword association</font>
+                {% endif %}
+            </td>
+            <td align="center">
+                <form method="POST" action="/" style="margin: 0;">
+                    <input type="hidden" name="action" value="select_movie">
+                    <input type="hidden" name="movie_id" value="{{ rec.movie.id }}">
+                    <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                    <button type="submit" style="background-color: #0d9488; color: white; border: none; padding: 5px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; cursor: pointer;">
+                        Inspect ➔
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 3: PERSONALIZED USER PROFILE MODELING -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#4a154b">
+            <th colspan="6">
+                <font color="#ffffff">SECTION 3: PERSONALIZED USER PREFERENCE MODELING (ACTIVE USER: {{ selected_user.name }})</font>
+            </th>
+        </tr>
+        <tr bgcolor="#fdf4ff">
+            <td colspan="6">
+                <form method="POST" action="/" style="margin: 0;">
+                    <input type="hidden" name="action" value="select_user">
+                    <input type="hidden" name="movie_id" value="{{ selected_movie_id }}">
+                    <b>Select Active User Persona:</b> &nbsp;
+                    <select name="user_id" onchange="this.form.submit()" style="padding: 4px 8px; font-size: 13px; font-weight: bold;">
+                        {% for u in users %}
+                            <option value="{{ u.id }}" {% if u.id == selected_user_id %}selected{% endif %}>
+                                User {{ u.id }}: {{ u.name }} &mdash; {{ u.archetype }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <noscript><button type="submit">Switch</button></noscript>
+                    &nbsp;&nbsp;
+                    <font size="2" color="#701a75">
+                        <b>Profile Archetype:</b> {{ selected_user.archetype }} &bull; {{ selected_user.description }}
+                    </font>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" width="50%" valign="top" bgcolor="#ffffff">
+                <font size="2">
+                <b>User Historical Ratings (Observed Ground Truth):</b><br>
+                Average Rating: <b>{{ user_mean }} / 5.0</b> &nbsp;|&nbsp; Total Movies Rated: <b>{{ rated_summary|length }}</b>
+                <ul>
+                    {% for item in rated_summary %}
+                        <li>
+                            <b>{{ item.movie.title }}</b> ({{ item.movie.genres|join(', ') }}): 
+                            <font color="#d97706"><b>{{ '★' * item.rating }}{{ '☆' * (5 - item.rating) }} ({{ item.rating }}.0)</b></font>
+                        </li>
+                    {% endfor %}
+                </ul>
+                </font>
+            </td>
+            <td colspan="3" width="50%" valign="top" bgcolor="#f8fafc">
+                <font size="2">
+                <b>Content-Based Personalization Engine Workflow:</b>
+                <ol>
+                    <li>Aggregates user rating weights: $w_i = (r_{ui} - \bar{r}_u + 1.0)$.</li>
+                    <li>Constructs dense User Profile Vector $\mathbf{p}_u = \sum w_i \mathbf{x}_i^*$.</li>
+                    <li>Normalizes $\mathbf{p}_u^* = \mathbf{p}_u / \|\mathbf{p}_u\|_2$ in $\mathbb{R}^K$ (where vocabulary dimension $K = {{ vocab_size }}$).</li>
+                    <li>Evaluates cosine affinity $\hat{y}_{uj} = \mathbf{p}_u^* \cdot \mathbf{x}_j^*$ for unrated movies.</li>
+                    <li>Ranks candidates and projects predicted rating $\hat{r}_{uj} \in [1.0, 5.0]$.</li>
+                </ol>
+                </font>
+            </td>
+        </tr>
+
+        <tr bgcolor="#fae8ff">
+            <th align="center" width="6%">Rank</th>
+            <th align="left" width="30%">Personalized Recommendation</th>
+            <th align="left" width="24%">Genres</th>
+            <th align="center" width="16%">User Profile Affinity</th>
+            <th align="center" width="14%">Predicted Rating</th>
+            <th align="center" width="10%">Action</th>
+        </tr>
+
+        {% for rec in user_recommendations %}
+        <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="center"><font size="3"><b>#{{ loop.index }}</b></font></td>
+            <td>
+                <b><font size="3" color="#4a154b">{{ rec.movie.emoji }} {{ rec.movie.title }}</font></b> ({{ rec.movie.year }})<br>
+                <font size="1" color="#555555">Dir: {{ rec.movie.director }} &bull; IMDb: ★ {{ rec.movie.rating }}</font>
+            </td>
+            <td>
+                {% for g in rec.movie.genres %}
+                    <font size="1" color="#701a75"><b>[{{ g }}]</b></font>
+                {% endfor %}
+            </td>
+            <td align="center">
+                <font size="2" color="#4a154b"><b>{{ rec.affinity }}</b></font>
+                ({{ rec.affinity_percent }}%)
+            </td>
+            <td align="center">
+                <font size="3" color="#b45309"><b>{{ rec.predicted_rating }}</b></font><br>
+                <font size="2" color="#d97706">{{ rec.stars }}</font>
+            </td>
+            <td align="center">
+                <form method="POST" action="/" style="margin: 0;">
+                    <input type="hidden" name="action" value="select_movie">
+                    <input type="hidden" name="movie_id" value="{{ rec.movie.id }}">
+                    <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                    <button type="submit" style="background-color: #86198f; color: white; border: none; padding: 5px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; cursor: pointer;">
+                        Select ➔
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 4: VISUALIZATION PLOTS -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e293b">
+            <th colspan="2">
+                <font color="#ffffff">SECTION 4: ALGORITHM VISUALIZATION &amp; DIAGNOSTIC DASHBOARD (MATPLOTLIB BASE64)</font>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="2" align="center" bgcolor="#f8fafc">
+                <br>
+                <img src="data:image/png;base64,{{ plot_url }}" alt="Content Based Recommender Diagnostic Dashboard" width="98%" style="border: 1px solid #cbd5e1; border-radius: 4px;">
+                <br><br>
+                <table width="95%" border="0" cellpadding="4" cellspacing="0" align="center">
+                    <tr>
+                        <td align="left">
+                            <font size="2" color="#334155">
+                            <b>Diagnostic Dashboard Interpretation:</b><br>
+                            &bull; <b>Top-Left (Panel 1):</b> Full $20 \times 20$ Item-to-Item Cosine Similarity Heatmap. Darker green/blue regions indicate thematic alignment; the active movie <b>#{{ selected_movie.id }} ({{ selected_movie.title }})</b> is highlighted with dashed amber boundary markers.<br>
+                            &bull; <b>Top-Right (Panel 2):</b> Top-6 most similar movies to <i>{{ selected_movie.title }}</i> with exact cosine similarity scores and percentages.<br>
+                            &bull; <b>Bottom-Left (Panel 3):</b> Top 10 dominant TF-IDF feature weights for <i>{{ selected_movie.title }}</i>, highlighting the key terms driving content-based associations.<br>
+                            &bull; <b>Bottom-Right (Panel 4):</b> User-Item ratings matrix heatmap across 8 users and 20 movies; active user <b>{{ selected_user.name }}</b> is highlighted with a blue horizontal rule.
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 5: COSINE SIMILARITY SCORES TABLE (SELECTED MOVIE VS ALL 20) -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#334155">
+            <th colspan="5">
+                <font color="#ffffff">SECTION 5: FULL ITEM-TO-ITEM COSINE SIMILARITY MATRIX ROW FOR '{{ selected_movie.title }}'</font>
+            </th>
+        </tr>
+        <tr bgcolor="#f1f5f9">
+            <th width="8%" align="center">Movie ID</th>
+            <th width="32%" align="left">Target Movie Title</th>
+            <th width="20%" align="center">Cosine Similarity S(i, j)</th>
+            <th width="20%" align="center">Similarity Percentage</th>
+            <th width="20%" align="center">Content Match Tier</th>
+        </tr>
+        {% for row in sim_row_data %}
+        <tr {% if row.is_selected %}bgcolor="#fef3c7"{% elif loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="center"><b>#{{ row.id }}</b></td>
+            <td>
+                <b>{{ row.title }}</b>
+                {% if row.is_selected %}<font color="#d97706"><b>(Source Query)</b></font>{% endif %}
+            </td>
+            <td align="center" style="font-family: monospace;"><b>{{ row.score }}</b></td>
+            <td align="center">{{ (row.score * 100)|round(1) }}%</td>
+            <td align="center">
+                {% if row.is_selected %}
+                    <font color="#d97706"><b>Identity (1.000)</b></font>
+                {% elif row.score >= 0.20 %}
+                    <font color="#047857"><b>High Similarity</b></font>
+                {% elif row.score >= 0.10 %}
+                    <font color="#0284c7"><b>Moderate Similarity</b></font>
+                {% else %}
+                    <font color="#64748b">Low / Distant</font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- SECTION 6: MATHEMATICAL EQUATIONS & ALGORITHM FORMULATION -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#212529">
+            <th colspan="2">
+                <font color="#ffffff">SECTION 6: MATHEMATICAL FORMULATIONS (IMPLEMENTED FROM SCRATCH IN NUMPY)</font>
+            </th>
+        </tr>
+        <tr bgcolor="#f8fafc">
+            <th width="35%" align="left">Algorithm Component</th>
+            <th width="65%" align="left">Mathematical Formula &amp; Vector Space Definition</th>
+        </tr>
+        <tr>
+            <td><b>1. Document Bag of Features</b></td>
+            <td>$D_i = \{\text{genres}_i\} \cup \{\text{director}_i\} \cup \{\text{cast}_i\} \cup \{\text{keywords}_i\}$, with unique vocabulary $V = \{t_1, \dots, t_K\}$.</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td><b>2. Term Frequency (TF)</b></td>
+            <td>$\text{TF}(t_k, D_i) = \frac{\text{count}(t_k, D_i)}{\sum_{t \in D_i} \text{count}(t, D_i)} = \frac{f_{ik}}{|D_i|}$</td>
+        </tr>
+        <tr>
+            <td><b>3. Smooth Inverse Document Frequency (IDF)</b></td>
+            <td>$\text{IDF}(t_k) = \ln\left( \frac{1 + M}{1 + \text{DF}(t_k)} \right) + 1.0$, where $\text{DF}(t_k) = \sum_{i=1}^M \mathbb{I}(f_{ik} > 0)$.</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td><b>4. TF-IDF Representation &amp; L2 Normalization</b></td>
+            <td>$X_{ik} = \text{TF}(t_k, D_i) \times \text{IDF}(t_k)$, &nbsp; normalized to unit sphere: $\mathbf{x}_i^* = \frac{\mathbf{x}_i}{\|\mathbf{x}_i\|_2} = \frac{\mathbf{x}_i}{\sqrt{\sum_{k=1}^K X_{ik}^2}}$.</td>
+        </tr>
+        <tr>
+            <td><b>5. Pairwise Cosine Similarity Matrix</b></td>
+            <td>$S_{ij} = \cos(\mathbf{x}_i, \mathbf{x}_j) = \frac{\mathbf{x}_i \cdot \mathbf{x}_j}{\|\mathbf{x}_i\|_2 \|\mathbf{x}_j\|_2} = \mathbf{x}_i^* \cdot \mathbf{x}_j^* \implies \mathbf{S} = \mathbf{X}^* (\mathbf{X}^*)^T$.</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td><b>6. User Content Profile Modeling</b></td>
+            <td>$\mathbf{p}_u = \sum_{i \in \text{Rated}(u)} (r_{ui} - \bar{r}_u + 1.0) \mathbf{x}_i^*$, &nbsp; with unit profile $\mathbf{p}_u^* = \frac{\mathbf{p}_u}{\|\mathbf{p}_u\|_2}$.</td>
+        </tr>
+        <tr>
+            <td><b>7. Rating Prediction &amp; Ranking</b></td>
+            <td>$\hat{r}_{uj} = \text{clip}\left(\bar{r}_u + 2.4 (\mathbf{p}_u^* \cdot \mathbf{x}_j^* - 0.2), 1.0, 5.0\right)$, &nbsp; ranked descending for unrated items.</td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- FOOTER -->
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p>
+            <font color="#777777" size="2">
+                <b>PARS Lab &mdash; Experiment 12 Submission</b> &nbsp;|&nbsp;
+                Netaji Subhas University of Technology (NSUT) &nbsp;|&nbsp;
+                Student: <b>Monis (Roll No: 2023UIT3027)</b><br>
+                <b>GitHub Repository:</b> 
+                <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366; font-weight: bold; text-decoration: none;">
+                    https://github.com/dSAxmonis/pars-lab
+                </a>
+            </font>
+        </p>
+    </center>
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 18 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>18 (Practical XVI)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Item-Based kNN Recommender System (Binary: Seen or Not Seen) Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement an Item-Based k-Nearest Neighbor Recommender System for implicit binary interaction data (Seen vs Not-Seen) from scratch in Python using Flask. The system converts rating matrices into binary consumption vectors, computes pairwise Jaccard Similarity coefficients, and recommends unseen items most similar to the user's viewing history.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Binary Item-Based kNN is designed for implicit feedback environments (such as movie streaming clicks, watchlists, or purchase records) where numerical star ratings do not exist. User behavior is represented simply as 1 (Watched/Seen) or 0 (Not Watched/Unseen). In this setting, movie similarity is measured using set-theoretic overlap metrics such as the Jaccard Similarity Coefficient.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Binary Consumption Matrix Representation</h3>
+<p>Continuous star ratings are converted into a binary interaction matrix B where 1 indicates that the user watched the movie, and 0 indicates they have not:</p>
+<div class="formula-box"><b>Binary Indicator Function:</b>
+B<sub>u,i</sub> = 1 (if User u watched Movie i)
+B<sub>u,i</sub> = 0 (if User u has not watched Movie i)
+
+<b>Audience Set for Movie i:</b>
+Audience(i) = Set of all users u who watched Movie i</div>
+<h3>2. Jaccard Similarity Coefficient</h3>
+<p>For two candidate movies i and j, Jaccard Similarity measures the ratio of the number of users who watched BOTH movies to the number of users who watched EITHER movie:</p>
+<div class="formula-box"><b>Jaccard Similarity Formula:</b>
+Jaccard(i, j) = | Audience(i) &cap; Audience(j) | / | Audience(i) &cup; Audience(j) |
+              = N<sub>11</sub> / ( N<sub>11</sub> + N<sub>10</sub> + N<sub>01</sub> )
+
+<b>Where:</b>
+• <b>N<sub>11</sub>:</b> Number of users who watched BOTH Movie i and Movie j.
+• <b>N<sub>10</sub>:</b> Number of users who watched Movie i but NOT Movie j.
+• <b>N<sub>01</sub>:</b> Number of users who watched Movie j but NOT Movie i.
+• <b>Jaccard(i, j):</b> Score between 0.0 (zero audience overlap) and 1.0 (identical audience).</div>
+<h3>3. Unseen Movie Recommendation Score</h3>
+<p>For an active user u with watched history S<sub>u</sub>, the recommendation score for an unseen movie j is the sum of its Jaccard similarities to all movies the user has watched:</p>
+<div class="formula-box"><b>Cumulative Recommendation Score:</b>
+Recommendation Score(u, j) = &sum;<sub>i &isin; Watched Movies</sub> Jaccard(i, j)
+
+<b>Predicted Affinity Percentage:</b>
+Affinity %(u, j) = [ Recommendation Score(u, j) / (Total Watched Movies) ] &times; 100%
+
+<b>Decision Rule:</b>
+Rank all unseen movies in descending order of their cumulative Jaccard score and recommend the top N titles.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie binary interaction matrix modeling realistic viewing habits across diverse viewer profiles.</li>
+<li>Implemented vectorized Jaccard similarity calculations in pure NumPy using Boolean bitwise operations.</li>
+<li>Engineered candidate scoring logic aggregating Jaccard affinities across all watched movies for any query user.</li>
+<li>Implemented real-time watch/unwatch toggle mechanics enabling instant recalculation of recommendation rankings.</li>
+<li>Deployed an interactive Flask web application on port 5018 featuring binary matrix inspection, watch selectors, and co-occurrence heatmaps.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 18.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 18.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 18.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 18.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 18.2: Recommendations">
+        <div class="screenshot-caption">Figure 18.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 18.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 18.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 18.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 18.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 18.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 18.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The binary Item-Based kNN recommender proved highly effective for implicit interaction data. By using the Jaccard similarity coefficient over viewing audience sets, the system eliminated the dependency on explicit star ratings. The cumulative set affinity score reliably prioritized unseen titles with high audience co-occurrence, delivering a practical solution for real-world streaming applications.</p>
+
+</body>
+</html>

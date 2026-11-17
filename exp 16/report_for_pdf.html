@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 16 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>16 (Practical XIV)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Item-Based Nearest Neighbor Recommender System Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement an Item-Based Nearest Neighbor (Item-kNN) Recommender System from scratch in Python using Flask. The system calculates pairwise item similarities across all historical user evaluations, identifies the k nearest rated movies for each candidate item, predicts numerical ratings via weighted summation, and generates top-N recommendations.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Item-Based Nearest Neighbor Recommendation looks at relationships between items rather than relationships between users. Two movies are considered similar if the same users tend to rate them similarly. To predict how much a user will like an unseen movie, the system looks at the movies that user has already rated, finds the ones most similar to the target movie, and calculates a weighted average of those ratings.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Item Rating Vector Representation</h3>
+<p>Each movie is represented as a column vector across all users in the system:</p>
+<div class="formula-box"><b>Item Rating Vector for Movie i:</b>
+R<sub>*i</sub> = [ R<sub>1,i</sub>, R<sub>2,i</sub>, ..., R<sub>N,i</sub> ]
+
+<b>Where:</b>
+• <b>R<sub>u,i</sub>:</b> Rating given by User u to Movie i.
+• <b>U<sub>ij</sub>:</b> Set of all users who rated both Movie i and Movie j.</div>
+<h3>2. Item-Item Cosine Similarity</h3>
+<p>Similarity between Movie i and Movie j is computed as the cosine angle between their rating column vectors over all co-rating users:</p>
+<div class="formula-box"><b>Item Cosine Similarity:</b>
+Similarity(Item i, Item j) = &sum;<sub>u &isin; U<sub>ij</sub></sub> ( R<sub>u,i</sub> &times; R<sub>u,j</sub> ) / [ &radic;( &sum;<sub>u &isin; U<sub>ij</sub></sub> R<sub>u,i</sub><sup>2</sup> ) &times; &radic;( &sum;<sub>u &isin; U<sub>ij</sub></sub> R<sub>u,j</sub><sup>2</sup> ) ]
+
+<b>Where:</b>
+• Values range from 0.0 (no co-rating alignment) to 1.0 (identical rating patterns across users).</div>
+<h3>3. Weighted Sum Rating Prediction Formula</h3>
+<p>To predict user u's rating for target movie i, the system selects the k movies rated by user u that are most similar to movie i, and computes their weighted average:</p>
+<div class="formula-box"><b>Item-Based Rating Prediction:</b>
+Predicted Rating(u, i) = [ &sum;<sub>j &isin; Neighbors(i)</sub> Similarity(i, j) &times; R<sub>u,j</sub> ] / [ &sum;<sub>j &isin; Neighbors(i)</sub> |Similarity(i, j)| ]
+
+<b>Where:</b>
+• <b>Neighbors(i):</b> The k movies rated by User u that have the highest similarity to target Movie i.
+• <b>R<sub>u,j</sub>:</b> User u's actual rating on movie j.
+• <b>Similarity(i, j):</b> Similarity weight between candidate Movie i and rated Movie j.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie benchmark rating matrix with multi-genre ratings.</li>
+<li>Implemented the item-item cosine similarity computation in pure NumPy across all movie pairs.</li>
+<li>Engineered the rated-item neighborhood selection logic finding the most similar movies in the active user's rating history.</li>
+<li>Constructed the weighted-sum rating prediction engine to compute expected star ratings for unrated movies.</li>
+<li>Deployed an interactive Flask application on port 5016 featuring movie inspection, parameter k tuning, and live recommendation tables.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 16.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 16.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 16.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 16.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 16.2: Recommendations">
+        <div class="screenshot-caption">Figure 16.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 16.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 16.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 16.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 16.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 16.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 16.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The Item-Based Nearest Neighbor recommender was successfully implemented from first principles. Because item similarity relationships remain stable over time as new users join, precomputing item-item similarities yielded fast, highly responsive rating predictions. The weighted sum of a user's own past ratings on similar movies provided transparent, dependable recommendations.</p>
+
+</body>
+</html>

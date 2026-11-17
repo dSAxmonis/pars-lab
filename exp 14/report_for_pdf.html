@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 14 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>14 (Practical XII)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Recommender System Solution to Cold Start Problem Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, analyze, and implement practical algorithmic solutions to both New User and New Item Cold Start problems from first principles in Python using Flask. The system implements Bayesian Damped Popularity ranking for new users, attribute vector projection for new items, and a dynamic exponential transition function as user interaction history grows.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>The Cold Start Problem occurs when a recommender system lacks sufficient historical interaction data to make collaborative filtering recommendations. It happens in two scenarios: (1) New User Cold Start, where a first-time visitor has zero ratings; and (2) New Item Cold Start, where a newly released movie has zero community ratings. Resolving cold start requires combining catalog-wide statistical priors with content metadata.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. New User Cold Start: Bayesian Damped Popularity</h3>
+<p>When a new user has zero ratings, personalized collaborative filtering is impossible. The system recommends popular, highly rated movies, but applies Bayesian Damping to prevent obscure movies with only 1 or 2 five-star ratings from dominating:</p>
+<div class="formula-box"><b>Bayesian Damped Popularity Score:</b>
+Score(i) = [ v<sub>i</sub> / ( v<sub>i</sub> + M ) ] &times; R̄<sub>i</sub> + [ M / ( v<sub>i</sub> + M ) ] &times; C
+
+<b>Where:</b>
+• <b>v<sub>i</sub>:</b> Number of ratings movie i has received across the platform.
+• <b>R̄<sub>i</sub>:</b> Average star rating of movie i.
+• <b>C:</b> Global average rating across all movies in the entire catalog (prior mean).
+• <b>M:</b> Minimum rating threshold required for confidence (damping factor, e.g., M = 5).</div>
+<h3>2. New Item Cold Start: Metadata Attribute Similarity</h3>
+<p>When a brand-new movie with zero ratings is added to the catalog, its genre and keyword attribute vector is compared against existing movies that the user has already rated:</p>
+<div class="formula-box"><b>Attribute Cosine Similarity for New Item:</b>
+Similarity(New Movie, Existing Movie j) = ( A<sub>new</sub> &middot; A<sub>j</sub> ) / ( ||A<sub>new</sub>|| &times; ||A<sub>j</sub>|| )
+
+<b>Predicted Rating for New Movie:</b>
+Predicted Rating(u, New Movie) = &sum;<sub>j &isin; Rated</sub> [ Similarity(New Movie, j) &times; R<sub>u,j</sub> ] / &sum;<sub>j &isin; Rated</sub> Similarity(New Movie, j)
+
+<b>Where:</b>
+• <b>A<sub>new</sub>, A<sub>j</sub>:</b> Multi-hot attribute vectors representing genres, director, and keywords.</div>
+<h3>3. Dynamic Exponential Transition Function</h3>
+<p>As the user rates more movies (N = count of ratings), the recommendation strategy smoothly transitions from cold-start popularity to personalized collaborative filtering via an exponential decay factor:</p>
+<div class="formula-box"><b>Transition Weight (Gamma):</b>
+&gamma; = 1.0 - exp( - N / &tau; )    (where &tau; = 3.0)
+
+<b>Hybrid Blended Score:</b>
+Final Score = ( 1.0 - &gamma; ) &times; (Cold Start Score) + &gamma; &times; (Collaborative Filtering Score)
+
+<b>Interpretation:</b>
+• At N = 0 ratings: &gamma; = 0.0 &rarr; 100% Popularity-based recommendations.
+• At N = 3 ratings: &gamma; = 0.63 &rarr; 63% Personalized, 37% Popularity.
+• At N &ge; 7 ratings: &gamma; &approx; 0.90+ &rarr; Almost fully personalized collaborative filtering.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed a catalog of 20 benchmark movies and introduced a brand-new unrated film ('Dune: Part Two') to test item cold start.</li>
+<li>Implemented the Bayesian Damped Popularity algorithm to compute statistically sound prior rankings for users with zero history.</li>
+<li>Coded attribute vector matching to evaluate content similarity for unrated incoming movies.</li>
+<li>Engineered the exponential blend equation dynamically adjusting the transition weight gamma as user ratings increase from 0 to 5+.</li>
+<li>Deployed an interactive Flask application on port 5014 with real-time profile switching (New User vs Active Rater) and live transition trajectory visualization.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 14.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 14.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 14.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 14.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 14.2: Recommendations">
+        <div class="screenshot-caption">Figure 14.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 14.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 14.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 14.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 14.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 14.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 14.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The Cold Start Recommender System successfully addressed both new user and new item scenarios. Bayesian damped popularity provided high-quality initial recommendations for new users without bias from low-sample ratings. Metadata matching enabled immediate discoverability for newly released movies. The dynamic exponential transition formula ensured a seamless handoff to collaborative filtering as interactions accumulated.</p>
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 17: Item-Based kNN Recommender System (Adjusted Cosine)</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222" style="font-family: Arial, Helvetica, sans-serif; margin: 15px;">
+
+    <!-- ====================================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 17</font></h1>
+        <h3><font color="#555555">Item-Based Nearest Neighbor Recommender System (Rating Prediction &amp; Recommendation) using Adjusted Cosine Similarity</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp; 
+            <b>Framework:</b> Flask (Python) &nbsp;|&nbsp; 
+            <b>Badge:</b> <font color="#003366"><b>Adjusted Cosine kNN</b></font> &nbsp;|&nbsp; 
+            <b>Port:</b> 5017
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- ====================================================================== -->
+    <!-- AIM & THEORETICAL SUMMARY -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th><font color="#ffffff">EXPERIMENT AIM &amp; ALGORITHMIC FOUNDATION</font></th>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafd" style="font-size: 14px; line-height: 1.6;">
+                <b>Aim:</b> To implement an Item-Based Nearest Neighbor (kNN) Recommender System from scratch in Python using 
+                <b>Adjusted Cosine Similarity</b> for a comprehensive Movie Recommendation portal. The system computes user-mean centered item affinities,
+                contrasts Adjusted Cosine against Raw Cosine Similarity, predicts unrated film scores via similarity-weighted neighborhood aggregation,
+                and generates personalized Top-N recommendations.
+                <br><br>
+                <b>Core Formulation (Sarwar et al., 2001):</b>
+                <center>
+                    <table border="0" cellpadding="6" cellspacing="0" bgcolor="#edf2f7" style="border-left: 4px solid #003366; margin: 6px 0;">
+                        <tr>
+                            <td>
+                                <code><b>sim_adj(i, j) = &sum;<sub>u &isin; U<sub>i,j</sub></sub> (R<sub>u,i</sub> - R&#772;<sub>u</sub>)(R<sub>u,j</sub> - R&#772;<sub>u</sub>) &nbsp;/&nbsp; [ &radic;(&sum; (R<sub>u,i</sub> - R&#772;<sub>u</sub>)<sup>2</sup>) &times; &radic;(&sum; (R<sub>u,j</sub> - R&#772;<sub>u</sub>)<sup>2</sup>) ]</b></code>
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+                Where <i>U<sub>i,j</sub></i> represents the set of users who co-rated items <i>i</i> and <i>j</i>, and <i>R&#772;<sub>u</sub></i> denotes the overall mean rating of user <i>u</i> across all their evaluated items.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 1: ACTIVE USER PROFILE & RECOMMENDER CONTROLS -->
+    <!-- ====================================================================== -->
+    <form method="POST" action="/" id="mainForm">
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004080">
+            <th colspan="2"><font color="#ffffff">SECTION 1: ACTIVE USER PROFILE &amp; RECOMMENDER CONTROLS</font></th>
+        </tr>
+        <tr>
+            <td width="55%" valign="top">
+                <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="30%"><b>Select Active User:</b></td>
+                        <td width="70%">
+                            <select name="user_id" onchange="document.getElementById('mainForm').submit();" style="font-size: 13px; padding: 4px 8px; font-weight: bold;">
+                                {% for u in users %}
+                                <option value="{{ u.id }}" {% if u.id == active_user_idx %}selected{% endif %}>
+                                    User {{ u.id }}: {{ u.name }} ({{ u.role }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Neighborhood Size (k):</b></td>
+                        <td>
+                            <select name="k_neighbors" style="font-size: 13px; padding: 4px 8px;">
+                                {% for kv in [1, 2, 3, 4, 5, 6] %}
+                                <option value="{{ kv }}" {% if kv == k_neighbors %}selected{% endif %}>k = {{ kv }} Nearest Neighbors</option>
+                                {% endfor %}
+                            </select>
+                            &nbsp;
+                            <input type="submit" value="Recompute Recommendations" style="background-color: #003366; color: white; border: none; padding: 5px 12px; font-weight: bold; cursor: pointer; border-radius: 3px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Quick Action Presets:</b></td>
+                        <td>
+                            <button type="submit" name="action" value="preset_hannah" style="background-color: #e2e8f0; border: 1px solid #94a3b8; padding: 3px 8px; font-size: 12px; cursor: pointer;">Reset Hannah (Default)</button>
+                            <button type="submit" name="action" value="preset_diana" style="background-color: #e2e8f0; border: 1px solid #94a3b8; padding: 3px 8px; font-size: 12px; cursor: pointer;">Switch Diana (Romance)</button>
+                            <button type="submit" name="action" value="preset_alice" style="background-color: #e2e8f0; border: 1px solid #94a3b8; padding: 3px 8px; font-size: 12px; cursor: pointer;">Switch Alice (Sci-Fi)</button>
+                            <button type="submit" name="action" value="clear_ratings" style="background-color: #fee2e2; border: 1px solid #f87171; padding: 3px 8px; font-size: 12px; cursor: pointer; color: #991b1b;">Clear Active Ratings</button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="45%" valign="top" bgcolor="#f9fbfd">
+                <b>Active User Summary:</b>
+                <div style="margin-top: 6px; font-size: 13px; line-height: 1.5;">
+                    &bull; <b>Name:</b> <font color="#003366"><b>{{ active_user.name }}</b></font> ({{ active_user.role }})<br>
+                    &bull; <b>Taste Profile:</b> {{ active_user.description }}<br>
+                    &bull; <b>Empirical Rating Mean (R&#772;<sub>u</sub>):</b> <font color="#b91c1c"><b>{{ active_user_mean }} / 5.0</b></font><br>
+                    &bull; <b>Active Neighbor Constraint:</b> Top <b>{{ k_neighbors }}</b> positively correlated items (<i>sim<sub>adj</sub> &gt; 0</i>)
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 2: FULL MOVIE CATALOG & INTERACTIVE RATINGS (20 MOVIES GRID) -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#0f766e">
+            <th colspan="4"><font color="#ffffff">SECTION 2: COMPLETE MOVIE CATALOG (20 ITEMS &mdash; CLICK, RATE &amp; EXPLORE)</font></th>
+        </tr>
+        <tr>
+            <td colspan="4" bgcolor="#f0fdfa" style="font-size: 13px;">
+                <b>Instructions:</b> Browse all 20 movies below across Action, Comedy, Drama, Sci-Fi, Horror, Romance, and Thriller genres. 
+                You can rate any film from <b>1★ (Terrible)</b> to <b>5★ (Masterpiece)</b>, set it to <b>Unrated (-)</b>, 
+                or click <b>"Inspect Sim"</b> to evaluate that film's item similarities in Section 5. 
+                Click <b>"Save Ratings &amp; Run kNN"</b> below to refresh predictions!
+            </td>
+        </tr>
+
+        <!-- Movie Catalog Grid: 4 columns x 5 rows -->
+        {% for row_movies in movies|batch(4) %}
+        <tr valign="top">
+            {% for m in row_movies %}
+            <td width="25%" bgcolor="{% if m.active_rating > 0 %}#f0fdf4{% else %}#ffffff{% endif %}" style="border: 1px solid #cbd5e1; padding: 10px;">
+                <!-- Movie Poster Placeholder Box -->
+                <div style="background-color: {{ m.color }}; border-radius: 4px; padding: 10px; color: #ffffff; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                    <div style="font-size: 26px;">{{ m.emoji }}</div>
+                    <div style="font-size: 20px; font-weight: bold; letter-spacing: 1.5px; margin: 4px 0;">{{ m.initials }}</div>
+                    <div style="font-size: 11px; color: #e2e8f0; text-transform: uppercase;">{{ m.year }} &bull; {{ m.genres[0] }}</div>
+                </div>
+
+                <!-- Movie Title & Attributes -->
+                <div style="margin-top: 8px;">
+                    <font size="3" color="#003366"><b>{{ m.title }}</b></font> <font size="2" color="#64748b">({{ m.year }})</font><br>
+                    <font size="2" color="#047857"><b>IMDb: {{ m.imdb_rating }} ★</b></font> &nbsp;|&nbsp;
+                    <font size="1" color="#475569"><i>{{ m.director }}</i></font>
+                </div>
+
+                <!-- Genres Badges -->
+                <div style="margin: 5px 0;">
+                    {% for g in m.genres %}
+                    <span style="display: inline-block; background-color: #e2e8f0; color: #1e293b; font-size: 10px; padding: 2px 5px; border-radius: 2px; margin-right: 2px;">{{ g }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Cast & Synopsis Snippet -->
+                <div style="font-size: 11px; color: #334155; height: 50px; overflow: hidden; margin-bottom: 8px; line-height: 1.35;">
+                    <b>Cast:</b> {{ m.cast }}<br>
+                    <i>{{ m.synopsis }}</i>
+                </div>
+
+                <hr size="1" color="#e2e8f0">
+
+                <!-- Interactive Rating Input -->
+                <div style="font-size: 12px; margin-bottom: 6px;">
+                    <b>Your Rating:</b>
+                    <select name="rating_{{ m.id }}" style="font-size: 12px; font-weight: bold; {% if m.active_rating > 0 %}color: #047857; background-color: #ecfdf5;{% endif %}">
+                        <option value="0" {% if m.active_rating == 0 %}selected{% endif %}>- Not Rated -</option>
+                        <option value="1" {% if m.active_rating == 1 %}selected{% endif %}>★ 1 Star (Terrible)</option>
+                        <option value="2" {% if m.active_rating == 2 %}selected{% endif %}>★★ 2 Stars (Poor)</option>
+                        <option value="3" {% if m.active_rating == 3 %}selected{% endif %}>★★★ 3 Stars (Average)</option>
+                        <option value="4" {% if m.active_rating == 4 %}selected{% endif %}>★★★★ 4 Stars (Good)</option>
+                        <option value="5" {% if m.active_rating == 5 %}selected{% endif %}>★★★★★ 5 Stars (Masterpiece)</option>
+                    </select>
+                </div>
+
+                <!-- Focal inspection button -->
+                <div style="text-align: right;">
+                    <button type="submit" name="target_movie_id" value="{{ m.id }}" style="background-color: #e2e8f0; border: 1px solid #cbd5e1; font-size: 11px; padding: 2px 6px; cursor: pointer; border-radius: 2px;">
+                        Inspect Sim &rarr;
+                    </button>
+                </div>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+        <tr bgcolor="#f8fafc">
+            <td colspan="4" align="center" style="padding: 14px;">
+                <input type="hidden" name="update_ratings" value="1">
+                <input type="submit" value="&radic; Save Ratings &amp; Run kNN Recommendation Engine" style="background-color: #047857; color: white; border: none; padding: 10px 24px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            </td>
+        </tr>
+    </table>
+    </form>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 3: TOP RECOMMENDED MOVIES & MATHEMATICAL PREDICTION BREAKDOWN -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#047857">
+            <th colspan="6"><font color="#ffffff">SECTION 3: PERSONALIZED TOP-N RECOMMENDATIONS FOR {{ active_user.name|upper }}</font></th>
+        </tr>
+        <tr bgcolor="#e6f4ea" align="center" style="font-size: 13px;">
+            <th width="6%">Rank</th>
+            <th width="24%">Recommended Film</th>
+            <th width="15%">Genres &bull; Year</th>
+            <th width="12%">Predicted Rating</th>
+            <th width="25%">Top-k Neighbor Affinities (sim<sub>adj</sub> &times; User Rating)</th>
+            <th width="18%">Recommendation Reason</th>
+        </tr>
+        {% if predictions %}
+            {% for pred in predictions[:8] %}
+            <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+                <td><b>#{{ loop.index }}</b></td>
+                <td align="left">
+                    <span style="display: inline-block; background-color: {{ pred.movie.color }}; color: white; padding: 1px 5px; font-size: 11px; font-weight: bold; border-radius: 2px; margin-right: 4px;">{{ pred.movie.initials }}</span>
+                    <b><font color="#003366">{{ pred.movie.title }}</font></b>
+                </td>
+                <td style="font-size: 12px;">{{ pred.movie.genres|join(', ') }}<br><font color="#666666">({{ pred.movie.year }})</font></td>
+                <td>
+                    <font size="3" color="{% if pred.predicted_rating >= 4.0 %}#047857{% elif pred.predicted_rating >= 3.0 %}#0284c7{% else %}#b45309{% endif %}">
+                        <b>{{ pred.predicted_rating }} ★</b>
+                    </font>
+                    <br><font size="1" color="#64748b">Dev Pred: {{ pred.dev_pred }}</font>
+                </td>
+                <td align="left" style="font-size: 11.5px; line-height: 1.35;">
+                    {% if pred.neighbors %}
+                        {% for nb in pred.neighbors %}
+                        &bull; <b>{{ nb.title }}</b>: sim = <font color="#003366">{{ nb.similarity }}</font>, rated <font color="#047857"><b>{{ nb.user_rating }}★</b></font><br>
+                        {% endfor %}
+                    {% else %}
+                        <font color="#888888"><i>No positive co-rated neighbors; defaulted to user mean.</i></font>
+                    {% endif %}
+                </td>
+                <td align="left" style="font-size: 11.5px;">
+                    {% if pred.neighbors %}
+                        Strong alignment with your high score for <b>{{ pred.neighbors[0].title }}</b> (sim = {{ pred.neighbors[0].similarity }}).
+                    {% else %}
+                        Fallback based on baseline taste profile.
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6" align="center"><font color="#666666">All catalog movies have already been rated by this user!</font></td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <br>
+
+    <!-- Detailed Mathematical Walkthrough for #1 Recommendation -->
+    {% if top_calc %}
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e293b">
+            <th><font color="#ffffff">MATHEMATICAL STEP-BY-STEP CALCULATION WALKTHROUGH FOR #1 TOP PICK: {{ top_calc.target_movie|upper }}</font></th>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc" style="font-size: 13.5px; line-height: 1.6;">
+                <b>Prediction Formula:</b><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;R&#770;<sub>u, {{ top_calc.target_movie }}</sub> = &sum;<sub>j &isin; N<sub>k</sub></sub> [ sim<sub>adj</sub>(i, j) &times; R<sub>u, j</sub> ] &nbsp;/&nbsp; &sum;<sub>j &isin; N<sub>k</sub></sub> sim<sub>adj</sub>(i, j)</code>
+                <br><br>
+                <b>1. Substituted Numerator (Similarity-Weighted Rating Sum):</b><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;Numerator = {{ top_calc.numerator_expr }} = <b>{{ top_calc.numerator_val }}</b></code>
+                <br><br>
+                <b>2. Substituted Denominator (Sum of Positive Adjusted Similarities):</b><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;Denominator = {{ top_calc.denominator_expr }} = <b>{{ top_calc.denominator_val }}</b></code>
+                <br><br>
+                <b>3. Final Computed Predicted Rating:</b><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;R&#770;<sub>u, {{ top_calc.target_movie }}</sub> = {{ top_calc.numerator_val }} / {{ top_calc.denominator_val }} = <font color="#047857" size="3"><b>{{ top_calc.computed_rating }} Stars</b></font></code>
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 4: MATPLOTLIB ALGORITHM VISUALIZATION PLOTS -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e3a5f">
+            <th><font color="#ffffff">SECTION 4: ALGORITHM INTERNAL VISUALIZATIONS (MATPLOTLIB BASE64 EMBEDDED)</font></th>
+        </tr>
+        <tr>
+            <td align="center" bgcolor="#fafafa">
+                <br>
+                <!-- PLOT 1: Heatmap -->
+                <font size="3" color="#003366"><b>Figure 17.1: Item-Item Adjusted Cosine Similarity Matrix Heatmap (20 &times; 20)</b></font><br>
+                <img src="data:image/png;base64,{{ plot1_b64 }}" width="92%" alt="Adjusted Cosine Similarity Matrix Heatmap" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                <br><br>
+                <div style="width: 90%; text-align: justify; font-size: 12px; color: #475569;">
+                    <b>Heatmap Interpretation:</b> The 20&times;20 symmetric matrix represents Adjusted Cosine affinity across all movie pairs. 
+                    Deep red cells indicate strong positive taste correlation (e.g. Inception, The Matrix, and Interstellar; or The Godfather and Goodfellas). 
+                    Deep blue cells indicate negative taste correlation (e.g. Inception vs. Titanic or The Hangover), where viewers who enjoyed one genre consistently rated the other below their individual mean.
+                </div>
+                <br><hr width="90%" size="1" color="#cbd5e1"><br>
+
+                <!-- PLOT 2: Raw vs Adjusted Cosine Analysis -->
+                <font size="3" color="#003366"><b>Figure 17.2: Raw Cosine vs Adjusted Cosine Distribution &amp; Focal Movie Benchmark</b></font><br>
+                <img src="data:image/png;base64,{{ plot2_b64 }}" width="92%" alt="Raw vs Adjusted Cosine Analysis" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                <br><br>
+                <div style="width: 90%; text-align: justify; font-size: 12px; color: #475569;">
+                    <b>Comparative Insight:</b> 
+                    <b>(Left Panel):</b> Raw cosine values are heavily clustered near 0.85&ndash;0.98 because ratings are strictly positive numbers (1 to 5), causing high inner products regardless of genre mismatch. Adjusted cosine centers ratings around user means, shifting the true distribution to span [-1.0, +1.0] centered near 0.0.
+                    <b>(Right Panel):</b> Demonstrates how raw cosine assigns high similarity (0.78&ndash;0.82) between Inception and diametrically opposed films (Titanic, The Hangover), whereas Adjusted Cosine correctly yields negative similarity (-0.51).
+                </div>
+                <br><hr width="90%" size="1" color="#cbd5e1"><br>
+
+                <!-- PLOT 3 & 4: Predictions & User Bias -->
+                <table border="0" cellpadding="6" cellspacing="0" width="94%">
+                    <tr>
+                        <td width="50%" align="center" valign="top">
+                            <font size="2" color="#003366"><b>Figure 17.3: Top Predicted Ratings for Active User</b></font><br>
+                            <img src="data:image/png;base64,{{ plot3_b64 }}" width="100%" alt="Top Predicted Ratings" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                        </td>
+                        <td width="50%" align="center" valign="top">
+                            <font size="2" color="#003366"><b>Figure 17.4: User Mean Ratings &amp; Baseline Disparities</b></font><br>
+                            <img src="data:image/png;base64,{{ plot4_b64 }}" width="100%" alt="User Mean Ratings" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                        </td>
+                    </tr>
+                </table>
+                <br>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 5: FOCAL MOVIE COMPARISON TABLE (RAW VS ADJUSTED COSINE) -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#4338ca">
+            <th colspan="5"><font color="#ffffff">SECTION 5: FOCAL MOVIE PAIRWISE SIMILARITY AUDIT: {{ focal_movie.title|upper }} ({{ focal_movie.initials }})</font></th>
+        </tr>
+        <tr bgcolor="#e0e7ff" align="center" style="font-size: 13px;">
+            <th width="28%">Comparison Movie</th>
+            <th width="22%">Genres</th>
+            <th width="16%">Raw Cosine (sim<sub>raw</sub>)</th>
+            <th width="16%">Adjusted Cosine (sim<sub>adj</sub>)</th>
+            <th width="18%">Bias Inflation (&Delta; = Raw - Adj)</th>
+        </tr>
+        {% for comp in focal_comparisons %}
+        <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="left"><b>{{ comp.title }}</b></td>
+            <td style="font-size: 12px;">{{ comp.genres }}</td>
+            <td><font color="#b45309"><b>{{ comp.raw_sim }}</b></font></td>
+            <td>
+                <font color="{% if comp.adj_sim > 0.4 %}#047857{% elif comp.adj_sim > 0 %}#0284c7{% else %}#b91c1c{% endif %}">
+                    <b>{{ comp.adj_sim }}</b>
+                </font>
+            </td>
+            <td><font color="#4b5563">+{{ comp.difference }}</font></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 6: COMPLETE USER-ITEM RATINGS MATRIX -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="6" cellspacing="0" width="92%" align="center" bgcolor="#ffffff" style="font-size: 12px;">
+        <tr bgcolor="#334155">
+            <th colspan="23"><font color="#ffffff">SECTION 6: COMPLETE USER &times; ITEM RATINGS MATRIX (8 USERS &times; 20 MOVIES)</font></th>
+        </tr>
+        <tr bgcolor="#f1f5f9" align="center">
+            <th width="10%">User Persona</th>
+            <th width="5%">Mean</th>
+            {% for m in movies %}
+            <th title="{{ m.title }}" width="4%">{{ m.initials }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in matrix_rows %}
+        <tr align="center" bgcolor="{% if row.is_active %}#fef3c7{% elif loop.index % 2 == 0 %}#f8fafc{% else %}#ffffff{% endif %}">
+            <td align="left">
+                {% if row.is_active %}&#9658; <b><font color="#b45309">{{ row.user_name }}</font></b>{% else %}<b>{{ row.user_name }}</b>{% endif %}
+            </td>
+            <td><b>{{ row.mean_rating }}</b></td>
+            {% for r in row.ratings %}
+            <td>
+                {% if r != '-' %}
+                    <font color="{% if r >= 4 %}#047857{% elif r <= 2 %}#b91c1c{% else %}#1e293b{% endif %}"><b>{{ r }}</b></font>
+                {% else %}
+                    <font color="#94a3b8">-</font>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 7: COMPARATIVE ALGORITHM JUSTIFICATION -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e293b">
+            <th colspan="4"><font color="#ffffff">SECTION 7: THEORETICAL COMPARISON OF SIMILARITY METRICS IN COLLABORATIVE FILTERING</font></th>
+        </tr>
+        <tr bgcolor="#f1f5f9" align="center" style="font-size: 13px;">
+            <th width="20%">Similarity Measure</th>
+            <th width="30%">Mathematical Expression</th>
+            <th width="25%">User Rating Bias Treatment</th>
+            <th width="25%">Recommender System Suitability</th>
+        </tr>
+        <tr>
+            <td><b>Standard (Raw) Cosine</b></td>
+            <td><code>sim(i,j) = &sum; R<sub>ui</sub>R<sub>uj</sub> / [ &radic;&sum; R<sub>ui</sub><sup>2</sup> &radic;&sum; R<sub>uj</sub><sup>2</sup> ]</code></td>
+            <td>Ignores user bias. Treats missing ratings as 0, which introduces positive bias distortion.</td>
+            <td><font color="#b91c1c"><b>Poor for Item-based CF</b></font> (Inflates similarity values to ~0.90 even for conflicting genres).</td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td><b>Pearson Correlation</b></td>
+            <td><code>sim(i,j) = &sum; (R<sub>ui</sub>-R&#772;<sub>i</sub>)(R<sub>uj</sub>-R&#772;<sub>j</sub>) / [ &radic;&sum;(R<sub>ui</sub>-R&#772;<sub>i</sub>)<sup>2</sup> &radic;&sum;(R<sub>uj</sub>-R&#772;<sub>j</sub>)<sup>2</sup> ]</code></td>
+            <td>Subtracts <i>item mean</i> (R&#772;<sub>i</sub>), failing to account for user leniency differences across users.</td>
+            <td><font color="#d97706"><b>Moderate</b></font> (Well suited for user-based CF, sub-optimal for item-based CF).</td>
+        </tr>
+        <tr>
+            <td><b>Adjusted Cosine Similarity</b></td>
+            <td><code>sim(i,j) = &sum; (R<sub>ui</sub>-R&#772;<sub>u</sub>)(R<sub>uj</sub>-R&#772;<sub>u</sub>) / [ &radic;&sum;(R<sub>ui</sub>-R&#772;<sub>u</sub>)<sup>2</sup> &radic;&sum;(R<sub>uj</sub>-R&#772;<sub>u</sub>)<sup>2</sup> ]</code></td>
+            <td><b>Subtracts <i>user mean</i> (R&#772;<sub>u</sub>)</b> from co-rated items, isolating pure affinity from personal bias.</td>
+            <td><font color="#047857"><b>Optimal Benchmark</b></font> (Industry standard for item-based collaborative filtering).</td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- FOOTER -->
+    <!-- ====================================================================== -->
+    <center>
+        <hr width="92%" size="1" color="#cbd5e1">
+        <p style="font-size: 13px; color: #64748b;">
+            <b>Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical File Submission</b><br>
+            <b>Student Name:</b> Monis &nbsp;|&nbsp; 
+            <b>Roll Number:</b> 2023UIT3027 &nbsp;|&nbsp; 
+            <b>Faculty Mentor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp; 
+            <b>Session:</b> 2026&ndash;2027<br>
+            <b>Institution:</b> Netaji Subhas University of Technology (NSUT), Dwarka, New Delhi<br>
+            <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold; text-decoration: none;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </center>
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 17 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>17 (Practical XV)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Item-Based kNN Recommender System Using Adjusted Cosine Measure in Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement an Item-Based Nearest Neighbor Recommender System using the Adjusted Cosine Measure from first principles in Python using Flask. The experiment contrasts raw cosine similarity against adjusted cosine similarity, mathematically demonstrating how subtracting user mean ratings eliminates subjective rater bias and improves recommendation fidelity.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>The Adjusted Cosine Measure is an improved similarity metric for item-based collaborative filtering. Standard cosine similarity treats raw ratings as absolute values and fails to account for the fact that different users have different rating scales (e.g., an overly strict user whose highest rating is 3 versus a generous user whose lowest rating is 4). The Adjusted Cosine measure corrects for this subjective disparity by subtracting each user's average rating from their rating before computing the cosine angle.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Limitation of Standard Raw Cosine Similarity</h3>
+<p>Standard cosine similarity treats raw star scores as absolute coordinates, confounding user rating scale differences with true item similarity:</p>
+<div class="formula-box"><b>Raw Cosine Similarity (Unadjusted):</b>
+Raw Cosine(i, j) = &sum;<sub>u</sub> ( R<sub>u,i</sub> &times; R<sub>u,j</sub> ) / [ &radic;( &sum;<sub>u</sub> R<sub>u,i</sub><sup>2</sup> ) &times; &radic;( &sum;<sub>u</sub> R<sub>u,j</sub><sup>2</sup> ) ]
+
+<b>Problem:</b>
+If User A rates movies as (4, 5) and User B rates them as (1, 2), both users agree that Movie 2 is better than Movie 1. However, raw cosine treats (4, 5) and (1, 2) as different vectors, failing to capture their true agreement.</div>
+<h3>2. Adjusted Cosine Similarity Formula</h3>
+<p>Adjusted Cosine fixes this problem by subtracting each user's personal average rating r̄<sub>u</sub> from their rating, centering all ratings around zero (positive = above average/liked, negative = below average/disliked):</p>
+<div class="formula-box"><b>Adjusted Cosine Similarity Formula:</b>
+Similarity<sub>adj</sub>(i, j) = &sum;<sub>u &isin; U<sub>ij</sub></sub> [ ( R<sub>u,i</sub> - r̄<sub>u</sub> ) &times; ( R<sub>u,j</sub> - r̄<sub>u</sub> ) ] / [ &radic;( &sum;<sub>u &isin; U<sub>ij</sub></sub> ( R<sub>u,i</sub> - r̄<sub>u</sub> )<sup>2</sup> ) &times; &radic;( &sum;<sub>u &isin; U<sub>ij</sub></sub> ( R<sub>u,j</sub> - r̄<sub>u</sub> )<sup>2</sup> ) ]
+
+<b>Where:</b>
+• <b>R<sub>u,i</sub>, R<sub>u,j</sub>:</b> Ratings given by user u to items i and j.
+• <b>r̄<sub>u</sub>:</b> User u's average rating across all movies they have rated.
+• <b>Similarity<sub>adj</sub>(i, j):</b> Adjusted cosine score ranging from -1.0 to +1.0.</div>
+<h3>3. Mean-Centered Rating Prediction Formula</h3>
+<p>Using the adjusted similarity matrix, the predicted rating for target item i incorporates the active user's baseline average r̄<sub>u</sub>:</p>
+<div class="formula-box"><b>Mean-Centered Prediction Formula:</b>
+Predicted Rating(u, i) = r̄<sub>u</sub> + [ &sum;<sub>j &isin; Neighbors(i)</sub> Similarity<sub>adj</sub>(i, j) &times; ( R<sub>u,j</sub> - r̄<sub>u</sub> ) ] / [ &sum;<sub>j &isin; Neighbors(i)</sub> |Similarity<sub>adj</sub>(i, j)| ]
+
+<b>Where:</b>
+• <b>r̄<sub>u</sub>:</b> Active user u's baseline average rating.
+• <b>( R<sub>u,j</sub> - r̄<sub>u</sub> ):</b> Active user's rating deviation on similar movie j.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie rating matrix with deliberately varied rater baselines (strict vs lenient users).</li>
+<li>Implemented vectorized computation of user mean ratings r̄<sub>u</sub> and mean-centered deviations in pure NumPy.</li>
+<li>Formulated and computed both the Raw Cosine Matrix and Adjusted Cosine Matrix to directly compare their numerical behavior.</li>
+<li>Implemented the mean-centered prediction formula and audited recommendation rank shifts between raw and adjusted metrics.</li>
+<li>Deployed an interactive Flask application on port 5017 featuring dual-matrix comparison heatmaps and rating prediction audits.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 17.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 17.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 17.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 17.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 17.2: Recommendations">
+        <div class="screenshot-caption">Figure 17.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 17.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 17.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 17.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 17.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 17.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 17.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The experiment demonstrated the clear advantage of the Adjusted Cosine Measure over raw cosine similarity. By centering ratings around each user's unique average, the algorithm eliminated distortions caused by rater generosity or severity. The resulting recommendations exhibited substantially higher semantic accuracy and resilience to subjective rating biases.</p>
+
+</body>
+</html>

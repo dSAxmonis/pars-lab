@@ -34,9 +34,19 @@
 | **09** | Implement regularization for any application show plots of 1)decision boundary and 2) performance before and after applying regularization | 36&ndash;39 | [`exp 9/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%209) |
 | **10** | Implement Principal component analysis (PCA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line. | 40&ndash;43 | [`exp 10/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2010) |
 | **11** | Implement Linear Discriminant analysis (LDA) for any application which involves testing. Also show the projected line and new reduced feature mapped on projected line. | 44&ndash;47 | [`exp 11/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2011) |
+| **12** | Implement Content Based Recommender system for any application using Flask | 48&ndash;51 | [`exp 12/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2012) |
+| **13** | Implement collaborative based recommender system for any application using Flask | 52&ndash;55 | [`exp 13/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2013) |
+| **14** | Implement recommender system giving solution to Cold start problem using Flask | 56&ndash;60 | [`exp 14/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2014) |
+| **15** | Implement User based Nearest Neighbor recommender system for any application using Flask | 61&ndash;64 | [`exp 15/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2015) |
+| **16** | Implement item based Nearest Neighbor recommender system (predict rating and generate recommendation) for any application using Flask | 65&ndash;67 | [`exp 16/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2016) |
+| **17** | Implement item based Nearest Neighbor recommender system (predict rating and generate recommendation) using Adjusted cosine measure for any application using Flask | 68&ndash;71 | [`exp 17/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2017) |
+| **18** | Implement item-based k-Nearest Neighbor recommender system (either seen or not seen) for any application using Flask | 72&ndash;75 | [`exp 18/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2018) |
+| **19** | Implement hybrid approach Based Recommender system for any application using Flask | 76&ndash;79 | [`exp 19/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2019) |
+| **20** | Implement Knowledge Based Recommender system, consisting of score and weight for any application using Flask | 80&ndash;83 | [`exp 20/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2020) |
+| **21** | Implement matrix Factorization to find unknown Rating using Stochastic Gradient Descent for at least 3 Epoch | 84&ndash;87 | [`exp 21/`](https://github.com/dSAxmonis/pars-lab/tree/main/exp%2021) |
 
 ---
 
 ### PDF ARTIFACTS:
 - **Standalone Front Page &amp; Index PDF:** [`FRONT_PAGE_AND_INDEX.pdf`](./FRONT_PAGE_AND_INDEX.pdf)
-- **Complete Merged Practical File (58 Pages):** [`PARS_LAB_COMPLETE_PRACTICAL_FILE.pdf`](./PARS_LAB_COMPLETE_PRACTICAL_FILE.pdf)
+- **Complete Merged Practical File (94 Pages):** [`PARS_LAB_COMPLETE_PRACTICAL_FILE.pdf`](./PARS_LAB_COMPLETE_PRACTICAL_FILE.pdf)

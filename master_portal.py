@@ -20,7 +20,7 @@ from flask import Flask, render_template_string, jsonify, redirect, send_from_di
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# 11 Experiments Configuration
+# 21 Experiments Configuration
 EXPERIMENTS = [
     {
         "id": 1,
@@ -109,6 +109,86 @@ EXPERIMENTS = [
         "badge": "Supervised Projection & Fisher Criterion",
         "desc": "Maximizes between-class to within-class scatter ratio S_W^-1(mu_1 - mu_2), projects 2D points onto the optimal discriminant line, and classifies test coordinates.",
         "path": os.path.join(BASE_DIR, "exp 11", "app.py")
+    },
+    {
+        "id": 12,
+        "port": 5012,
+        "title": "Implement Content Based Recommender system for any application using Flask",
+        "badge": "Content-Based Filtering",
+        "desc": "TF-IDF feature extraction from movie genres/keywords, cosine similarity matrix, interactive movie catalog with clickable items, and content-based recommendations.",
+        "path": os.path.join(BASE_DIR, "exp 12", "app.py")
+    },
+    {
+        "id": 13,
+        "port": 5013,
+        "title": "Implement collaborative based recommender system for any application using Flask",
+        "badge": "Collaborative Filtering",
+        "desc": "User-item rating matrix, Pearson correlation-based user-user similarity, weighted average rating prediction, and collaborative filtering recommendations.",
+        "path": os.path.join(BASE_DIR, "exp 13", "app.py")
+    },
+    {
+        "id": 14,
+        "port": 5014,
+        "title": "Implement recommender system giving solution to Cold start problem using Flask",
+        "badge": "Cold Start Solution",
+        "desc": "Handles new users (popularity-based) and new items (attribute-based) with smooth transition as ratings accumulate, demonstrating cold start mitigation strategies.",
+        "path": os.path.join(BASE_DIR, "exp 14", "app.py")
+    },
+    {
+        "id": 15,
+        "port": 5015,
+        "title": "Implement User based Nearest Neighbor recommender system for any application using Flask",
+        "badge": "User-Based kNN",
+        "desc": "k-Nearest Neighbor user similarity computation, neighbor selection visualization, and rating prediction from weighted votes of k most similar users.",
+        "path": os.path.join(BASE_DIR, "exp 15", "app.py")
+    },
+    {
+        "id": 16,
+        "port": 5016,
+        "title": "Implement item based Nearest Neighbor recommender system (predict rating and generate recommendation) for any application using Flask",
+        "badge": "Item-Based kNN Ratings",
+        "desc": "Item-item similarity from rating co-occurrence patterns, k nearest item selection, weighted sum rating prediction, and top-N item recommendation generation.",
+        "path": os.path.join(BASE_DIR, "exp 16", "app.py")
+    },
+    {
+        "id": 17,
+        "port": 5017,
+        "title": "Implement item based Nearest Neighbor recommender system using Adjusted cosine measure for any application using Flask",
+        "badge": "Adjusted Cosine kNN",
+        "desc": "Adjusted cosine similarity subtracting user mean ratings before item-item cosine computation, with comparison against standard cosine similarity results.",
+        "path": os.path.join(BASE_DIR, "exp 17", "app.py")
+    },
+    {
+        "id": 18,
+        "port": 5018,
+        "title": "Implement item-based k-Nearest Neighbor recommender system (either seen or not seen) for any application using Flask",
+        "badge": "Item-Based kNN Binary",
+        "desc": "Binary interaction matrix (seen/not-seen), Jaccard similarity coefficient between items, and recommendation of unseen items most similar to user's watched set.",
+        "path": os.path.join(BASE_DIR, "exp 18", "app.py")
+    },
+    {
+        "id": 19,
+        "port": 5019,
+        "title": "Implement hybrid approach Based Recommender system for any application using Flask",
+        "badge": "Hybrid Recommender",
+        "desc": "Weighted hybrid combining content-based and collaborative filtering scores with adjustable alpha parameter, showing how recommendations shift with weighting.",
+        "path": os.path.join(BASE_DIR, "exp 19", "app.py")
+    },
+    {
+        "id": 20,
+        "port": 5020,
+        "title": "Implement Knowledge Based Recommender system, consisting of score and weight for any application using Flask",
+        "badge": "Knowledge-Based RS",
+        "desc": "Utility-based recommender with movie attribute scores (acting, visuals, story, pace) and user-specified preference weights computing weighted utility scores.",
+        "path": os.path.join(BASE_DIR, "exp 20", "app.py")
+    },
+    {
+        "id": 21,
+        "port": 5021,
+        "title": "Implement matrix Factorization to find unknown Rating using Stochastic Gradient Descent for at least 3 Epoch",
+        "badge": "Matrix Factorization SGD",
+        "desc": "Low-rank matrix decomposition R ≈ P×Q^T via Stochastic Gradient Descent across multiple epochs, loss curve visualization, and latent factor analysis.",
+        "path": os.path.join(BASE_DIR, "exp 21", "app.py")
     }
 ]
 
@@ -478,19 +558,16 @@ HTML_PORTAL = """
         <div class="action-bar">
             <div class="status-summary">
                 <div class="pulse-dot"></div>
-                <span>All 11 Experiment Servers Online &amp; Running Concurrently</span>
+                <span>All 21 Experiment Servers Online &amp; Running Concurrently</span>
             </div>
             <div class="btn-group">
                 <a href="/download_pdf" target="_blank" class="btn-pdf">
-                    📄 View Full Practical File (58-Page PDF)
-                </a>
-                <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" class="btn-github">
-                    ⭐ GitHub Repository
+                    📄 View Complete Practical File (94-Page PDF)
                 </a>
             </div>
         </div>
 
-        <!-- 11 Experiments Grid -->
+        <!-- 21 Experiments Grid -->
         <div class="exp-grid">
             {% for exp in exps %}
             <div class="exp-card">
@@ -538,7 +615,7 @@ def serve_pdf():
 
 def start_experiment_servers():
     print("=" * 70)
-    print("🚀 STARTING ALL 11 PARS LAB EXPERIMENT SERVERS CONCURRENTLY...")
+    print("🚀 STARTING ALL 21 PARS LAB EXPERIMENT SERVERS CONCURRENTLY...")
     print("=" * 70)
     for exp in EXPERIMENTS:
         exp_id = exp["id"]
@@ -555,7 +632,7 @@ def start_experiment_servers():
     # Give them 2 seconds to initialize
     time.sleep(2)
     print("=" * 70)
-    print("✅ ALL 11 EXPERIMENT SERVERS ARE RUNNING!")
+    print("✅ ALL 21 EXPERIMENT SERVERS ARE RUNNING!")
     print(f"🌟 MASTER PORTAL LAUNCHED: http://127.0.0.1:8000 (and http://localhost:8000)")
     print("=" * 70)
 

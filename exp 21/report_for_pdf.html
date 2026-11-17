@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 21 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>21 (Practical XIX)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Matrix Factorization Using Stochastic Gradient Descent (SGD) for Rating Prediction in Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement a Matrix Factorization Recommender System from scratch in Python using Flask. The system decomposes the observed user-item rating matrix into low-rank latent user and item factor matrices, optimizes latent parameters via regularized Stochastic Gradient Descent (SGD) across multiple training epochs, tracks convergence loss, and reconstructs the full rating matrix to predict unknown entries.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Matrix Factorization is a latent factor model that decomposes a large, sparse user-item rating matrix into the product of two lower-rank matrices: a User Matrix (representing user tastes across hidden factors) and an Item Matrix (representing movie characteristics across the same hidden factors). By training on only the observed ratings, the model discovers latent patterns and uses their dot product to predict all missing, unobserved ratings in the catalog.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. Low-Rank Latent Factor Decomposition</h3>
+<p>Given an 8-user by 20-movie rating matrix R, matrix factorization decomposes R into two smaller factor matrices: User Matrix P (8 users x 4 factors) and Movie Matrix Q (20 movies x 4 factors):</p>
+<div class="formula-box"><b>Predicted Rating Formula:</b>
+Predicted Rating(u, i) = &mu; + b<sub>u</sub> + b<sub>i</sub> + &sum;<sub>f=1</sub><sup>d</sup> ( P<sub>u,f</sub> &times; Q<sub>i,f</sub> )
+
+<b>Where:</b>
+• <b>&mu; (Mu):</b> Global average rating across all observed ratings in the entire catalog.
+• <b>b<sub>u</sub>:</b> User bias capturing whether User u is generally strict (negative) or generous (positive).
+• <b>b<sub>i</sub>:</b> Item bias capturing whether Movie i is generally acclaimed (positive) or panned (negative).
+• <b>P<sub>u,f</sub>:</b> User u's affinity for latent factor f.
+• <b>Q<sub>i,f</sub>:</b> Movie i's expression of latent factor f.
+• <b>d:</b> Number of latent factors (e.g., d = 4 hidden dimensions).</div>
+<h3>2. Prediction Residual Error</h3>
+<p>For any observed rating given by user u to movie i, the prediction error (residual) is the difference between the actual rating and the model's prediction:</p>
+<div class="formula-box"><b>Prediction Error:</b>
+e<sub>u,i</sub> = Actual Rating(u, i) - Predicted Rating(u, i)</div>
+<h3>3. Stochastic Gradient Descent (SGD) Parameter Update Rules</h3>
+<p>In each training epoch, the algorithm iterates through every observed rating in the dataset and updates the biases and latent factor vectors opposite to the error gradient, applying L2 regularization to prevent overfitting:</p>
+<div class="formula-box"><b>Parameter Updates for Sample (u, i):</b>
+b<sub>u</sub> &larr; b<sub>u</sub> + &gamma; &times; ( e<sub>u,i</sub> - &lambda; &times; b<sub>u</sub> )
+b<sub>i</sub> &larr; b<sub>i</sub> + &gamma; &times; ( e<sub>u,i</sub> - &lambda; &times; b<sub>i</sub> )
+P<sub>u,f</sub> &larr; P<sub>u,f</sub> + &gamma; &times; ( e<sub>u,i</sub> &times; Q<sub>i,f</sub> - &lambda; &times; P<sub>u,f</sub> )
+Q<sub>i,f</sub> &larr; Q<sub>i,f</sub> + &gamma; &times; ( e<sub>u,i</sub> &times; P<sub>u,f</sub> - &lambda; &times; Q<sub>i,f</sub> )
+
+<b>Where:</b>
+• <b>&gamma; (Gamma):</b> Learning rate hyperparameter controlling step size (e.g., &gamma; = 0.02).
+• <b>&lambda; (Lambda):</b> Regularization parameter penalizing large weights to prevent overfitting (e.g., &lambda; = 0.04).</div>
+<h3>4. Multi-Epoch Training & Convergence</h3>
+<p>The model repeats this process for at least 3 epochs (default: 15 epochs). Across epochs, the Mean Squared Error (MSE) and Root Mean Squared Error (RMSE) monotonically decrease as the reconstructed matrix converges:</p>
+<div class="formula-box"><b>Loss Metrics:</b>
+MSE = ( 1 / Total Observed ) &times; &sum;<sub>(u,i)</sub> ( e<sub>u,i</sub> )<sup>2</sup>
+RMSE = &radic;( MSE )</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie sparse rating matrix containing 72 observed ratings (45% sparsity) and 88 unobserved entries to predict.</li>
+<li>Initialized user latent matrix P (8x4) and item latent matrix Q (20x4) with small random Gaussian values.</li>
+<li>Implemented the regularized Stochastic Gradient Descent optimization loop executing across 15 epochs (surpassing the minimum 3-epoch requirement).</li>
+<li>Monitored MSE, RMSE, and Loss at every epoch, verifying smooth monotonic convergence.</li>
+<li>Deployed an interactive Flask application on port 5021 displaying convergence plots, latent factor breakdowns, and complete reconstructed rating matrices.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 21.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 21.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 21.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 21.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 21.2: Recommendations">
+        <div class="screenshot-caption">Figure 21.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 21.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 21.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 21.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 21.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 21.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 21.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>Matrix Factorization using Stochastic Gradient Descent was successfully formulated and executed from scratch. The optimization algorithm monotonically reduced training loss across epochs, learning compact 4-dimensional latent representations for all users and movies. Reconstructing the complete matrix accurately estimated unobserved entries, confirming Matrix Factorization as a cornerstone of modern collaborative filtering.</p>
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 16: Item-Based Nearest Neighbor Recommender System</title>
+</head>
+<body bgcolor="#f5f7fa" text="#222222" style="font-family: Arial, Helvetica, sans-serif; margin: 20px 0;">
+
+    <!-- ================================================================= -->
+    <!-- EXPERIMENT PAGE HEADER                                            -->
+    <!-- ================================================================= -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 16</font></h1>
+        <h3><font color="#555555">Item-Based Nearest Neighbor Recommender System (Rating Prediction & Recommendation Generation)</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Department:</b> Information Technology, NSUT &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027<br>
+            <b>Student:</b> Monis &nbsp;|&nbsp;
+            <b>Roll No:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Framework:</b> Flask (Python 3) & NumPy
+        </p>
+        <p>
+            <b>GitHub Repository:</b> 
+            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366; font-weight: bold; text-decoration: none;">
+                https://github.com/dSAxmonis/pars-lab
+            </a> &nbsp;|&nbsp;
+            <b>Port:</b> <code>5016</code> &nbsp;|&nbsp;
+            <b>Badge:</b> <font color="#ffffff" style="background-color: #003366; padding: 3px 8px; border-radius: 3px; font-size: 12px;"><b>Item-Based kNN Ratings</b></font>
+        </p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    {% if user_action_msg %}
+    <!-- ALERT / NOTIFICATION BANNER -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#e6fffa" style="border-color: #319795;">
+        <tr>
+            <td align="center">
+                <font color="#234e52"><b>🔔 System Notification:</b> {{ user_action_msg }}</font>
+            </td>
+        </tr>
+    </table>
+    <br>
+    {% endif %}
+
+    <!-- ================================================================= -->
+    <!-- SECTION 1: AIM & MATHEMATICAL FORMULATION SUMMARY                 -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left"><font color="#ffffff">SECTION 1: EXPERIMENT AIM &amp; MATHEMATICAL FORMULATION SUMMARY</font></th>
+        </tr>
+        <tr>
+            <td width="18%" bgcolor="#f0f4f8"><b>Practical Aim:</b></td>
+            <td>
+                Implement an <b>Item-Based Nearest Neighbor (kNN) Recommender System</b> from first principles in Python (using pure <b>NumPy</b> without scikit-learn or surprise libraries) within a Flask web application for a movies catalog domain.
+                The system computes item-item similarities across historical co-rating patterns, identifies the $k$ most similar neighbor items already rated by a target user, predicts unknown ratings using a <b>weighted sum aggregation formula</b>, and generates a personalized Top-N recommendation list.
+            </td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td bgcolor="#f0f4f8"><b>1. Adjusted Cosine Similarity Formula:</b></td>
+            <td>
+                Standard cosine ignores user rating scale biases. Adjusted Cosine offsets each user's rating by their mean rating across all items $\bar{R}_u$:
+                <br><br>
+                <center>
+                    <font face="Courier New" size="3" color="#003366">
+                        <b>sim(i, j) = &sum;<sub>u &isin; U<sub>ij</sub></sub> (R<sub>u, i</sub> &minus; R&#772;<sub>u</sub>)(R<sub>u, j</sub> &minus; R&#772;<sub>u</sub>) / [ &radic;(&sum;<sub>u</sub> (R<sub>u, i</sub> &minus; R&#772;<sub>u</sub>)<sup>2</sup>) &middot; &radic;(&sum;<sub>u</sub> (R<sub>u, j</sub> &minus; R&#772;<sub>u</sub>)<sup>2</sup>) ]</b>
+                    </font>
+                </center>
+                <br>
+                where <i>U<sub>ij</sub></i> is the co-rating set of users who rated both item <i>i</i> and item <i>j</i>, and <i>R&#772;<sub>u</sub></i> is user <i>u</i>'s average rating.
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#f0f4f8"><b>2. k-Nearest Neighbors Rating Prediction:</b></td>
+            <td>
+                For target user <i>u</i> and unrated candidate movie <i>i</i>, let <i>S<sup>k</sup>(i; u)</i> be the set of <i>k</i> items rated by user <i>u</i> with the highest positive item-item similarity <i>sim(i, j) &gt; 0</i>:
+                <br><br>
+                <center>
+                    <font face="Courier New" size="3" color="#004d40">
+                        <b>R&#770;<sub>u, i</sub> = [ &sum;<sub>j &isin; S<sup>k</sup>(i; u)</sub> sim(i, j) &middot; R<sub>u, j</sub> ] / [ &sum;<sub>j &isin; S<sup>k</sup>(i; u)</sub> sim(i, j) ]</b>
+                    </font>
+                </center>
+                <br>
+                Predicted ratings are bounded within the rating scale [1.0, 5.0]. If no positively correlated rated neighbors exist, the system gracefully falls back to the item's catalog mean.
+            </td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td bgcolor="#f0f4f8"><b>3. Top-N Ranking Criterion:</b></td>
+            <td>
+                Rank all unrated items &forall; <i>i &notin; I<sub>u</sub></i> in descending order of predicted rating <i>R&#770;<sub>u, i</sub></i> and return the top <i>N</i> highest-scoring movies with full mathematical proof.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 2: ACTIVE USER & HYPERPARAMETER CONTROLS                  -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1a365d">
+            <th colspan="4" align="left"><font color="#ffffff">SECTION 2: ACTIVE USER PROFILE &amp; RECOMMENDER CONFIGURATION</font></th>
+        </tr>
+        <tr>
+            <td colspan="4" bgcolor="#e8f4fd">
+                <form method="POST" action="/" style="margin: 0;">
+                    <input type="hidden" name="action" value="apply_settings">
+                    <input type="hidden" name="selected_movie_id" value="{{ selected_movie_id }}">
+                    <table width="100%" cellpadding="6" cellspacing="0" border="0">
+                        <tr>
+                            <td width="25%">
+                                <b>Select Active User Profile:</b><br>
+                                <select name="user_id" style="padding: 5px; width: 95%; font-size: 13px;" onchange="this.form.submit()">
+                                    {% for u in users %}
+                                    <option value="{{ u.id }}" {% if u.id == selected_user_id %}selected{% endif %}>
+                                        {{ u.name }} &mdash; {{ u.persona }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td width="25%">
+                                <b>Similarity Metric:</b><br>
+                                <select name="metric" style="padding: 5px; width: 95%; font-size: 13px;" onchange="this.form.submit()">
+                                    <option value="adj_cos" {% if similarity_metric == 'adj_cos' %}selected{% endif %}>Adjusted Cosine Similarity (User Mean-Centered)</option>
+                                    <option value="cosine" {% if similarity_metric == 'cosine' %}selected{% endif %}>Standard Cosine Similarity</option>
+                                </select>
+                            </td>
+                            <td width="20%">
+                                <b>k Nearest Neighbors:</b><br>
+                                <select name="k_neighbors" style="padding: 5px; width: 90%; font-size: 13px;" onchange="this.form.submit()">
+                                    <option value="2" {% if k_neighbors == 2 %}selected{% endif %}>k = 2 Neighbors</option>
+                                    <option value="3" {% if k_neighbors == 3 %}selected{% endif %}>k = 3 Neighbors (Default)</option>
+                                    <option value="4" {% if k_neighbors == 4 %}selected{% endif %}>k = 4 Neighbors</option>
+                                    <option value="5" {% if k_neighbors == 5 %}selected{% endif %}>k = 5 Neighbors</option>
+                                </select>
+                            </td>
+                            <td width="15%">
+                                <b>Top-N List:</b><br>
+                                <select name="top_n" style="padding: 5px; width: 90%; font-size: 13px;" onchange="this.form.submit()">
+                                    <option value="3" {% if top_n_rec == 3 %}selected{% endif %}>Top 3</option>
+                                    <option value="5" {% if top_n_rec == 5 %}selected{% endif %}>Top 5 (Standard)</option>
+                                    <option value="8" {% if top_n_rec == 8 %}selected{% endif %}>Top 8</option>
+                                </select>
+                            </td>
+                            <td width="15%" align="center">
+                                <br>
+                                <button type="submit" style="background-color: #003366; color: #ffffff; border: none; padding: 7px 14px; cursor: pointer; font-weight: bold; border-radius: 3px;">
+                                    Recalculate
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr bgcolor="#fafafa">
+            <td width="25%">
+                <b>Active User:</b> <font color="#003366"><b>{{ selected_user.name }}</b></font><br>
+                <small>Persona: {{ selected_user.persona }}</small>
+            </td>
+            <td width="25%">
+                <b>Movies Rated by User:</b> <font color="#008000"><b>{{ rated_count }} / {{ total_movies }}</b></font><br>
+                <small>Unrated Candidates: <b>{{ unrated_count }}</b> movies</small>
+            </td>
+            <td width="25%">
+                <b>Active Algorithm:</b> Item-Based kNN (k={{ k_neighbors }})<br>
+                <small>Metric: <b>{% if similarity_metric == 'adj_cos' %}Adjusted Cosine{% else %}Standard Cosine{% endif %}</b></small>
+            </td>
+            <td width="25%" align="center">
+                <form method="POST" action="/" style="margin: 0;">
+                    <input type="hidden" name="action" value="reset_ratings">
+                    <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                    <input type="hidden" name="selected_movie_id" value="{{ selected_movie_id }}">
+                    <input type="hidden" name="metric" value="{{ similarity_metric }}">
+                    <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                    <input type="hidden" name="top_n" value="{{ top_n_rec }}">
+                    <button type="submit" style="background-color: #c53030; color: #ffffff; border: none; padding: 6px 12px; cursor: pointer; font-size: 11px; border-radius: 3px;">
+                        Reset Ratings Matrix to Default
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 3: FULL MOVIES CATALOG (INTERACTIVE MOVIE ITEM GRID)      -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="4" align="left">
+                <font color="#ffffff">
+                    SECTION 3: COMPLETE MOVIE CATALOG ({{ total_movies }} ITEMS ACROSS 7 GENRES) &mdash; CLICK TO INSPECT / RATE
+                </font>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="4" bgcolor="#e0f2f1">
+                <font color="#004d40">
+                    <b>Instructions:</b> Click <b>"Inspect &amp; Find Neighbors"</b> on any movie to evaluate its item-item similarities across the dataset. 
+                    You can also change or provide new ratings (1&ndash;5 stars) for <b>{{ selected_user.name }}</b> using the dropdown. Rated movies act as anchors for generating recommendations for unrated movies!
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 4-Column Movie Grid Table -->
+    <table border="0" cellpadding="6" cellspacing="6" width="90%" align="center">
+        {% for row in movies|batch(4) %}
+        <tr>
+            {% for m in row %}
+            <td width="25%" valign="top">
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="{% if m.is_selected %}#e6fffa{% elif m.is_rated %}#f0fff4{% else %}#ffffff{% endif %}" style="border: {% if m.is_selected %}2px solid #319795{% elif m.is_rated %}1px solid #38a169{% else %}1px solid #cbd5e0{% endif %}; border-radius: 4px;">
+                    <!-- Movie Card Header with Poster Div Placeholder -->
+                    <tr>
+                        <td align="center" bgcolor="{{ m.color }}" style="padding: 12px 6px;">
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <div style="background-color: rgba(255,255,255,0.2); border: 2px solid #ffffff; border-radius: 8px; width: 64px; height: 64px; line-height: 64px; text-align: center;">
+                                            <font size="5" color="#ffffff">{{ m.emoji }}</font>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top: 4px;">
+                                        <font color="#ffffff" size="2"><b>[{{ m.code }}] {{ m.initials }}</b></font>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Movie Metadata -->
+                    <tr>
+                        <td valign="top" style="font-size: 12px; line-height: 1.4;">
+                            <div style="font-size: 14px; font-weight: bold; color: #003366; margin-bottom: 3px;">
+                                {{ m.title }} <font color="#718096" size="1">({{ m.year }})</font>
+                            </div>
+                            <b>Genres:</b> <font color="#2b6cb0">{{ m.genres }}</font><br>
+                            <b>Director:</b> {{ m.director }}<br>
+                            <b>IMDb Score:</b> <font color="#b7791f"><b>★ {{ m.imdb }}/10</b></font><br>
+                            <hr size="1" color="#e2e8f0">
+                            <!-- User Rating Status -->
+                            <div style="margin-bottom: 6px;">
+                                <b>{{ selected_user.name.split(' ')[0] }}'s Rating:</b>
+                                {% if m.is_rated %}
+                                    <font color="#2f855a"><b>★ {{ m.user_rating }} / 5.0</b></font>
+                                    <span style="background-color: #c6f6d5; color: #22543d; font-size: 10px; padding: 2px 4px; border-radius: 2px;">RATED</span>
+                                {% else %}
+                                    <font color="#a0aec0"><i>(Unrated / Candidate)</i></font>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Action: Inspect Movie Button -->
+                            <form method="POST" action="/" style="margin: 3px 0;">
+                                <input type="hidden" name="action" value="select_movie">
+                                <input type="hidden" name="target_movie_id" value="{{ m.id }}">
+                                <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                                <input type="hidden" name="metric" value="{{ similarity_metric }}">
+                                <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                                <input type="hidden" name="top_n" value="{{ top_n_rec }}">
+                                <button type="submit" style="width: 100%; background-color: {% if m.is_selected %}#319795{% else %}#edf2f7{% endif %}; color: {% if m.is_selected %}#ffffff{% else %}#1a202c{% endif %}; border: 1px solid #cbd5e0; padding: 5px; font-size: 11px; cursor: pointer; font-weight: bold; border-radius: 3px;">
+                                    {% if m.is_selected %}✔ Currently Inspecting{% else %}🔍 Inspect &amp; Find Neighbors{% endif %}
+                                </button>
+                            </form>
+
+                            <!-- Action: Rate / Update Movie Form -->
+                            <form method="POST" action="/" style="margin: 3px 0;">
+                                <input type="hidden" name="action" value="rate_movie">
+                                <input type="hidden" name="target_movie_id" value="{{ m.id }}">
+                                <input type="hidden" name="selected_movie_id" value="{{ selected_movie_id }}">
+                                <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                                <input type="hidden" name="metric" value="{{ similarity_metric }}">
+                                <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                                <input type="hidden" name="top_n" value="{{ top_n_rec }}">
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td width="65%">
+                                            <select name="rating_value" style="width: 100%; font-size: 11px; padding: 3px;">
+                                                <option value="5.0" {% if m.user_rating == 5.0 %}selected{% endif %}>★ 5 (Loved it)</option>
+                                                <option value="4.0" {% if m.user_rating == 4.0 %}selected{% endif %}>★ 4 (Good)</option>
+                                                <option value="3.0" {% if m.user_rating == 3.0 %}selected{% endif %}>★ 3 (Average)</option>
+                                                <option value="2.0" {% if m.user_rating == 2.0 %}selected{% endif %}>★ 2 (Disliked)</option>
+                                                <option value="1.0" {% if m.user_rating == 1.0 %}selected{% endif %}>★ 1 (Terrible)</option>
+                                            </select>
+                                        </td>
+                                        <td width="35%" align="right">
+                                            <button type="submit" style="background-color: #2b6cb0; color: #ffffff; border: none; padding: 4px 6px; font-size: 11px; cursor: pointer; border-radius: 3px;">
+                                                Rate
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+
+                            {% if m.is_rated %}
+                            <!-- Action: Clear / Unrate button -->
+                            <form method="POST" action="/" style="margin: 2px 0 0 0;">
+                                <input type="hidden" name="action" value="unrate_movie">
+                                <input type="hidden" name="target_movie_id" value="{{ m.id }}">
+                                <input type="hidden" name="selected_movie_id" value="{{ selected_movie_id }}">
+                                <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                                <input type="hidden" name="metric" value="{{ similarity_metric }}">
+                                <input type="hidden" name="k_neighbors" value="{{ k_neighbors }}">
+                                <input type="hidden" name="top_n" value="{{ top_n_rec }}">
+                                <button type="submit" style="width: 100%; background: none; border: none; color: #e53e3e; font-size: 10px; cursor: pointer; text-decoration: underline; padding: 0;">
+                                    Clear Rating (Mark Unrated)
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 4: SELECTED MOVIE DEEP-DIVE & NEAREST NEIGHBORS           -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#2d3748">
+            <th colspan="2" align="left">
+                <font color="#ffffff">
+                    SECTION 4: ITEM-ITEM NEAREST NEIGHBOR ANALYSIS FOR SELECTED MOVIE: [{{ selected_movie.code }}] {{ selected_movie.title }}
+                </font>
+            </th>
+        </tr>
+        <tr>
+            <td width="40%" valign="top" bgcolor="#f7fafc">
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="70" align="center" valign="top">
+                            <div style="background-color: {{ selected_movie.color }}; border-radius: 8px; width: 64px; height: 64px; line-height: 64px; text-align: center;">
+                                <font size="5" color="#ffffff">{{ selected_movie.emoji }}</font>
+                            </div>
+                        </td>
+                        <td valign="top">
+                            <h3 style="margin: 0; color: #003366;">[{{ selected_movie.code }}] {{ selected_movie.title }}</h3>
+                            <font color="#718096" size="2"><b>Release Year:</b> {{ selected_movie.year }} &nbsp;|&nbsp; <b>IMDb:</b> ★ {{ selected_movie.imdb }}/10</font><br>
+                            <font color="#2b6cb0" size="2"><b>Genres:</b> {{ selected_movie.genres|join(', ') if selected_movie.genres is iterable and selected_movie.genres is not string else selected_movie.genres }}</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="font-size: 12.5px; padding-top: 8px;">
+                            <b>Director:</b> {{ selected_movie.director }}<br>
+                            <b>Key Cast:</b> {{ selected_movie.cast }}<br>
+                            <b>Plot Summary:</b> <i>"{{ selected_movie.plot }}"</i>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="60%" valign="top">
+                <b>Top Most Similar Movies in Dataset (via {{ 'Adjusted Cosine' if similarity_metric == 'adj_cos' else 'Standard Cosine' }} Similarity):</b>
+                <br><br>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff" style="font-size: 12px; border-color: #cbd5e0;">
+                    <tr bgcolor="#edf2f7">
+                        <th align="center">Rank</th>
+                        <th align="center">Movie Code</th>
+                        <th align="left">Neighbor Movie Title</th>
+                        <th align="left">Genres</th>
+                        <th align="center">Similarity Score s(i, j)</th>
+                        <th align="center">Match Confidence</th>
+                    </tr>
+                    {% for nbr in movie_neighbors %}
+                    <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+                        <td align="center"><b>#{{ loop.index }}</b></td>
+                        <td align="center"><font face="monospace"><b>{{ nbr.code }}</b></font></td>
+                        <td><b>{{ nbr.title }}</b> ({{ nbr.year }})</td>
+                        <td><font color="#4a5568">{{ nbr.genres }}</font></td>
+                        <td align="center">
+                            <font face="Courier New" color="{% if nbr.similarity > 0.7 %}#2f855a{% elif nbr.similarity > 0.4 %}#2b6cb0{% else %}#718096{% endif %}">
+                                <b>{{ nbr.similarity }}</b>
+                            </font>
+                        </td>
+                        <td align="center">
+                            <div style="background-color: #e2e8f0; width: 80px; height: 12px; border-radius: 6px; display: inline-block; overflow: hidden; vertical-align: middle;">
+                                <div style="background-color: {% if nbr.similarity > 0.7 %}#38a169{% elif nbr.similarity > 0.4 %}#3182ce{% else %}#a0aec0{% endif %}; width: {{ [0, [100, (nbr.similarity * 100)|int]|min]|max }}%; height: 100%;"></div>
+                            </div>
+                            &nbsp;<small>{{ nbr.sim_percent }}%</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 5: TOP-N RECOMMENDATIONS FOR ACTIVE USER                  -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="7" align="left">
+                <font color="#ffffff">
+                    SECTION 5: TOP-{{ top_n_rec }} MOVIE RECOMMENDATIONS FOR {{ selected_user.name|upper }} (PREDICTED VIA ITEM-BASED kNN, k={{ k_neighbors }})
+                </font>
+            </th>
+        </tr>
+        <tr bgcolor="#e6f0fa">
+            <th align="center" width="5%">Rank</th>
+            <th align="center" width="8%">Code</th>
+            <th align="left" width="22%">Recommended Movie Title</th>
+            <th align="left" width="15%">Genres</th>
+            <th align="center" width="12%">Predicted Rating R&#770;<sub>u, i</sub></th>
+            <th align="left" width="38%">k-Nearest Rated Neighbors &amp; Step-by-Step Mathematical Formula</th>
+        </tr>
+        {% for rec in recommendations %}
+        <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td align="center">
+                <div style="background-color: #003366; color: #ffffff; border-radius: 50%; width: 26px; height: 26px; line-height: 26px; text-align: center; font-weight: bold; font-size: 12px; margin: auto;">
+                    {{ loop.index }}
+                </div>
+            </td>
+            <td align="center"><font face="monospace"><b>{{ rec.code }}</b></font></td>
+            <td>
+                <b>{{ rec.title }}</b> <font color="#718096">({{ rec.year }})</font><br>
+                <small>Dir: {{ rec.director }} &nbsp;|&nbsp; IMDb: ★ {{ rec.imdb }}</small>
+            </td>
+            <td><font color="#2b6cb0" size="2">{{ rec.genres }}</font></td>
+            <td align="center">
+                <font size="3" color="#008000"><b>★ {{ rec.pred_rating }} / 5.0</b></font><br>
+                <small><font color="#718096">Confidence: {{ (rec.pred_rating / 5.0 * 100)|round(1) }}%</font></small>
+            </td>
+            <td style="font-size: 11px;">
+                {% if rec.has_neighbors %}
+                    <b>Contributing Rated Neighbors (k={{ rec.top_k_neighbors|length }}):</b><br>
+                    {% for n in rec.top_k_neighbors %}
+                        &bull; [{{ n.code }}] <i>{{ n.movie }}</i> &mdash; Sim: <b>{{ n.similarity }}</b> &times; Rated: <b>★{{ n.user_rating }}</b><br>
+                    {% endfor %}
+                    <div style="background-color: #edf2f7; padding: 4px; margin-top: 4px; font-family: monospace; font-size: 10.5px; border-left: 3px solid #003366;">
+                        R&#770; = {{ rec.math_formula }}
+                    </div>
+                {% else %}
+                    <font color="#718096"><i>{{ rec.math_formula }}</i></font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 6: ALGORITHM VISUALIZATION & INTERNALS (MATPLOTLIB)       -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#4a5568">
+            <th colspan="2" align="left"><font color="#ffffff">SECTION 6: ALGORITHM VISUALIZATIONS &amp; REASONING INTERNALS (MATPLOTLIB)</font></th>
+        </tr>
+        <tr>
+            <td width="50%" align="center" valign="top">
+                <b>Figure 1: Pairwise Item-Item Similarity Matrix Heatmap (20 &times; 20)</b><br>
+                <small>Depicts similarity clustering across genres (Sci-Fi, Action, Crime/Drama, Comedy, Horror)</small><br><br>
+                <img src="data:image/png;base64,{{ plots.heatmap }}" width="96%" style="border: 1px solid #cbd5e0; border-radius: 4px;">
+            </td>
+            <td width="50%" align="center" valign="top">
+                <b>Figure 2: Top Nearest Neighbors for Selected Item [{{ selected_movie.code }}]</b><br>
+                <small>Visualizes top correlated items used to calculate prediction weights</small><br><br>
+                <img src="data:image/png;base64,{{ plots.neighbors_bar }}" width="96%" style="border: 1px solid #cbd5e0; border-radius: 4px;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center" valign="top">
+                <b>Figure 3: Predicted Ratings for Top Recommended Movies &amp; Rating Distribution Profiles</b><br>
+                <small>Displays predicted rating scores R&#770; relative to recommendation threshold &amp; user rating frequencies</small><br><br>
+                <img src="data:image/png;base64,{{ plots.predictions_dist }}" width="96%" style="border: 1px solid #cbd5e0; border-radius: 4px;">
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- SECTION 7: ITEM SIMILARITY MATRIX NUMERICAL TABLE                 -->
+    <!-- ================================================================= -->
+    <table border="1" cellpadding="6" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="{{ total_movies + 1 }}" align="left">
+                <font color="#ffffff">
+                    SECTION 7: ITEM-ITEM SIMILARITY MATRIX TABLE S<sub>20 &times; 20</sub> (COMPUTED VIA NUMPY FROM SCRATCH)
+                </font>
+            </th>
+        </tr>
+        <tr bgcolor="#edf2f7" style="font-size: 10px;">
+            <th align="center">Item</th>
+            {% for code in sim_matrix.headers %}
+            <th align="center">{{ code }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in sim_matrix.rows %}
+        <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %} style="font-size: 10px;">
+            <td align="center" bgcolor="#e2e8f0"><b>{{ row.code }}</b></td>
+            {% for val in row.sim_values %}
+            <td align="center" style="font-family: monospace; {% if val == 1.0 %}background-color: #bee3f8; font-weight: bold;{% elif val > 0.7 %}background-color: #c6f6d5; font-weight: bold;{% elif val < -0.3 %}background-color: #fed7d7;{% endif %}">
+                {{ val }}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ================================================================= -->
+    <!-- PAGE FOOTER                                                       -->
+    <!-- ================================================================= -->
+    <table border="0" cellpadding="8" cellspacing="0" width="90%" align="center">
+        <tr>
+            <td align="center">
+                <hr width="100%" size="1" color="#003366">
+                <p style="font-size: 12px; color: #718096; margin: 4px 0;">
+                    <b>Pattern Analysis and Recommender Systems (PARS) Laboratory</b> &nbsp;|&nbsp; 
+                    Academic Session 2026&ndash;2027 &nbsp;|&nbsp; 
+                    Netaji Subhas University of Technology (NSUT), New Delhi
+                </p>
+                <p style="font-size: 11px; color: #a0aec0; margin: 4px 0;">
+                    Practical File Record for <b>Monis</b> (Roll No: <b>2023UIT3027</b>) &nbsp;|&nbsp; Instructor: <b>Dr. Vishal Maheshkar</b>
+                </p>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

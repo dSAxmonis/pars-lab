@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 15 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>15 (Practical XIII)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of User-Based Nearest Neighbor (kNN) Recommender System Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement a User-Based k-Nearest Neighbor (kNN) Recommender System from scratch in Python using Flask. The system calculates vector similarities between users, identifies the k nearest neighbors, provides step-by-step mathematical rating derivations, and provides interactive tuning of neighborhood size k.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>User-Based Nearest Neighbor (kNN) Recommendation is a memory-based technique that predicts an active user's ratings by consulting a committee of the k most similar users. When the active user considers a movie, the system identifies the k nearest neighbors who have already watched that movie, weights their ratings by how closely their tastes match the active user, and computes a consensus prediction.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. User Rating Vector Formulation</h3>
+<p>Each user u is represented by a sparse vector of ratings across all catalog movies. Unrated movies are marked as missing entries rather than zero-valued dislikes:</p>
+<div class="formula-box"><b>User Rating Vector:</b>
+R<sub>u</sub> = [ R<sub>u,1</sub>, R<sub>u,2</sub>, R<sub>u,3</sub>, ..., R<sub>u,M</sub> ]
+
+<b>User Baseline Mean:</b>
+r̄<sub>u</sub> = ( 1 / |I<sub>u</sub>| ) &times; &sum;<sub>i &isin; I<sub>u</sub></sub> R<sub>u,i</sub></div>
+<h3>2. Vector Cosine Similarity</h3>
+<p>Similarity between active user u and candidate neighbor v is evaluated across their common ratings using the cosine of the angle between their rating vectors:</p>
+<div class="formula-box"><b>Vector Cosine Similarity:</b>
+Cosine(u, v) = ( R<sub>u</sub> &middot; R<sub>v</sub> ) / ( ||R<sub>u</sub>|| &times; ||R<sub>v</sub>|| )
+             = &sum;<sub>i</sub> ( R<sub>u,i</sub> &times; R<sub>v,i</sub> ) / [ &radic;(&sum; R<sub>u,i</sub><sup>2</sup>) &times; &radic;(&sum; R<sub>v,i</sub><sup>2</sup>) ]</div>
+<h3>3. Top-k Neighborhood Isolation</h3>
+<p>The system sorts all other users by similarity, retains those with positive affinity who have rated candidate movie j, and selects the top k neighbors:</p>
+<div class="formula-box"><b>k-Nearest Neighbor Set:</b>
+N<sub>k</sub>(u; j) = Top-k users v with highest Similarity(u, v) > 0 who rated movie j</div>
+<h3>4. Step-by-Step Prediction Formula</h3>
+<p>The predicted rating is computed using the active user's personal mean plus the similarity-weighted deviation of the k nearest neighbors:</p>
+<div class="formula-box"><b>kNN Prediction Formula:</b>
+Predicted Rating(u, j) = r̄<sub>u</sub> + [ &sum;<sub>v &isin; N<sub>k</sub></sub> Similarity(u, v) &times; ( R<sub>v,j</sub> - r̄<sub>v</sub> ) ] / [ &sum;<sub>v &isin; N<sub>k</sub></sub> |Similarity(u, v)| ]
+
+<b>Where:</b>
+• <b>k:</b> Number of neighbors consulted (hyperparameter tuning controls bias vs variance).
+• <b>r̄<sub>u</sub>, r̄<sub>v</sub>:</b> Mean ratings of active user u and neighbor v.
+• <b>( R<sub>v,j</sub> - r̄<sub>v</sub> ):</b> Rating deviation indicating how strongly neighbor v liked or disliked movie j.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie rating matrix capturing realistic taste clusters across genres.</li>
+<li>Implemented vectorized Cosine and Pearson similarity computation algorithms in pure NumPy.</li>
+<li>Engineered the k-nearest neighbor filtering logic selecting exactly k peers for any query user and candidate movie.</li>
+<li>Built a step-by-step mathematical derivation logger displaying exact numerical substitution for each predicted rating.</li>
+<li>Deployed an interactive Flask application on port 5015 with neighborhood size k slider, similarity metric toggles, and live recommendation generation.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 15.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 15.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 15.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 15.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 15.2: Recommendations">
+        <div class="screenshot-caption">Figure 15.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 15.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 15.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 15.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 15.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 15.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 15.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The User-Based k-Nearest Neighbor recommender was successfully implemented from first principles. By isolating the k most correlated peers and applying mean-centered aggregation, the model generated accurate and explainable predictions. The interactive parameter k demonstrated the classic trade-off: small k values capture niche tastes with higher variance, while larger k values provide stable, consensus-driven predictions.</p>
+
+</body>
+</html>

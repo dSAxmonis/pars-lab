@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 14: Cold Start Solution in Recommender Systems</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f8;
+            color: #222222;
+        }
+        .poster-card {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            height: 100%;
+            box-sizing: border-box;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .poster-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        }
+        .poster-box {
+            border-radius: 4px;
+            color: white;
+            text-align: center;
+            padding: 14px 6px;
+            font-weight: bold;
+            font-size: 13pt;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 85px;
+        }
+        .badge-genre {
+            display: inline-block;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            font-size: 8pt;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin: 1px;
+        }
+        .badge-cold {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            font-weight: bold;
+        }
+        .badge-warm {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #60a5fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            font-weight: bold;
+        }
+        .badge-transition {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            font-weight: bold;
+        }
+        .btn-action {
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 9pt;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-action:hover {
+            background-color: #002244;
+        }
+        .btn-secondary {
+            background-color: #475569;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 8.5pt;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-star {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #d97706;
+            font-size: 8.5pt;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+        .btn-star:hover {
+            background-color: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .matrix-cell {
+            text-align: center;
+            font-family: monospace;
+            font-size: 9pt;
+            padding: 4px 6px;
+        }
+    </style>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- ======================================================================= -->
+    <!-- HEADER                                                                  -->
+    <!-- ======================================================================= -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 14 (EXPERIMENT XII)</font></h1>
+        <h3><font color="#555555">Implement Recommender System Giving Solution to Cold Start Problem Using Flask</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027 &nbsp;|&nbsp;
+            <b>Port:</b> 5014 &nbsp;|&nbsp;
+            <b>Framework:</b> Flask / Pure NumPy (No Sklearn / No Surprise)
+        </p>
+        <p>
+            <b>Student:</b> Monis &nbsp;|&nbsp;
+            <b>Roll No:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Department:</b> Information Technology, NSUT, New Delhi
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- ======================================================================= -->
+    <!-- ACTIVE SYSTEM STATUS & COLD-START METRICS BANNER                        -->
+    <!-- ======================================================================= -->
+    <table border="2" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff" style="border-color: #003366;">
+        <tr bgcolor="#003366">
+            <th colspan="4">
+                <font color="#ffffff" size="3">
+                    RECOMMENDER ENGINE LIVE STATUS: {{ stats.active_mode | upper }}
+                </font>
+            </th>
+        </tr>
+        <tr bgcolor="#f8fafc">
+            <td width="25%" align="center">
+                <font size="2" color="#64748b"><b>ACTIVE EVALUATION PROFILE:</b></font><br>
+                <font size="3" color="#003366"><b>
+                    {% for u in users %}
+                        {% if u.id == active_user_id %}{{ u.name }}{% endif %}
+                    {% endfor %}
+                </b></font>
+            </td>
+            <td width="25%" align="center">
+                <font size="2" color="#64748b"><b>RATED MOVIES COUNT (k):</b></font><br>
+                <font size="4" color="{% if stats.k_rated == 0 %}#dc2626{% elif stats.k_rated < 4 %}#d97706{% else %}#16a34a{% endif %}">
+                    <b>{{ stats.k_rated }} / 20 Movies</b>
+                </font>
+                <br>
+                <font size="1">
+                    {% if stats.k_rated == 0 %}
+                        <span class="badge-cold">PURE NEW USER (COLD)</span>
+                    {% elif stats.k_rated < 4 %}
+                        <span class="badge-transition">TRANSITIONING (WARMING UP)</span>
+                    {% else %}
+                        <span class="badge-warm">WARM SATURATION (CF ACTIVE)</span>
+                    {% endif %}
+                </font>
+            </td>
+            <td width="25%" align="center">
+                <font size="2" color="#64748b"><b>DYNAMIC BLENDING FACTOR (&alpha;<sub>k</sub>):</b></font><br>
+                <font size="3" color="#2563eb"><b>&alpha;<sub>k</sub> = {{ stats.alpha }}</b></font><br>
+                <font size="1" color="#475569">
+                    <b>Cold Prior Weight:</b> {{ stats.cold_weight_pct }}% &nbsp;|&nbsp;
+                    <b>Warm CF Weight:</b> {{ stats.warm_weight_pct }}%
+                </font>
+            </td>
+            <td width="25%" align="center">
+                <font size="2" color="#64748b"><b>GLOBAL MEAN PRIOR (C):</b></font><br>
+                <font size="3" color="#003366"><b>C = {{ stats.global_mean_C }} ★</b></font><br>
+                <font size="1" color="#64748b">Bayesian Prior Confidence m = 2.0</font>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 1: COLD START CONTROL CONSOLE & OPERATING MODES                 -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2">
+                <font color="#ffffff">SECTION 1: COLD START CONTROL CONSOLE &amp; PROFILE SWITCHER</font>
+            </th>
+        </tr>
+        <tr>
+            <td width="55%" valign="top">
+                <h4 style="margin-top: 0; color: #003366;">1. Select Evaluation Profile / Mode:</h4>
+                <form method="GET" action="/">
+                    <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="30%"><b>Select User Profile:</b></td>
+                            <td>
+                                <select name="user_id" style="padding: 6px; font-size: 10pt; width: 100%; border: 1px solid #94a3b8; border-radius: 4px;" onchange="this.form.submit()">
+                                    {% for u in users %}
+                                    <option value="{{ u.id }}" {% if u.id == active_user_id %}selected{% endif %}>
+                                        {{ u.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Quick Mode Preset:</b></td>
+                            <td>
+                                <a href="/?user_id=8&mode=new_user" class="btn-action" style="background-color: #dc2626; margin-right: 4px;">Mode A: New User (0 Ratings)</a>
+                                <a href="/?user_id=1&mode=existing_user" class="btn-action" style="background-color: #2563eb; margin-right: 4px;">Mode B: Existing User (Monis)</a>
+                                <a href="/?user_id=8&mode=new_user&action=reset_ratings" class="btn-action" style="background-color: #475569;">Reset Ratings</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+
+                <p style="font-size: 9.5pt; color: #475569; margin-bottom: 0;">
+                    <b>Algorithm Behavior Explanation:</b>
+                    <br>&bull; <b>New User (k=0):</b> Collaborative filtering has no ratings to compute user similarity. System activates <i>Bayesian Popularity Weighted Rating</i> ($WR = \frac{v}{v+m}R + \frac{m}{v+m}C$) combined with onboarding genre preferences.
+                    <br>&bull; <b>As you rate 1 to 4 movies:</b> Blending factor $\alpha_k = \min(1.0, k/4)$ smoothly shifts weight from popularity ($1-\alpha_k$) to personalized collaborative recommendations ($\alpha_k$).
+                </p>
+            </td>
+
+            <td width="45%" valign="top" bgcolor="#f8fafc">
+                <h4 style="margin-top: 0; color: #003366;">2. New User Onboarding Genre Survey:</h4>
+                <form method="POST" action="/">
+                    <input type="hidden" name="user_id" value="{{ active_user_id }}">
+                    <input type="hidden" name="mode" value="new_user">
+                    
+                    <font size="2" color="#475569">
+                        Check genres you enjoy to steer the cold-start Bayesian prior before your first rating:
+                    </font>
+                    <div style="margin-top: 8px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+                        {% for g in all_genres %}
+                        <label style="font-size: 8.5pt; background: #ffffff; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" name="selected_genres" value="{{ g }}" {% if g in selected_genres %}checked{% endif %}>
+                            <b>{{ g }}</b>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn-action">Apply Genre Onboarding Preferences</button>
+                    &nbsp;
+                    <span style="font-size: 8.5pt; color: #64748b;">(Active: {{ selected_genres | join(', ') }})</span>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 2: FULL MOVIE CATALOG (INTERACTIVE CLICKABLE MOVIE CARDS)        -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="4">
+                <font color="#ffffff">
+                    SECTION 2: COMPLETE MOVIES CATALOG &amp; INTERACTIVE SELECTION GRID (20 MOVIES)
+                </font>
+            </th>
+        </tr>
+        <tr bgcolor="#f1f5f9">
+            <td colspan="4">
+                <table width="100%" border="0">
+                    <tr>
+                        <td>
+                            <b>Click movies to rate them (1★ to 5★) or inspect their attribute vector.</b>
+                            Watch how the recommender state immediately updates in real-time from cold-start to warm!
+                        </td>
+                        <td align="right">
+                            <span style="font-size: 9pt; color: #475569;">
+                                Total Movies: <b>20</b> &nbsp;|&nbsp;
+                                Clicked/Rated by You: <b>{{ stats.k_rated }}</b>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Movie Cards Rendered in 4-Column Grid -->
+        {% for row in movies | batch(4) %}
+        <tr>
+            {% for m in row %}
+                {% if not m.is_new_arrival %}
+                <td width="25%" valign="top" style="padding: 10px;">
+                    <div class="poster-card">
+                        <!-- Poster Placeholder Box -->
+                        <div class="poster-box" style="background-color: {{ m.poster_color }};">
+                            <span style="font-size: 26pt;">{{ m.emoji }}</span>
+                            <span style="font-size: 11pt; margin-top: 4px;">{{ m.title | upper }}</span>
+                            <span style="font-size: 8.5pt; color: #cbd5e1; font-weight: normal;">({{ m.year }}) &bull; {{ m.director }}</span>
+                        </div>
+
+                        <!-- Title and Meta -->
+                        <div style="margin-bottom: 6px;">
+                            <b style="font-size: 10.5pt; color: #003366;">{{ m.id }}. {{ m.title }}</b>
+                            <span style="float: right; color: #d97706; font-weight: bold; font-size: 9.5pt;">★ {{ m.rating }}</span>
+                        </div>
+
+                        <!-- Genre Badges -->
+                        <div style="margin-bottom: 6px;">
+                            {% for g in m.genres %}
+                            <span class="badge-genre">{{ g }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Description Snippet -->
+                        <p style="font-size: 8pt; color: #475569; margin: 4px 0 8px 0; height: 38px; overflow: hidden; line-height: 1.3;">
+                            {{ m.description }}
+                        </p>
+
+                        <!-- Plot Keywords -->
+                        <div style="font-size: 7.5pt; color: #64748b; margin-bottom: 8px;">
+                            <b>Keywords:</b> {{ m.plot_keywords[:3] | join(', ') }}
+                        </div>
+
+                        <hr size="1" color="#e2e8f0" style="margin: 6px 0;">
+
+                        <!-- User Rating State & Interactive Star Buttons -->
+                        <div style="font-size: 8.5pt; margin-bottom: 6px;">
+                            {% if user_vector[m.id - 1] > 0 %}
+                                <span style="background-color: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 3px; font-weight: bold; border: 1px solid #86efac;">
+                                    ✓ Watched &amp; Rated: {{ user_vector[m.id - 1] | int }}★
+                                </span>
+                            {% else %}
+                                <span style="color: #64748b;">Not Watched / Unrated</span>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 8pt; color: #475569; font-weight: bold;">Rate:</span>
+                                {% for star in range(1, 6) %}
+                                <a href="/?user_id={{ active_user_id }}&rate_movie_id={{ m.id }}&rate_score={{ star }}&detail_id={{ m.id }}" class="btn-star" title="Rate {{ star }} stars">
+                                    {{ star }}★
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 6px; text-align: center;">
+                            <a href="/?user_id={{ active_user_id }}&detail_id={{ m.id }}#section_detail" class="btn-secondary" style="width: 90%; text-align: center;">
+                                🔍 View Similarity &amp; Details
+                            </a>
+                        </div>
+                    </div>
+                </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 3: TOP RECOMMENDATION RESULTS & COLD-START REASONS              -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="7">
+                <font color="#ffffff">
+                    SECTION 3: RECOMMENDED MOVIES FOR ACTIVE PROFILE &amp; EXPLANATION RATIONALE
+                </font>
+            </th>
+        </tr>
+        <tr bgcolor="#f1f5f9">
+            <th width="5%" align="center">Rank</th>
+            <th width="22%" align="left">Movie Details</th>
+            <th width="14%" align="center">Genres &amp; Year</th>
+            <th width="10%" align="center">Blended Score</th>
+            <th width="14%" align="center">Cold vs Warm Score</th>
+            <th width="15%" align="center">Pipeline Stage</th>
+            <th width="20%" align="left">Recommendation Reason / Rationale</th>
+        </tr>
+        {% for r in recs[:8] %}
+        <tr bgcolor="{% if loop.index % 2 == 0 %}#fcfcfc{% else %}#ffffff{% endif %}">
+            <td align="center">
+                <font size="3" color="#003366"><b>#{{ loop.index }}</b></font>
+            </td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="background-color: {{ r.movie.poster_color }}; color: white; border-radius: 4px; padding: 4px 8px; font-size: 14pt;">
+                        {{ r.movie.emoji }}
+                    </div>
+                    <div>
+                        <b><font color="#003366">{{ r.movie.title }}</font></b><br>
+                        <font size="1" color="#64748b">Dir: {{ r.movie.director }} &bull; Cast: {{ r.movie.cast.split(',')[0] }}</font>
+                    </div>
+                </div>
+            </td>
+            <td align="center">
+                {% for g in r.movie.genres %}
+                <span class="badge-genre">{{ g }}</span>
+                {% endfor %}
+                <br>
+                <font size="1" color="#64748b">({{ r.movie.year }})</font>
+            </td>
+            <td align="center">
+                <font size="3" color="#d97706"><b>★ {{ r.score }}</b></font>
+                <br>
+                <font size="1" color="#64748b">Benchmark: {{ r.movie.rating }}★</font>
+            </td>
+            <td align="center">
+                <font size="1">
+                    <span style="color: #dc2626;">Cold: {{ r.cold_component }}★</span><br>
+                    <span style="color: #2563eb;">Warm: {{ r.warm_component }}★</span><br>
+                    <b>&alpha;<sub>k</sub> = {{ r.alpha }}</b>
+                </font>
+            </td>
+            <td align="center">
+                {% if r.alpha == 0.0 %}
+                    <span class="badge-cold">{{ r.rec_mode }}</span>
+                {% elif r.alpha < 1.0 %}
+                    <span class="badge-transition">{{ r.rec_mode }}</span>
+                {% else %}
+                    <span class="badge-warm">{{ r.rec_mode }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <font size="2" color="#334155">{{ r.reason }}</font>
+                {% if r.is_rated %}
+                    <br><span style="font-size: 7.5pt; color: #16a34a; font-weight: bold;">(Already in your watched list: {{ r.user_rating }}★)</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 4: ITEM COLD START BENCHMARK: NEW UNRATED MOVIE ARRIVAL          -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#3b0764">
+            <th colspan="3">
+                <font color="#ffffff">
+                    SECTION 4: ITEM COLD-START RESOLUTION (BRAND NEW UNRATED MOVIE ARRIVAL)
+                </font>
+            </th>
+        </tr>
+        <tr>
+            <td width="35%" valign="top" bgcolor="#faf5ff">
+                <div style="border: 2px dashed #9333ea; border-radius: 6px; padding: 14px; text-align: center; background-color: #ffffff;">
+                    <span style="font-size: 32pt;">{{ new_item_data.movie.emoji }}</span>
+                    <h3 style="margin: 6px 0; color: #581c87;">{{ new_item_data.movie.title }}</h3>
+                    <span class="badge-cold" style="background-color: #fae8ff; color: #86198f; border-color: #d8b4fe;">
+                        ★ BRAND NEW 2026 RELEASE (0 RATINGS)
+                    </span>
+                    <p style="font-size: 8.5pt; color: #4b5563; text-align: justify; margin: 10px 0;">
+                        {{ new_item_data.movie.description }}
+                    </p>
+                    <div style="margin-bottom: 8px;">
+                        {% for g in new_item_data.movie.genres %}
+                        <span class="badge-genre">{{ g }}</span>
+                        {% endfor %}
+                    </div>
+                    <div style="font-size: 8pt; color: #6b7280;">
+                        <b>Director:</b> {{ new_item_data.movie.director }}<br>
+                        <b>Cast:</b> {{ new_item_data.movie.cast }}<br>
+                        <b>Plot Keywords:</b> {{ new_item_data.movie.plot_keywords | join(', ') }}
+                    </div>
+                </div>
+            </td>
+
+            <td width="65%" valign="top">
+                <h4 style="margin-top: 0; color: #581c87;">
+                    How Does the Recommender Predict Ratings for a Movie with ZERO Historical Ratings?
+                </h4>
+                <p style="font-size: 9.5pt; color: #374151; text-align: justify;">
+                    <b>The Item Cold-Start Challenge:</b> Traditional collaborative filtering (user-user or matrix factorization) cannot recommend a brand-new item because its rating row/column is completely empty ($\sum_{u} R_{u, \text{new}} = 0$).
+                    <br><br>
+                    <b>The Attribute-Based Content Solution:</b>
+                    We project the new item into the shared attribute feature space using its metadata (Director: Christopher Nolan, Genres: Sci-Fi/Action/Thriller, Keywords: quantum, simulation, spacetime). We compute its cosine similarity $\text{Sim}(\text{new}, j)$ against all 20 existing catalog items, find its nearest neighbors, and project the user's expected rating:
+                </p>
+
+                <div style="background-color: #f3e8ff; border-left: 4px solid #9333ea; padding: 8px 12px; font-family: monospace; font-size: 9pt; margin-bottom: 12px;">
+                    Predicted Rating r&#770;(u, new) = &sum;<sub>j &isin; Neighbors</sub> [ Sim(new, j) &times; r(u, j) ] / &sum;<sub>j</sub> Sim(new, j)
+                </div>
+
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#f3e8ff">
+                        <th>Nearest Neighbor Movie</th>
+                        <th align="center">Attribute Cosine Similarity</th>
+                        <th align="center">Your Rating r(u, j)</th>
+                        <th align="center">Catalog Bayesian Prior</th>
+                    </tr>
+                    {% for n in new_item_data.neighbors %}
+                    <tr>
+                        <td><b>{{ n.title }}</b></td>
+                        <td align="center"><font color="#7e22ce"><b>{{ n.similarity }}</b></font></td>
+                        <td align="center">
+                            {% if n.user_rating == 'Unrated' %}
+                                <font color="#94a3b8">Unrated</font>
+                            {% else %}
+                                <font color="#16a34a"><b>{{ n.user_rating }}★</b></font>
+                            {% endif %}
+                        </td>
+                        <td align="center">{{ n.wr_popularity }}★</td>
+                    </tr>
+                    {% endfor %}
+                    <tr bgcolor="#faf5ff">
+                        <td colspan="4">
+                            <b>Projected Rating for Active Profile:</b>
+                            <font size="3" color="#7e22ce"><b>★ {{ new_item_data.predicted_score }} / 5.0</b></font>
+                            <br>
+                            <font size="2" color="#6b7280"><i>{{ new_item_data.reason }}</i></font>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 5: MATPLOTLIB ALGORITHM VISUALIZATION PLOTS                      -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th>
+                <font color="#ffffff">SECTION 5: ALGORITHM INTERNALS VISUALIZATION (NUMPY &amp; MATPLOTLIB)</font>
+            </th>
+        </tr>
+        <tr>
+            <td align="center">
+                <img src="data:image/png;base64,{{ plot_url }}" alt="Cold Start Algorithm Visualizations" style="max-width: 98%; border: 1px solid #cbd5e1; border-radius: 4px;">
+            </td>
+        </tr>
+        <tr bgcolor="#f8fafc">
+            <td>
+                <table width="100%" border="0" cellpadding="4">
+                    <tr>
+                        <td width="33%" valign="top">
+                            <b>Panel 1: Transition Dynamics</b><br>
+                            <font size="2" color="#475569">
+                                Illustrates the linear transition curve $\alpha_k = \min(1.0, k/4)$. The red curve is popularity weight ($1-\alpha_k$), blue is personalized CF weight ($\alpha_k$). Current user operating point is marked in real time.
+                            </font>
+                        </td>
+                        <td width="33%" valign="top">
+                            <b>Panel 2: Score Breakdown</b><br>
+                            <font size="2" color="#475569">
+                                Stacked bar chart detailing how the final rating score of top recommendations decomposes into Cold Prior contribution versus Warm Personalized contribution.
+                            </font>
+                        </td>
+                        <td width="33%" valign="top">
+                            <b>Panel 3: Attribute Matrix Heatmap</b><br>
+                            <font size="2" color="#475569">
+                                10x10 cosine similarity matrix of key catalog movies alongside the brand-new unrated item (Movie 21), highlighting how attribute overlap bridges the cold-start gap.
+                            </font>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 6: MOVIE DEEP DIVE & ATTRIBUTE SIMILARITY EXPLORER              -->
+    <!-- ======================================================================= -->
+    <a name="section_detail"></a>
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2">
+                <font color="#ffffff">
+                    SECTION 6: SELECTED MOVIE DEEP DIVE &amp; CONTENT COSINE SIMILARITY EXPLORER
+                </font>
+            </th>
+        </tr>
+        <tr>
+            <td width="40%" valign="top">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="background-color: {{ selected_movie.poster_color }}; color: white; border-radius: 6px; padding: 20px; font-size: 36pt; text-align: center; min-width: 70px;">
+                        {{ selected_movie.emoji }}
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; color: #003366;">{{ selected_movie.title }} ({{ selected_movie.year }})</h3>
+                        <p style="margin: 4px 0; font-size: 9pt; color: #475569;">
+                            <b>Director:</b> {{ selected_movie.director }}<br>
+                            <b>Cast:</b> {{ selected_movie.cast }}<br>
+                            <b>IMDB Consensus:</b> ★ {{ selected_movie.rating }} / 5.0
+                        </p>
+                        <div>
+                            {% for g in selected_movie.genres %}
+                            <span class="badge-genre">{{ g }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 9pt; color: #334155; margin-top: 10px; line-height: 1.4;">
+                    <b>Synopsis:</b> {{ selected_movie.description }}
+                </p>
+                <p style="font-size: 8.5pt; color: #64748b;">
+                    <b>Vectorized Keywords:</b> {{ selected_movie.plot_keywords | join(', ') }}
+                </p>
+            </td>
+
+            <td width="60%" valign="top">
+                <h4 style="margin-top: 0; color: #003366;">
+                    Top Attribute-Similar Movies in the Catalog (Cosine Distance &le; 1 - Sim):
+                </h4>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%">
+                    <tr bgcolor="#f1f5f9">
+                        <th>Movie Title</th>
+                        <th align="center">Year</th>
+                        <th align="center">Genres</th>
+                        <th align="center">Cosine Similarity</th>
+                        <th align="center">Action</th>
+                    </tr>
+                    {% for sim in similar_to_selected %}
+                    <tr>
+                        <td>
+                            <b>{{ sim.movie.emoji }} {{ sim.movie.title }}</b>
+                        </td>
+                        <td align="center">{{ sim.movie.year }}</td>
+                        <td align="center">
+                            {% for g in sim.movie.genres %}
+                            <span class="badge-genre">{{ g }}</span>
+                            {% endfor %}
+                        </td>
+                        <td align="center">
+                            <font color="#0284c7"><b>{{ sim.similarity }}</b></font>
+                        </td>
+                        <td align="center">
+                            <a href="/?user_id={{ active_user_id }}&detail_id={{ sim.movie.id }}#section_detail" class="btn-secondary" style="font-size: 7.5pt; padding: 2px 6px;">
+                                Inspect
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- SECTION 7: USER-RATINGS MATRIX & MATHEMATICAL THEORY                    -->
+    <!-- ======================================================================= -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="22">
+                <font color="#ffffff">SECTION 7: COMPLETE USER-RATINGS MATRIX (8 USERS &times; 20 MOVIES)</font>
+            </th>
+        </tr>
+        <tr bgcolor="#f1f5f9">
+            <th width="12%" align="left">User Name</th>
+            {% for i in range(1, 21) %}
+            <th width="4.4%" align="center">M{{ i }}</th>
+            {% endfor %}
+        </tr>
+        {% for u in users %}
+        <tr bgcolor="{% if u.id == active_user_id %}#fef9c3{% elif loop.index % 2 == 0 %}#fcfcfc{% else %}#ffffff{% endif %}">
+            <td>
+                <b><font size="2" color="{% if u.id == active_user_id %}#854d0e{% else %}#003366{% endif %}">
+                    {{ u.name.split('(')[0] }}
+                </font></b>
+                {% if u.id == active_user_id %}
+                    <br><span style="font-size: 7.5pt; color: #a16207; font-weight: bold;">[ACTIVE]</span>
+                {% endif %}
+            </td>
+            {% set row_ratings = ratings_mat[u.id - 1] %}
+            {% for r in row_ratings %}
+            <td class="matrix-cell" bgcolor="{% if r > 0 %}#dbeafe{% else %}#ffffff{% endif %}">
+                {% if r > 0 %}
+                    <font color="#1e40af"><b>{{ r | int }}</b></font>
+                {% else %}
+                    <font color="#cbd5e1">-</font>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ======================================================================= -->
+    <!-- FOOTER                                                                  -->
+    <!-- ======================================================================= -->
+    <center>
+        <hr width="92%" size="1" color="#cbd5e1">
+        <p style="font-size: 9pt; color: #64748b;">
+            <b>PARS Lab Experiment 14: Cold Start Solution Recommender Engine</b> &nbsp;|&nbsp;
+            Department of Information Technology, Netaji Subhas University of Technology (NSUT)<br>
+            Student: <b>Monis (2023UIT3027)</b> &nbsp;|&nbsp;
+            Instructor: <b>Dr. Vishal Maheshkar</b> &nbsp;|&nbsp;
+            Session: <b>2026&ndash;2027</b> &nbsp;|&nbsp;
+            GitHub Repository: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #0b63ce; font-weight: bold;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </center>
+
+</body>
+</html>

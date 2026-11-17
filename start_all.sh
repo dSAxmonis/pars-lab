@@ -5,6 +5,6 @@
 
 cd "$(dirname "$0")"
 echo "================================================================="
-echo "🎓 LAUNCHING PARS LAB MASTER PORTAL & ALL 11 EXPERIMENT SERVERS..."
+echo "🎓 LAUNCHING PARS LAB MASTER PORTAL & ALL 21 EXPERIMENT SERVERS..."
 echo "================================================================="
 python3 master_portal.py

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 18: Item-Based k-Nearest Neighbor Recommender System (Binary Seen/Not Seen)</title>
+    <style>
+        .movie-card {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .movie-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: #003366;
+        }
+        .movie-card-watched {
+            border: 2px solid #16a34a !important;
+            background-color: #f0fdf4 !important;
+        }
+        .genre-pill {
+            display: inline-block;
+            background-color: #e2e8f0;
+            color: #334155;
+            font-size: 9pt;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 3px;
+            margin-bottom: 3px;
+        }
+        .badge-watched {
+            background-color: #16a34a;
+            color: #ffffff;
+            font-size: 8pt;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            float: right;
+        }
+        .poster-box {
+            width: 100%;
+            height: 70px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+        }
+        .btn-action {
+            background-color: #003366;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 11pt;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-action:hover {
+            background-color: #002244;
+        }
+        .btn-secondary {
+            background-color: #475569;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 9pt;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .btn-secondary:hover {
+            background-color: #334155;
+        }
+        .btn-inspect {
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            padding: 4px 8px;
+            font-size: 9pt;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-inspect:hover {
+            background-color: #0369a1;
+        }
+        .rec-rank-badge {
+            background-color: #b71c1c;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11pt;
+        }
+    </style>
+    <script>
+        function selectGenre(genreName) {
+            var checkboxes = document.querySelectorAll('input[name="watched_movies"]');
+            checkboxes.forEach(function(cb) {
+                var genres = cb.getAttribute('data-genres');
+                if (genres && genres.indexOf(genreName) !== -1) {
+                    cb.checked = true;
+                }
+            });
+            document.getElementById('presetSelect').value = 'custom';
+            updateCardVisuals();
+        }
+        function clearAllSelections() {
+            var checkboxes = document.querySelectorAll('input[name="watched_movies"]');
+            checkboxes.forEach(function(cb) {
+                cb.checked = false;
+            });
+            document.getElementById('presetSelect').value = 'custom';
+            updateCardVisuals();
+        }
+        function selectAllMovies() {
+            var checkboxes = document.querySelectorAll('input[name="watched_movies"]');
+            checkboxes.forEach(function(cb) {
+                cb.checked = true;
+            });
+            document.getElementById('presetSelect').value = 'custom';
+            updateCardVisuals();
+        }
+        function updateCardVisuals() {
+            var checkboxes = document.querySelectorAll('input[name="watched_movies"]');
+            checkboxes.forEach(function(cb) {
+                var card = document.getElementById('card_' + cb.value);
+                if (card) {
+                    if (cb.checked) {
+                        card.classList.add('movie-card-watched');
+                        var badge = document.getElementById('badge_' + cb.value);
+                        if (badge) badge.style.display = 'inline-block';
+                    } else {
+                        card.classList.remove('movie-card-watched');
+                        var badge = document.getElementById('badge_' + cb.value);
+                        if (badge) badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+        function inspectMovie(movieId) {
+            document.getElementById('detailMovieIdInput').value = movieId;
+            document.getElementById('recForm').submit();
+        }
+    </script>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- ====================================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 18 (XVI)</font></h1>
+        <h3><font color="#555555">Item-Based k-Nearest Neighbor Recommender System (Binary Seen / Not-Seen) Using Flask</font></h3>
+        <p>
+            <b>Course:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Badge:</b> Item-Based kNN Binary &nbsp;|&nbsp;
+            <b>Port:</b> 5018 &nbsp;|&nbsp;
+            <b>Framework:</b> Flask / Pure NumPy (From Scratch)
+        </p>
+        <p>
+            <b>Student Name:</b> Monis &nbsp;|&nbsp;
+            <b>Roll No:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027 &nbsp;|&nbsp;
+            <b>Institution:</b> Netaji Subhas University of Technology (NSUT), New Delhi
+        </p>
+        <hr width="90%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- ====================================================================== -->
+    <!-- METADATA & AIM SUMMARY -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">EXPERIMENT AIM &amp; MATHEMATICAL OBJECTIVES</font></th>
+        </tr>
+        <tr>
+            <td width="20%" bgcolor="#f8fafc"><b>Aim / Objective:</b></td>
+            <td>
+                To implement an <b>Item-Based k-Nearest Neighbor (kNN) Recommender System</b> from scratch in Python using pure NumPy (without any black-box libraries like <code>scikit-learn</code> or <code>Surprise</code>) for implicit/binary feedback (Seen = 1, Not-Seen = 0) within a Flask web application.
+                The experiment derives pairwise <b>Jaccard similarity coefficients</b> between item columns, establishes neighborhood matrices, predicts recommendation relevance for unobserved items, provides transparent recommendation reasons, and visualizes matrix sparsity and convergence diagnostics.
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc"><b>Domain Application:</b></td>
+            <td>
+                <b>Movies Recommender System</b> &mdash; 20 Curated Landmark Films across 7 Genres (Action, Comedy, Drama, Sci-Fi, Horror, Romance, Thriller) evaluated by an 8-user cinephile community.
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc"><b>Mathematical Formulation:</b></td>
+            <td>
+                <b>Jaccard Item-Item Similarity:</b> 
+                <code>J(i, j) = |U_i &cap; U_j| / |U_i &cup; U_j| = (b_i &middot; b_j) / (&sum;b_i + &sum;b_j - b_i &middot; b_j)</code><br>
+                <b>Item-Based kNN Ranking Score:</b> 
+                <code>Score(c) = (1 / |k-NN(c; S)|) &times; &sum;_{s &isin; k-NN(c; S)} J(c, s)</code>, where <code>S</code> is the user's seen set and <code>c &notin; S</code>.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 1: ACTIVE USER & INFERENCE CONTROLS -->
+    <!-- ====================================================================== -->
+    <form method="POST" action="/" id="recForm">
+        <input type="hidden" name="action" id="formAction" value="recommend">
+        <input type="hidden" name="detail_movie_id" id="detailMovieIdInput" value="">
+
+        <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+            <tr bgcolor="#003366">
+                <th colspan="2"><font color="#ffffff">SECTION 1: ACTIVE USER PROFILE &amp; RECOMMENDATION CONTROLS</font></th>
+            </tr>
+            <tr>
+                <td width="55%" valign="top">
+                    <b>1. Select Community User Profile Preset:</b><br>
+                    <font size="2" color="#555555">Switch between 8 pre-configured users with distinct cinematic taste profiles, or check custom items below:</font><br><br>
+                    
+                    <select name="user_preset" id="presetSelect" style="padding: 6px; font-size: 10.5pt; width: 75%;" onchange="document.getElementById('formAction').value='load_preset'; this.form.submit();">
+                        {% for u in users %}
+                        <option value="{{ u.id }}" {% if selected_user_id == u.id %}selected{% endif %}>
+                            User {{ u.id }}: {{ u.name }}
+                        </option>
+                        {% endfor %}
+                        <option value="custom" {% if selected_user_id == -1 %}selected{% endif %}>
+                            [Custom User Profile &mdash; Manually Checked Items]
+                        </option>
+                    </select>
+                    <button type="submit" onclick="document.getElementById('formAction').value='load_preset';" style="padding: 6px 12px; font-size: 10pt; font-weight: bold; background-color: #334155; color: white; border: none; border-radius: 3px; cursor: pointer;">Load Preset</button>
+                    
+                    <br><br>
+                    <hr color="#eeeeee">
+
+                    <b>2. Algorithm Hyperparameters:</b><br>
+                    <table border="0" cellpadding="4" cellspacing="0" style="margin-top: 6px;">
+                        <tr>
+                            <td><b>Number of Nearest Neighbors (k):</b></td>
+                            <td>
+                                <select name="k_neighbors" style="padding: 4px 8px; font-size: 10pt;">
+                                    {% for k_opt in [1, 2, 3, 4, 5] %}
+                                    <option value="{{ k_opt }}" {% if stats.k_val == k_opt %}selected{% endif %}>k = {{ k_opt }} Neighbors</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><font size="2" color="#666666">(Number of most-similar watched items averaged)</font></td>
+                        </tr>
+                        <tr>
+                            <td><b>Maximum Recommendations (N):</b></td>
+                            <td>
+                                <select name="top_n" style="padding: 4px 8px; font-size: 10pt;">
+                                    {% for n_opt in [3, 5, 8, 10] %}
+                                    <option value="{{ n_opt }}" {% if stats.top_n_val == n_opt %}selected{% endif %}>Top {{ n_opt }} Movies</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><font size="2" color="#666666">(Top candidates displayed in ranking)</font></td>
+                        </tr>
+                    </table>
+
+                    <br>
+                    <button type="submit" class="btn-action" onclick="document.getElementById('formAction').value='recommend';">
+                        ⚡ Compute Item-Based kNN Recommendations
+                    </button>
+
+                    <br><br>
+                    <b>Quick Batch Selection Filters:</b><br>
+                    <button type="button" class="btn-secondary" onclick="selectGenre('Sci-Fi');">Select All Sci-Fi</button>
+                    <button type="button" class="btn-secondary" onclick="selectGenre('Action');">Select All Action</button>
+                    <button type="button" class="btn-secondary" onclick="selectGenre('Horror');">Select All Horror</button>
+                    <button type="button" class="btn-secondary" onclick="selectGenre('Comedy');">Select All Comedy</button>
+                    <button type="button" class="btn-secondary" onclick="selectGenre('Drama');">Select All Drama</button>
+                    <button type="button" class="btn-secondary" onclick="selectAllMovies();">Select All (20)</button>
+                    <button type="button" class="btn-secondary" style="background-color: #b91c1c;" onclick="clearAllSelections();">Clear All</button>
+                </td>
+
+                <td width="45%" valign="top" bgcolor="#f8fafc">
+                    <center><b><font color="#003366" size="3">Active User State &amp; Sparsity Metrics</font></b></center>
+                    <br>
+                    <div style="background-color: #e0f2fe; border: 1px solid #7dd3fc; padding: 10px; border-radius: 4px; margin-bottom: 12px;">
+                        <b>Active User:</b> <font color="#0369a1">{{ stats.active_user_name }}</font><br>
+                        <b>Watched Count:</b> <b>{{ stats.total_watched }}</b> / {{ stats.total_movies }} Movies ({{ "%.1f"|format(stats.total_watched / stats.total_movies * 100) }}%)<br>
+                        <b>Unseen Candidate Count:</b> <b>{{ stats.total_unseen }}</b> Movies<br>
+                        <b>Community Matrix Sparsity:</b> <b>{{ stats.sparsity }}%</b> (Density: {{ stats.matrix_density }}%)
+                    </div>
+
+                    <b>Currently Watched Movies (Seen Items S):</b>
+                    <div style="max-height: 140px; overflow-y: auto; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; margin-top: 6px;">
+                        {% if active_watched_ids %}
+                            {% for mid in active_watched_ids %}
+                                <span style="display: inline-block; background-color: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 2px 6px; border-radius: 4px; font-size: 9pt; margin: 2px;">
+                                    {{ movies[mid].emoji }} <b>{{ movies[mid].title }}</b> ({{ movies[mid].year }})
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <font color="#ef4444" size="2"><i>No movies watched yet. Please check some movies below or load a preset user!</i></font>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <br><br>
+
+        <!-- ====================================================================== -->
+        <!-- MOVIE DETAILS SPOTLIGHT (IF A MOVIE WAS INSPECTED) -->
+        <!-- ====================================================================== -->
+        {% if selected_movie_detail %}
+        <div id="movie_detail_box">
+            <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff" style="border-left: 6px solid #0284c7;">
+                <tr bgcolor="#0284c7">
+                    <th colspan="2"><font color="#ffffff">MOVIE SPOTLIGHT &amp; ATTRIBUTE INSPECTOR: {{ selected_movie_detail.title }} ({{ selected_movie_detail.year }})</font></th>
+                </tr>
+                <tr>
+                    <td width="25%" align="center" bgcolor="#f0f9ff" valign="top">
+                        <div style="width: 140px; height: 140px; background-color: {{ selected_movie_detail.bg_color }}; color: white; display: flex; align-items: center; justify-content: center; font-size: 54px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                            {{ selected_movie_detail.emoji }}
+                        </div>
+                        <br>
+                        <font size="3"><b>{{ selected_movie_detail.title }}</b></font><br>
+                        <font color="#d97706" size="2">⭐ IMDb: <b>{{ selected_movie_detail.rating }}/10</b></font><br>
+                        <font color="#64748b" size="2">Runtime: {{ selected_movie_detail.runtime }}</font><br>
+                        <br>
+                        {% if selected_movie_detail.id in active_watched_ids %}
+                            <span style="background-color: #16a34a; color: white; padding: 4px 8px; border-radius: 4px; font-size: 9pt; font-weight: bold;">✓ In Your Watched List</span>
+                        {% else %}
+                            <span style="background-color: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 9pt;">Unseen Candidate</span>
+                        {% endif %}
+                    </td>
+                    <td width="75%" valign="top">
+                        <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                            <tr>
+                                <td width="18%"><b>Director:</b></td>
+                                <td>{{ selected_movie_detail.director }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Main Cast:</b></td>
+                                <td>{{ selected_movie_detail.cast }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Genres:</b></td>
+                                <td>
+                                    {% for g in selected_movie_detail.genres %}
+                                    <span class="genre-pill" style="background-color: #0284c7; color: white;">{{ g }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top"><b>Plot Synopsis:</b></td>
+                                <td><i>"{{ selected_movie_detail.description }}"</i></td>
+                            </tr>
+                            <tr>
+                                <td><b>Keywords:</b></td>
+                                <td>
+                                    {% for kw in selected_movie_detail.plot_keywords %}
+                                    <span style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 2px 6px; border-radius: 3px; font-size: 8.5pt; margin-right: 4px;">#{{ kw }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+                        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 4px;">
+                            <b>Item-Based kNN Context:</b> When calculating Jaccard similarity, this movie's viewing vector <code>b_{{ selected_movie_detail.id }}</code> across the 8 community users is compared with candidate items. High co-occurrence with items of shared theme yields high Jaccard index.
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <br><br>
+        </div>
+        {% endif %}
+
+        <!-- ====================================================================== -->
+        <!-- SECTION 2: FULL MOVIE CATALOG (20 CARDS GRID) -->
+        <!-- ====================================================================== -->
+        <table border="1" cellpadding="10" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+            <tr bgcolor="#004d40">
+                <th>
+                    <font color="#ffffff">SECTION 2: COMPLETE INTERACTIVE MOVIE CATALOG (20 LANDMARK MOVIES &mdash; SELECT TO WATCH / INSPECT)</font>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <p style="margin-top: 0; font-size: 10pt; color: #555;">
+                        Click on the <b>"Mark as Watched"</b> checkbox for any movie to include or remove it from the active user's watched history. Click <b>"Inspect Details"</b> to review complete metadata, crew, and narrative themes.
+                    </p>
+
+                    <!-- Responsive CSS Grid inside Table -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;">
+                        {% for m in movies %}
+                        <div class="movie-card {% if m.id in active_watched_ids %}movie-card-watched{% endif %}" id="card_{{ m.id }}">
+                            
+                            <!-- Poster Placeholder Box -->
+                            <div class="poster-box" style="background-color: {{ m.bg_color }};">
+                                {{ m.emoji }} 
+                                <span style="font-size: 14px; font-weight: bold; margin-left: 8px; letter-spacing: 1px;">{{ m.initials }}</span>
+                            </div>
+
+                            <!-- Watched badge -->
+                            <span class="badge-watched" id="badge_{{ m.id }}" style="display: {% if m.id in active_watched_ids %}inline-block{% else %}none{% endif %};">
+                                ✓ SEEN
+                            </span>
+
+                            <!-- Title & Year -->
+                            <div style="font-size: 11pt; font-weight: bold; color: #003366; margin-bottom: 2px;">
+                                {{ m.title }}
+                            </div>
+                            <div style="font-size: 9pt; color: #64748b; margin-bottom: 6px;">
+                                {{ m.year }} &bull; {{ m.runtime }} &bull; <font color="#d97706">⭐ {{ m.rating }}</font>
+                            </div>
+
+                            <!-- Genre Pills -->
+                            <div style="margin-bottom: 6px;">
+                                {% for g in m.genres %}
+                                <span class="genre-pill">{{ g }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Director & Cast summary -->
+                            <div style="font-size: 8.5pt; color: #475569; margin-bottom: 8px; line-height: 1.3;">
+                                <b>Dir:</b> {{ m.director }}<br>
+                                <b>Cast:</b> {{ m.cast[:35] }}...
+                            </div>
+
+                            <!-- Plot snippet -->
+                            <div style="font-size: 8pt; color: #666666; font-style: italic; margin-bottom: 10px; min-height: 32px;">
+                                "{{ m.description[:75] }}..."
+                            </div>
+
+                            <hr color="#e2e8f0" size="1">
+
+                            <!-- Interactive Checkbox & Details button -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                <label style="font-size: 9.5pt; font-weight: bold; cursor: pointer; color: #1e293b;">
+                                    <input type="checkbox" name="watched_movies" value="{{ m.id }}" id="cb_{{ m.id }}"
+                                           data-genres="{{ m.genres|join(',') }}"
+                                           onchange="document.getElementById('presetSelect').value='custom'; updateCardVisuals();"
+                                           {% if m.id in active_watched_ids %}checked{% endif %}>
+                                    Watched
+                                </label>
+
+                                <button type="button" class="btn-inspect" onclick="inspectMovie({{ m.id }});">
+                                    Details &raquo;
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <br>
+                    <center>
+                        <button type="submit" class="btn-action" onclick="document.getElementById('formAction').value='recommend';">
+                            ⚡ Apply Selections &amp; Compute Recommendations
+                        </button>
+                    </center>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 3: RECOMMENDATION RESULTS TABLE -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#b71c1c">
+            <th colspan="7"><font color="#ffffff">SECTION 3: ITEM-BASED kNN RECOMMENDATIONS (RANKED BY JACCARD SIMILARITY)</font></th>
+        </tr>
+        {% if recommendations %}
+        <tr bgcolor="#fee2e2" align="center" style="font-weight: bold; font-size: 9.5pt;">
+            <th width="6%">Rank</th>
+            <th width="24%" align="left">Recommended Movie</th>
+            <th width="15%">Genres</th>
+            <th width="10%">IMDb Rating</th>
+            <th width="12%">kNN Score (&bar;J<sub>k</sub>)</th>
+            <th width="18%" align="left">Primary Recommendation Reason</th>
+            <th width="15%" align="left">Top-k Contributing Neighbors</th>
+        </tr>
+        {% for rec in recommendations %}
+        <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+            <td>
+                <span class="rec-rank-badge">#{{ loop.index }}</span>
+            </td>
+            <td align="left">
+                <table border="0" cellpadding="2" cellspacing="0">
+                    <tr>
+                        <td width="36" align="center">
+                            <div style="width: 32px; height: 32px; background-color: {{ rec.movie.bg_color }}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 4px;">
+                                {{ rec.movie.emoji }}
+                            </div>
+                        </td>
+                        <td>
+                            <b><font color="#003366" size="3">{{ rec.movie.title }}</font></b>
+                            <font size="2" color="#64748b">({{ rec.movie.year }})</font><br>
+                            <font size="1" color="#555555">Dir: {{ rec.movie.director }}</font>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                {% for g in rec.movie.genres %}
+                <span class="genre-pill" style="font-size: 8pt;">{{ g }}</span>
+                {% endfor %}
+            </td>
+            <td>
+                <font color="#d97706" size="2"><b>⭐ {{ rec.movie.rating }}/10</b></font><br>
+                <font size="1" color="#64748b">{{ rec.movie.runtime }}</font>
+            </td>
+            <td>
+                <font color="#b71c1c" size="3"><b>{{ rec.score }}</b></font><br>
+                <font size="1" color="#555555">&sum;J = {{ rec.sum_score }}</font>
+            </td>
+            <td align="left" style="font-size: 9.5pt;">
+                <font color="#047857"><b>{{ rec.primary_reason }}</b></font>
+            </td>
+            <td align="left" style="font-size: 8.5pt;">
+                {% if rec.k_neighbors %}
+                    {% for nb in rec.k_neighbors %}
+                    <div>&bull; {{ nb.emoji }} <b>{{ nb.title }}</b> (J = {{ nb.sim }})</div>
+                    {% endfor %}
+                {% else %}
+                    <font color="#64748b">Popularity baseline</font>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="7" align="center" style="padding: 25px;">
+                <font size="3" color="#64748b">
+                    <b>No recommendations to display!</b> Either all 20 catalog movies are marked as seen, or no movies were selected.
+                </font>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 4: ALGORITHM VISUALIZATION DASHBOARD -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e3a5f">
+            <th><font color="#ffffff">SECTION 4: ALGORITHM INTERNALS &amp; VISUALIZATION DASHBOARD (BASE64 PNG)</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <img src="data:image/png;base64,{{ plot_b64 }}" width="98%" alt="Recommender System Visualizations" border="1" style="border-color: #cbd5e1;">
+                <br><br>
+                <table border="0" cellpadding="6" cellspacing="0" width="96%" align="center" bgcolor="#f8fafc" style="border: 1px solid #e2e8f0; font-size: 9.5pt; text-align: left;">
+                    <tr>
+                        <td>
+                            <b>Comprehensive Visual Diagnostics &amp; Inspection:</b>
+                            <ul>
+                                <li><b>Panel 1 (Top Left &mdash; Jaccard Similarity Heatmap):</b> Illustrates pairwise Jaccard coefficients <code>J(i, j) &isin; [0, 1]</code> across all 20 items. Dark cyan/blue squares indicate genre-based co-occurrence clusters (e.g., Nolan Sci-Fi films <i>Inception, Interstellar, The Matrix</i> have high similarity; Horror films <i>The Conjuring, A Quiet Place, Alien, Get Out</i> form a distinct correlation cluster).</li>
+                                <li><b>Panel 2 (Top Right &mdash; Binary User-Item Matrix B):</b> Depicts binary feedback for the 8 community users (Alice through Hannah) alongside the active user row highlighted in red. Dark blue denotes <code>1</code> (Seen), white/light gray denotes <code>0</code> (Unseen).</li>
+                                <li><b>Panel 3 (Bottom Left &mdash; Recommendation Ranking Bar Chart):</b> Depicts the candidate unseen movies ranked strictly by their mean Jaccard score across the <code>k</code> nearest watched neighbors, displaying precise numerical scores.</li>
+                                <li><b>Panel 4 (Bottom Right &mdash; Catalog Watch Frequency):</b> Portrays total community popularity for each movie. Items marked as watched by the active user are highlighted in orange, while unseen candidate items are colored in royal blue.</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- SECTION 5: MATHEMATICAL MATRICES (SCRATCH COMPUTATIONS) -->
+    <!-- ====================================================================== -->
+    <table border="1" cellpadding="6" cellspacing="0" width="90%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#374151">
+            <th colspan="2"><font color="#ffffff">SECTION 5: SCRATCH NUMERICAL MATRICES (BINARY MATRIX B &amp; JACCARD COEFFICIENTS)</font></th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <b>Part A: Community Binary Interaction Matrix B &isin; {0, 1}<sup>8 &times; 20</sup>:</b><br>
+                <font size="2" color="#555555">Rows represent community users; columns represent the 20 catalog movies. 1 = Seen, 0 = Unseen.</font>
+                <br><br>
+                <div style="overflow-x: auto;">
+                    <table border="1" cellpadding="3" cellspacing="0" style="font-size: 8pt; border-collapse: collapse; width: 100%; text-align: center;">
+                        <tr bgcolor="#f1f5f9">
+                            <th align="left" style="padding: 4px;">User Profile</th>
+                            {% for m in movies %}
+                            <th title="{{ m.title }}">{{ m.initials }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in binary_table_rows %}
+                        <tr {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+                            <td align="left" style="padding: 4px; font-weight: bold;">{{ row.user_name }}</td>
+                            {% for val in row.ratings %}
+                            <td bgcolor="{% if val == 1 %}#bfdbfe{% else %}#ffffff{% endif %}">
+                                <font color="{% if val == 1 %}#1e3a8a{% else %}#94a3b8{% endif %}"><b>{{ val }}</b></font>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <!-- Active User Row -->
+                        <tr bgcolor="#fef08a" style="border-top: 2px solid #ca8a04;">
+                            <td align="left" style="padding: 4px; font-weight: bold; color: #854d0e;">&rarr; {{ stats.active_user_name }} (Active)</td>
+                            {% for val in active_row %}
+                            <td bgcolor="{% if val == 1 %}#bbf7d0{% else %}#fef9c3{% endif %}">
+                                <font color="{% if val == 1 %}#166534{% else %}#a16207{% endif %}"><b>{{ val }}</b></font>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <br>
+                <b>Part B: Representative Pairwise Jaccard Similarities (From Scratch Formulation):</b><br>
+                <font size="2" color="#555555">Demonstrating formula <code>J(i, j) = |U_i &cap; U_j| / |U_i &cup; U_j|</code> for diverse intra-genre and cross-genre pairs:</font>
+                <br><br>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" style="font-size: 9pt; border-collapse: collapse;">
+                    <tr bgcolor="#f1f5f9" align="center">
+                        <th width="32%" align="left">Evaluated Item Pair (i, j)</th>
+                        <th width="28%" align="left">Thematic Context</th>
+                        <th width="12%">Co-Viewers |U_i &cap; U_j|</th>
+                        <th width="12%">Total Viewers |U_i &cup; U_j|</th>
+                        <th width="16%">Jaccard Index J(i, j)</th>
+                    </tr>
+                    {% for jp in jaccard_pairs_data %}
+                    <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#fafafa"{% endif %}>
+                        <td align="left">{{ jp.emojis }} <b>{{ jp.pair }}</b></td>
+                        <td align="left"><font color="#475569">{{ jp.desc }}</font></td>
+                        <td><b>{{ jp.intersection }}</b> users</td>
+                        <td><b>{{ jp.union }}</b> users</td>
+                        <td>
+                            <font color="{% if jp.jaccard >= 0.5 %}#15803d{% elif jp.jaccard >= 0.25 %}#0369a1{% else %}#94a3b8{% endif %}" size="2">
+                                <b>{{ jp.jaccard }}</b>
+                            </font>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ====================================================================== -->
+    <!-- FOOTER -->
+    <!-- ====================================================================== -->
+    <center>
+        <hr width="90%" size="1" color="#cccccc">
+        <p>
+            <font color="#777777" size="2">
+                <b>PARS Lab &mdash; Experiment 18 (XVI)</b> &nbsp;|&nbsp;
+                Implement item-based k-Nearest Neighbor recommender system (either seen or not seen) for any application using Flask &nbsp;|&nbsp;
+                Badge: <b>Item-Based kNN Binary</b><br>
+                Student: <b>Monis (Roll No: 2023UIT3027)</b> &nbsp;|&nbsp;
+                Instructor: <b>Dr. Vishal Maheshkar</b> &nbsp;|&nbsp;
+                Academic Session: <b>2026&ndash;2027</b> &nbsp;|&nbsp;
+                Department of Information Technology, Netaji Subhas University of Technology (NSUT), New Delhi
+            </font>
+        </p>
+    </center>
+
+</body>
+</html>

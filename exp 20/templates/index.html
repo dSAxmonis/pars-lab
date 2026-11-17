@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 20: Knowledge-Based Recommender System (Score &amp; Weight Utility Modeling)</title>
+    <style>
+        .movie-card {
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 6px;
+            transition: all 0.2s ease;
+        }
+        .movie-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #003366;
+        }
+        .poster-box {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 40px;
+            border-radius: 4px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .year-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .attr-pill {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-right: 3px;
+            margin-bottom: 3px;
+        }
+        .btn-action {
+            background-color: #003366;
+            color: #ffffff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-action:hover {
+            background-color: #002244;
+        }
+        .btn-preset {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            border: 1px solid #94a3b8;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        .btn-preset:hover {
+            background-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body bgcolor="#f4f6f8" text="#222222" style="font-family: Arial, sans-serif; margin: 20px;">
+
+    <!-- ===================================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 20 (XVIII)</font></h1>
+        <h3><font color="#555555">Knowledge-Based Recommender System Using Multi-Attribute Utility Theory (Score &amp; Weight Modeling)</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Framework:</b> Flask / Pure NumPy (No Inbuilt Libraries) &nbsp;|&nbsp;
+            <b>Port:</b> 5020 &nbsp;|&nbsp;
+            <b>Badge:</b> <font color="#003366"><b>[ Knowledge-Based RS ]</b></font>
+        </p>
+        <p>
+            <b>Student:</b> Monis &nbsp;|&nbsp;
+            <b>Roll No:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027 &nbsp;|&nbsp;
+            <b>Institution:</b> NSUT Delhi
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- NOTIFICATION FEEDBACK BANNER (IF ANY) -->
+    {% if feedback_msg %}
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#e6fffa" style="border-color: #38b2ac;">
+        <tr>
+            <td align="center">
+                <font color="#234e52" size="3"><b>&#10004; Notification:</b> {{ feedback_msg }}</font>
+            </td>
+        </tr>
+    </table>
+    <br>
+    {% endif %}
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 1: USER PREFERENCE WEIGHT CONTROLS & CONSTRAINTS -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">SECTION 1: KNOWLEDGE UTILITY WEIGHTS &amp; CONSTRAINT CONFIGURATION</font></th>
+        </tr>
+        <tr>
+            <td width="55%" valign="top">
+                <form method="POST" action="/">
+                    <input type="hidden" name="action" value="recommend">
+                    <input type="hidden" name="selected_movie_id" value="{{ selected_movie.id }}">
+
+                    <b>1. Set Criteria Preference Weights (Scale: 0.0 to 10.0):</b>
+                    <p style="font-size: 12px; color: #555; margin-top: 2px;">
+                        Formula: <i>Score(m) = w<sub>acting</sub> &middot; s<sub>acting</sub> + w<sub>visuals</sub> &middot; s<sub>visuals</sub> + w<sub>story</sub> &middot; s<sub>story</sub> + w<sub>pace</sub> &middot; s<sub>pace</sub></i>
+                    </p>
+
+                    <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="35%"><b>&#127917; Acting Weight (w<sub>1</sub>):</b></td>
+                            <td width="25%"><input type="number" step="0.5" min="0" max="10" name="w_acting" value="{{ weights.acting }}" style="width: 70px; font-weight: bold; font-size: 13px;" required></td>
+                            <td width="40%"><font size="2" color="#666">Character depth &amp; acting quality</font></td>
+                        </tr>
+                        <tr>
+                            <td><b>&#127912; Visuals Weight (w<sub>2</sub>):</b></td>
+                            <td><input type="number" step="0.5" min="0" max="10" name="w_visuals" value="{{ weights.visuals }}" style="width: 70px; font-weight: bold; font-size: 13px;" required></td>
+                            <td><font size="2" color="#666">VFX, cinematography &amp; aesthetic</font></td>
+                        </tr>
+                        <tr>
+                            <td><b>&#128214; Story Weight (w<sub>3</sub>):</b></td>
+                            <td><input type="number" step="0.5" min="0" max="10" name="w_story" value="{{ weights.story }}" style="width: 70px; font-weight: bold; font-size: 13px;" required></td>
+                            <td><font size="2" color="#666">Plot complexity &amp; screenwriting</font></td>
+                        </tr>
+                        <tr>
+                            <td><b>&#9889; Pace Weight (w<sub>4</sub>):</b></td>
+                            <td><input type="number" step="0.5" min="0" max="10" name="w_pace" value="{{ weights.pace }}" style="width: 70px; font-weight: bold; font-size: 13px;" required></td>
+                            <td><font size="2" color="#666">Narrative tempo &amp; excitement</font></td>
+                        </tr>
+                    </table>
+
+                    <br>
+                    <b>2. Hard Constraints (Domain Filter Rules):</b>
+                    <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="35%"><b>Genre Filter:</b></td>
+                            <td width="65%">
+                                <select name="genre_filter" style="padding: 4px 8px; font-size: 13px;">
+                                    <option value="All" {% if genre_filter == 'All' %}selected{% endif %}>All Genres (Unrestricted)</option>
+                                    {% for g in all_genres %}
+                                    <option value="{{ g }}" {% if genre_filter == g %}selected{% endif %}>{{ g }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Minimum Release Year:</b></td>
+                            <td>
+                                <select name="min_year" style="padding: 4px 8px; font-size: 13px;">
+                                    <option value="1970" {% if min_year == 1970 %}selected{% endif %}>Any Year (&ge; 1970)</option>
+                                    <option value="1990" {% if min_year == 1990 %}selected{% endif %}>Modern Era (&ge; 1990)</option>
+                                    <option value="2000" {% if min_year == 2000 %}selected{% endif %}>21st Century (&ge; 2000)</option>
+                                    <option value="2010" {% if min_year == 2010 %}selected{% endif %}>Contemporary (&ge; 2010)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Minimum IMDb Rating:</b></td>
+                            <td>
+                                <select name="min_rating" style="padding: 4px 8px; font-size: 13px;">
+                                    <option value="0.0" {% if min_rating == 0.0 %}selected{% endif %}>Any Rating (&ge; 0.0)</option>
+                                    <option value="8.0" {% if min_rating == 8.0 %}selected{% endif %}>Highly Rated (&ge; 8.0)</option>
+                                    <option value="8.5" {% if min_rating == 8.5 %}selected{% endif %}>Masterpiece Tier (&ge; 8.5)</option>
+                                    <option value="9.0" {% if min_rating == 9.0 %}selected{% endif %}>Top Hall of Fame (&ge; 9.0)</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br>
+                    <input type="submit" value="Calculate Knowledge-Based Recommendations" style="font-size: 13px; font-weight: bold; padding: 8px 18px; background-color: #003366; color: #ffffff; cursor: pointer; border-radius: 4px; border: none;">
+                </form>
+            </td>
+
+            <td width="45%" valign="top" bgcolor="#f8fafc">
+                <b>Quick Persona Weight Presets:</b>
+                <p style="font-size: 12px; color: #555; margin-top: 2px;">
+                    Click a benchmark user archetype to instantly load tailored utility weights:
+                </p>
+
+                <form method="POST" action="/" style="margin-bottom: 5px;">
+                    <input type="hidden" name="preset" value="cinephile">
+                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                    <button type="submit" class="btn-preset" style="width: 100%; text-align: left;">
+                        &#127891; <b>Cinephile Critic:</b> Acting = 10.0, Story = 10.0, Visuals = 7.0, Pace = 6.0
+                    </button>
+                </form>
+
+                <form method="POST" action="/" style="margin-bottom: 5px;">
+                    <input type="hidden" name="preset" value="blockbuster">
+                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                    <button type="submit" class="btn-preset" style="width: 100%; text-align: left;">
+                        &#127910; <b>Blockbuster Thrill:</b> Visuals = 10.0, Pace = 10.0, Story = 7.0, Acting = 6.0
+                    </button>
+                </form>
+
+                <form method="POST" action="/" style="margin-bottom: 5px;">
+                    <input type="hidden" name="preset" value="visualist">
+                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                    <button type="submit" class="btn-preset" style="width: 100%; text-align: left;">
+                        &#128065; <b>Cinematography Visualist:</b> Visuals = 10.0, Story = 8.0, Acting = 7.0, Pace = 6.0
+                    </button>
+                </form>
+
+                <form method="POST" action="/" style="margin-bottom: 5px;">
+                    <input type="hidden" name="preset" value="balanced">
+                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                    <button type="submit" class="btn-preset" style="width: 100%; text-align: left;">
+                        &#9878; <b>Balanced General:</b> Acting = 8.0, Visuals = 8.0, Story = 8.0, Pace = 8.0
+                    </button>
+                </form>
+
+                <hr size="1" color="#cbd5e1">
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e2e8f0">
+                        <th colspan="2"><font size="2">Active Filter Status Summary</font></th>
+                    </tr>
+                    <tr>
+                        <td><font size="2">Total Catalog Movies:</font></td>
+                        <td><font size="2"><b>{{ movies|length }} Movies</b></font></td>
+                    </tr>
+                    <tr>
+                        <td><font size="2">Passed Constraints:</font></td>
+                        <td><font size="2" color="#166534"><b>{{ passed_movies|length }} Candidates</b></font></td>
+                    </tr>
+                    <tr>
+                        <td><font size="2">Filtered (Rejected):</font></td>
+                        <td><font size="2" color="#991b1b"><b>{{ filtered_movies|length }} Disqualified</b></font></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 2: FULL MOVIE CATALOG (INTERACTIVE CLICKABLE GRID) -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th>
+                <font color="#ffffff">SECTION 2: FULL MOVIE CATALOG BROWSER &amp; INTERACTIVE SELECTION (20 MOVIES)</font>
+            </th>
+        </tr>
+        <tr>
+            <td bgcolor="#f8fafc">
+                <p style="margin: 4px 0 12px 0; font-size: 13px; color: #475569;">
+                    <b>Interactive Instructions:</b> Browse the full movie library below. Click <b>"Inspect Knowledge Profile"</b> on any movie card to load its deep criteria vector, plot details, and cosine similarity neighbors, or submit a <b>"Quick Rating"</b> to interact as a viewer.
+                </p>
+
+                <!-- 4 COLUMNS GRID DISPLAY FOR 20 MOVIES -->
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    {% for row in movies|batch(4) %}
+                    <tr>
+                        {% for m in row %}
+                        <td width="25%" valign="top">
+                            <div class="movie-card" {% if m.id == selected_movie.id %}style="border: 2px solid #003366; background-color: #f0f7ff;"{% endif %}>
+                                
+                                <!-- MOVIE POSTER PLACEHOLDER -->
+                                <div class="poster-box" style="background-color: {{ m.poster_color }};">
+                                    <span>{{ m.poster_emoji }}</span>
+                                    <div class="year-badge">{{ m.year }}</div>
+                                </div>
+
+                                <font size="3" color="#003366"><b>{{ m.title }}</b></font><br>
+                                <font size="2" color="#64748b">Dir: {{ m.director }}</font><br>
+                                <font size="2" color="#b45309"><b>&#9733; IMDb {{ m.rating }}/10</b></font>
+                                
+                                <div style="margin: 4px 0;">
+                                    {% for g in m.genres %}
+                                    <span style="background-color: #e2e8f0; font-size: 10px; padding: 2px 5px; border-radius: 3px; color: #334155;">{{ g }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- ATTRIBUTE BADGES -->
+                                <table border="0" cellpadding="1" cellspacing="0" width="100%" style="font-size: 11px; margin-top: 4px;">
+                                    <tr>
+                                        <td>Acting: <b>{{ m.acting }}</b></td>
+                                        <td>Visuals: <b>{{ m.visuals }}</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Story: <b>{{ m.story }}</b></td>
+                                        <td>Pace: <b>{{ m.pace }}</b></td>
+                                    </tr>
+                                </table>
+
+                                <hr size="1" color="#e2e8f0">
+
+                                <!-- CARD ACTIONS -->
+                                <form method="POST" action="/" style="margin: 0;">
+                                    <input type="hidden" name="action" value="inspect">
+                                    <input type="hidden" name="selected_movie_id" value="{{ m.id }}">
+                                    <input type="hidden" name="w_acting" value="{{ weights.acting }}">
+                                    <input type="hidden" name="w_visuals" value="{{ weights.visuals }}">
+                                    <input type="hidden" name="w_story" value="{{ weights.story }}">
+                                    <input type="hidden" name="w_pace" value="{{ weights.pace }}">
+                                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                                    
+                                    <button type="submit" class="btn-action" style="width: 100%;">
+                                        {% if m.id == selected_movie.id %}&#10003; Currently Selected{% else %}Inspect Profile &rarr;{% endif %}
+                                    </button>
+                                </form>
+
+                                <form method="POST" action="/" style="margin-top: 4px;">
+                                    <input type="hidden" name="action" value="rate">
+                                    <input type="hidden" name="selected_movie_id" value="{{ m.id }}">
+                                    <input type="hidden" name="w_acting" value="{{ weights.acting }}">
+                                    <input type="hidden" name="w_visuals" value="{{ weights.visuals }}">
+                                    <input type="hidden" name="w_story" value="{{ weights.story }}">
+                                    <input type="hidden" name="w_pace" value="{{ weights.pace }}">
+                                    <input type="hidden" name="genre_filter" value="{{ genre_filter }}">
+                                    <input type="hidden" name="min_year" value="{{ min_year }}">
+                                    <input type="hidden" name="min_rating" value="{{ min_rating }}">
+                                    
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td width="60%">
+                                                <select name="user_rating_val" style="font-size: 10px; width: 100%;">
+                                                    <option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; (5)</option>
+                                                    <option value="4">&#9733;&#9733;&#9733;&#9733; (4)</option>
+                                                    <option value="3">&#9733;&#9733;&#9733; (3)</option>
+                                                </select>
+                                            </td>
+                                            <td width="40%" align="right">
+                                                <button type="submit" style="background-color: #047857; color: white; border: none; font-size: 10px; padding: 2px 6px; border-radius: 2px; cursor: pointer;">
+                                                    Rate
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 3: KNOWLEDGE-BASED RECOMMENDATION RESULTS -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e3a8a">
+            <th><font color="#ffffff">SECTION 3: KNOWLEDGE UTILITY RECOMMENDED RESULTS (RANKED BY COMPOSITE SCORE)</font></th>
+        </tr>
+        <tr>
+            <td>
+                <p style="font-size: 13px; color: #334155; margin-top: 4px;">
+                    Below are candidate movies ranked by their <b>Multi-Attribute Utility Theory (MAUT) Score</b> matching your weights:
+                    <i>Acting ({{ weights.acting }}), Visuals ({{ weights.visuals }}), Story ({{ weights.story }}), Pace ({{ weights.pace }})</i>.
+                </p>
+
+                {% if passed_movies|length > 0 %}
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#f1f5f9">
+                        <th width="5%" align="center">Rank</th>
+                        <th width="20%">Movie Title &amp; Year</th>
+                        <th width="12%" align="center">Match Score (%)</th>
+                        <th width="10%" align="center">Pred. Rating</th>
+                        <th width="23%">Criteria Point Breakdown (&Sigma; w<sub>i</sub> s<sub>m,i</sub>)</th>
+                        <th width="30%">Explanation &amp; Justification</th>
+                    </tr>
+                    {% for m in passed_movies %}
+                    <tr {% if loop.index <= 3 %}bgcolor="#f0fdf4"{% elif loop.index % 2 == 0 %}bgcolor="#f8fafc"{% endif %}>
+                        <td align="center">
+                            <b>#{{ m.rank }}</b>
+                            {% if m.rank == 1 %}&#129351;{% elif m.rank == 2 %}&#129352;{% elif m.rank == 3 %}&#129353;{% endif %}
+                        </td>
+                        <td>
+                            <b><font color="#003366">{{ m.title }}</font></b> ({{ m.year }})<br>
+                            <font size="2" color="#64748b">IMDb: &#9733; {{ m.rating }}/10 &nbsp;|&nbsp; Dir: {{ m.director }}</font>
+                        </td>
+                        <td align="center">
+                            <font size="3" color="#166534"><b>{{ m.match_pct }}%</b></font><br>
+                            <font size="1" color="#64748b">Raw: {{ m.raw_score }} pts</font>
+                        </td>
+                        <td align="center">
+                            <font size="3" color="#b45309"><b>{{ m.pred_rating }} / 5.0</b></font>
+                        </td>
+                        <td>
+                            <font size="2">
+                                &#127917; Act: {{ m.acting }} &times; {{ weights.acting }} = <b>{{ m.contributions.acting }}</b><br>
+                                &#127912; Vis: {{ m.visuals }} &times; {{ weights.visuals }} = <b>{{ m.contributions.visuals }}</b><br>
+                                &#128214; Sty: {{ m.story }} &times; {{ weights.story }} = <b>{{ m.contributions.story }}</b><br>
+                                &#9889; Pce: {{ m.pace }} &times; {{ weights.pace }} = <b>{{ m.contributions.pace }}</b>
+                            </font>
+                        </td>
+                        <td>
+                            <font size="2" color="#1e293b">{{ m.justification }}</font>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <div style="background-color: #fee2e2; border: 1px solid #f87171; padding: 12px; text-align: center;">
+                    <font color="#991b1b"><b>No movies passed all active constraint filters.</b> Please relax minimum year, rating, or genre constraints in Section 1.</font>
+                </div>
+                {% endif %}
+
+                <!-- FILTERED CANDIDATES TABLE -->
+                {% if filtered_movies|length > 0 %}
+                <br>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#fee2e2">
+                        <th colspan="4" align="left"><font color="#991b1b">Disqualified Movies Due to Constraint Violations ({{ filtered_movies|length }} items)</font></th>
+                    </tr>
+                    <tr bgcolor="#fef2f2">
+                        <th width="20%">Movie</th>
+                        <th width="15%">Genres &amp; Year</th>
+                        <th width="10%">IMDb Rating</th>
+                        <th width="55%">Violation Reasoning</th>
+                    </tr>
+                    {% for m in filtered_movies %}
+                    <tr>
+                        <td><b>{{ m.title }}</b></td>
+                        <td>{{ m.genres|join(', ') }} ({{ m.year }})</td>
+                        <td>&#9733; {{ m.rating }}/10</td>
+                        <td><font color="#991b1b" size="2">{{ m.filter_reasons|join('; ') }}</font></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 4: SELECTED MOVIE DEEP PROFILE & ATTRIBUTE SIMILARITY -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#312e81">
+            <th><font color="#ffffff">SECTION 4: ACTIVE MOVIE KNOWLEDGE PROFILE &amp; COSINE SIMILAR NEIGHBORS</font></th>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="8" cellspacing="0" width="100%">
+                    <tr>
+                        <!-- POSTER AND BASIC STATS -->
+                        <td width="25%" valign="top" align="center">
+                            <div class="poster-box" style="background-color: {{ selected_movie.poster_color }}; height: 160px; font-size: 55px;">
+                                <span>{{ selected_movie.poster_emoji }}</span>
+                                <div class="year-badge">{{ selected_movie.year }}</div>
+                            </div>
+                            <font size="4" color="#003366"><b>{{ selected_movie.title }}</b></font><br>
+                            <font size="2" color="#64748b">Directed by {{ selected_movie.director }}</font><br>
+                            <font size="3" color="#b45309"><b>&#9733; IMDb Rating: {{ selected_movie.rating }} / 10</b></font>
+                        </td>
+
+                        <!-- SYNOPSIS & ATTRIBUTES -->
+                        <td width="45%" valign="top">
+                            <b>Plot Summary:</b>
+                            <p style="font-size: 13px; color: #334155; line-height: 1.4; margin-top: 4px;">
+                                {{ selected_movie.description }}
+                            </p>
+
+                            <b>Key Cast Members:</b>
+                            <p style="font-size: 12px; color: #475569; margin-top: 2px;">
+                                {{ selected_movie.cast|join(', ') }}
+                            </p>
+
+                            <b>Knowledge Plot Keywords:</b>
+                            <p style="margin-top: 2px;">
+                                {% for kw in selected_movie.plot_keywords %}
+                                <span style="background-color: #f1f5f9; border: 1px solid #cbd5e1; font-size: 11px; padding: 2px 6px; border-radius: 3px; color: #334155; margin-right: 4px;">{{ kw }}</span>
+                                {% endfor %}
+                            </p>
+
+                            <b>Knowledge Base Criterion Ratings:</b>
+                            <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#f8fafc" style="margin-top: 6px;">
+                                <tr bgcolor="#e2e8f0" align="center">
+                                    <th>&#127917; Acting</th>
+                                    <th>&#127912; Visuals</th>
+                                    <th>&#128214; Story</th>
+                                    <th>&#9889; Pace</th>
+                                </tr>
+                                <tr align="center">
+                                    <td><b>{{ selected_movie.acting }} / 10</b></td>
+                                    <td><b>{{ selected_movie.visuals }} / 10</b></td>
+                                    <td><b>{{ selected_movie.story }} / 10</b></td>
+                                    <td><b>{{ selected_movie.pace }} / 10</b></td>
+                                </tr>
+                            </table>
+                        </td>
+
+                        <!-- COSINE SIMILAR NEIGHBORS -->
+                        <td width="30%" valign="top" bgcolor="#f8fafc" style="border-left: 1px solid #e2e8f0; padding-left: 12px;">
+                            <b>Top 3 Attribute-Similar Movies:</b>
+                            <p style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                                Computed via Cosine Similarity over [Acting, Visuals, Story, Pace]:
+                            </p>
+
+                            {% for sm in top_similar_movies %}
+                            <div style="background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px 10px; margin-bottom: 6px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td width="25%" align="center">
+                                            <div style="background-color: {{ sm.poster_color }}; width: 36px; height: 36px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                                {{ sm.poster_emoji }}
+                                            </div>
+                                        </td>
+                                        <td width="75%" style="padding-left: 6px;">
+                                            <b><font color="#003366" size="2">{{ sm.title }}</font></b><br>
+                                            <font size="1" color="#166534"><b>Cosine Sim: {{ sm.sim_pct }}%</b></font><br>
+                                            <font size="1" color="#64748b">IMDb: &#9733; {{ sm.rating }}</font>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 5: ALGORITHM VISUALIZATION PLOTS -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#065f46">
+            <th><font color="#ffffff">SECTION 5: ALGORITHM VISUALIZATION PLOTS (UTILITY BREAKDOWN &amp; MATRIX HEATMAPS)</font></th>
+        </tr>
+        <tr>
+            <td align="center">
+                <br>
+                <b>Figure 20.1: Preference Weights Alignment &amp; Stacked Multi-Criteria Utility Breakdown</b><br>
+                <img src="data:image/png;base64,{{ plot_b64_1 }}" width="96%" alt="Figure 20.1: Utility Alignment Plots" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                <br><br>
+
+                <b>Figure 20.2: 20-Movie Multi-Attribute Matrix &amp; 20&times;20 Cosine Similarity Heatmap</b><br>
+                <img src="data:image/png;base64,{{ plot_b64_2 }}" width="96%" alt="Figure 20.2: Similarity Matrix Heatmaps" border="1" style="border-color: #cbd5e1; margin-top: 6px;">
+                <br><br>
+
+                <table border="0" cellpadding="6" cellspacing="0" width="96%" bgcolor="#f0fdf4" style="border: 1px solid #bbf7d0; text-align: left; font-size: 12px;">
+                    <tr>
+                        <td>
+                            <b>Mathematical &amp; Algorithmic Insights:</b><br>
+                            1. <b>Figure 20.1 (Left):</b> Visualizes the user's active normalized weights across the 4 criteria compared directly against the top 2 ranked movie candidates.<br>
+                            2. <b>Figure 20.1 (Right):</b> Stacked horizontal bar chart demonstrating the exact points contributed by each attribute: <i>Score(m) = &sum; w<sub>i</sub> &times; s<sub>m,i</sub></i>.<br>
+                            3. <b>Figure 20.2 (Left):</b> Full 20&times;4 Knowledge Space heatmap revealing the multi-criteria spectrum of all movies in the database.<br>
+                            4. <b>Figure 20.2 (Right):</b> Symmetric 20&times;20 Cosine Similarity matrix computed from scratch using NumPy: <i>Sim(a, b) = (a &middot; b) / (||a|| &times; ||b||)</i>.
+                        </td>
+                    </tr>
+                </table>
+                <br>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 6: HARDCODED USER-RATINGS MATRIX & KNOWLEDGE ATTRIBUTES -->
+    <!-- ===================================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#334155">
+            <th><font color="#ffffff">SECTION 6: HARDCODED BENCHMARK USER-RATINGS MATRIX &amp; KNOWLEDGE ATTRIBUTES</font></th>
+        </tr>
+        <tr>
+            <td>
+                <b>1. Benchmark User-Item Rating Matrix (7 Users &times; 20 Movies):</b>
+                <p style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                    Scale: 1 to 5 stars (0 denotes unobserved / missing rating). Total observations: <b>{{ total_ratings_count }}</b> / 140 entries (Sparsity: <b>{{ sparsity_pct }}%</b>).
+                </p>
+
+                <div style="overflow-x: auto;">
+                    <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#ffffff" style="font-size: 11px; text-align: center;">
+                        <tr bgcolor="#f1f5f9">
+                            <th align="left" width="18%">Benchmark User Persona</th>
+                            {% for m in movies %}
+                            <th title="{{ m.title }}">M{{ m.id }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for u in benchmark_users %}
+                        <tr>
+                            <td align="left"><b>{{ u.name }}</b></td>
+                            {% for val in u.ratings %}
+                            <td {% if val == 5 %}bgcolor="#dcfce7"{% elif val == 4 %}bgcolor="#f0fdf4"{% elif val == 0 %}bgcolor="#f8fafc"{% endif %}>
+                                {% if val > 0 %}<b>{{ val }}</b>{% else %}<font color="#cbd5e1">-</font>{% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <tr bgcolor="#e2e8f0">
+                            <td align="left"><b>Average Observed Rating:</b></td>
+                            {% for col in range(20) %}
+                            <td><b>{{ movie_mean_ratings[col] }}</b></td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </div>
+
+                <br>
+                <b>2. Movie Catalog Knowledge Attributes Summary Table:</b>
+                <div style="overflow-x: auto; margin-top: 6px;">
+                    <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#ffffff" style="font-size: 11px;">
+                        <tr bgcolor="#f1f5f9" align="center">
+                            <th width="4%">ID</th>
+                            <th width="20%" align="left">Title &amp; Year</th>
+                            <th width="18%" align="left">Genres</th>
+                            <th width="8%">IMDb</th>
+                            <th width="10%">Acting (s<sub>1</sub>)</th>
+                            <th width="10%">Visuals (s<sub>2</sub>)</th>
+                            <th width="10%">Story (s<sub>3</sub>)</th>
+                            <th width="10%">Pace (s<sub>4</sub>)</th>
+                            <th width="10%">Avg Attribute</th>
+                        </tr>
+                        {% for m in movies %}
+                        <tr align="center" {% if loop.index % 2 == 0 %}bgcolor="#f8fafc"{% endif %}>
+                            <td>M{{ m.id }}</td>
+                            <td align="left"><b>{{ m.title }}</b> ({{ m.year }})</td>
+                            <td align="left">{{ m.genres|join(', ') }}</td>
+                            <td>&#9733; {{ m.rating }}</td>
+                            <td>{{ m.acting }}</td>
+                            <td>{{ m.visuals }}</td>
+                            <td>{{ m.story }}</td>
+                            <td>{{ m.pace }}</td>
+                            <td><b>{{ "%.2f"|format((m.acting + m.visuals + m.story + m.pace) / 4.0) }}</b></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ===================================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================================== -->
+    <center>
+        <hr width="92%" size="1" color="#cbd5e1">
+        <p style="font-size: 12px; color: #64748b;">
+            <b>Pattern Analysis &amp; Recommender Systems (PARS) Lab</b> &nbsp;|&nbsp;
+            Experiment 20: Knowledge-Based Recommender System &nbsp;|&nbsp;
+            Student: <b>Monis (2023UIT3027)</b> &nbsp;|&nbsp;
+            Instructor: <b>Dr. Vishal Maheshkar</b> &nbsp;|&nbsp;
+            Session: <b>2026-2027</b><br>
+            GitHub Repository: <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366; font-weight: bold;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </center>
+
+</body>
+</html>

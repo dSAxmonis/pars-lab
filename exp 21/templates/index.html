@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Experiment 21: Matrix Factorization via Stochastic Gradient Descent</title>
+</head>
+<body bgcolor="#f4f6f8" text="#222222" style="font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 20px;">
+
+    <!-- =================================================================== -->
+    <!-- HEADER                                                              -->
+    <!-- =================================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 21</font></h1>
+        <h3><font color="#555555">Matrix Factorization using Stochastic Gradient Descent (SGD) for Collaborative Filtering</font></h3>
+        <p>
+            <b>Practical:</b> XIX &nbsp;|&nbsp;
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Framework:</b> Flask / Pure NumPy (No Inbuilt ML Libraries)
+        </p>
+        <p>
+            <b>Student:</b> Monis &nbsp;|&nbsp;
+            <b>Roll No.:</b> 2023UIT3027 &nbsp;|&nbsp;
+            <b>Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp;
+            <b>Session:</b> 2026&ndash;2027 &nbsp;|&nbsp;
+            <b>Institution:</b> NSUT Delhi
+        </p>
+        <p>
+            <b>GitHub Repository:</b> 
+            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366; font-weight: bold; text-decoration: none;">
+                https://github.com/dSAxmonis/pars-lab
+            </a>
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- AIM & THEORY BANNER                                                 -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#eef4fa" style="border-color: #b0c8e0;">
+        <tr>
+            <td>
+                <b><font color="#003366" size="3">EXPERIMENT AIM &amp; MATHEMATICAL OBJECTIVE:</font></b><br>
+                <font size="2" color="#333333">
+                    To implement <b>Matrix Factorization</b> from scratch using <b>Stochastic Gradient Descent (SGD)</b> in pure NumPy without external recommender libraries (such as <code>scikit-learn</code> or <code>Surprise</code>). The algorithm factorizes an incomplete user-item rating matrix <b>R &approx; P &times; Q<sup>T</sup></b> into lower-rank user latent vectors <b>P &isin; &Ropf;<sup>m &times; k</sup></b> and item latent vectors <b>Q &isin; &Ropf;<sup>n &times; k</sup></b>. The model is trained iteratively for <b>at least 3 epochs</b> minimizing regularized Mean Squared Error (MSE), tracking monotonic loss reduction, filling in previously unknown/unrated ratings, and generating top-N personalized movie recommendations.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    {% if message %}
+    <br>
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#dcfce7" style="border-color: #86efac;">
+        <tr>
+            <td align="center">
+                <b><font color="#15803d">&#10004; {{ message }}</font></b>
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1: SGD HYPERPARAMETERS & TRAINING CONTROLS                  -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left">
+                <font color="#ffffff" size="3">SECTION 1: SGD HYPERPARAMETER TUNING &amp; REAL-TIME FACTORIZATION CONTROLS</font>
+            </th>
+        </tr>
+        <tr>
+            <!-- Controls Form -->
+            <td width="55%" valign="top">
+                <form method="POST" action="/">
+                    <input type="hidden" name="action" value="train">
+                    <input type="hidden" name="filter_genre" value="{{ filter_genre }}">
+                    <input type="hidden" name="inspected_movie_id" value="{{ inspected_movie['id'] }}">
+
+                    <b><font color="#003366">Interactive Algorithm Parameters:</font></b>
+                    <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                        <tr>
+                            <td width="45%"><b>Active Evaluated User:</b></td>
+                            <td width="55%">
+                                <select name="active_user_idx" style="width: 220px; font-size: 10pt; padding: 4px;">
+                                    {% for u in users %}
+                                    <option value="{{ u.id }}" {% if u.id == active_user_idx %}selected{% endif %}>
+                                        {{ u.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Training Epochs (min 3):</b></td>
+                            <td>
+                                <input type="number" name="epochs" value="{{ epochs }}" min="3" max="100" step="1" style="width: 90px; font-size: 10pt; padding: 4px;" required>
+                                <font size="2" color="#666666">&nbsp;(Run &ge; 3 Epochs)</font>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Latent Dimensions (k):</b></td>
+                            <td>
+                                <select name="k_factors" style="width: 100px; font-size: 10pt; padding: 4px;">
+                                    <option value="2" {% if k_factors == 2 %}selected{% endif %}>k = 2</option>
+                                    <option value="3" {% if k_factors == 3 %}selected{% endif %}>k = 3 (Default)</option>
+                                    <option value="4" {% if k_factors == 4 %}selected{% endif %}>k = 4</option>
+                                    <option value="5" {% if k_factors == 5 %}selected{% endif %}>k = 5</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Learning Rate (&gamma;):</b></td>
+                            <td>
+                                <select name="learning_rate" style="width: 100px; font-size: 10pt; padding: 4px;">
+                                    <option value="0.005" {% if learning_rate == 0.005 %}selected{% endif %}>0.005</option>
+                                    <option value="0.01" {% if learning_rate == 0.01 %}selected{% endif %}>0.010</option>
+                                    <option value="0.02" {% if learning_rate == 0.02 %}selected{% endif %}>0.020 (Default)</option>
+                                    <option value="0.05" {% if learning_rate == 0.05 %}selected{% endif %}>0.050</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Regularization (&lambda;):</b></td>
+                            <td>
+                                <select name="reg_param" style="width: 100px; font-size: 10pt; padding: 4px;">
+                                    <option value="0.01" {% if reg_param == 0.01 %}selected{% endif %}>0.010</option>
+                                    <option value="0.02" {% if reg_param == 0.02 %}selected{% endif %}>0.020</option>
+                                    <option value="0.04" {% if reg_param == 0.04 %}selected{% endif %}>0.040 (Default)</option>
+                                    <option value="0.08" {% if reg_param == 0.08 %}selected{% endif %}>0.080</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="left">
+                                <br>
+                                <input type="submit" value="Execute Matrix Factorization via SGD" style="font-size: 10.5pt; font-weight: bold; padding: 8px 18px; background-color: #003366; color: #ffffff; border: none; cursor: pointer;">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+
+                <form method="POST" action="/" style="margin-top: 10px;">
+                    <input type="hidden" name="action" value="reset">
+                    <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                    <input type="submit" value="Reset All Ratings to Default Benchmark" style="font-size: 9.5pt; padding: 5px 12px; background-color: #dc2626; color: #ffffff; border: none; cursor: pointer;">
+                </form>
+            </td>
+
+            <!-- Summary Table -->
+            <td width="45%" valign="top" bgcolor="#f9fbfd">
+                <center><b><font color="#003366" size="3">Optimization &amp; Matrix Statistics</font></b></center>
+                <br>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e6f0fa">
+                        <th><b>Metric / Property</b></th>
+                        <th><b>Observed Value</b></th>
+                    </tr>
+                    <tr>
+                        <td><b>Active User Profile:</b></td>
+                        <td><b><font color="#003366">{{ active_user.name }}</font></b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Matrix Dimensions:</b></td>
+                        <td>{{ summary_stats.total_users }} Users &times; {{ summary_stats.total_movies }} Movies ({{ summary_stats.total_users * summary_stats.total_movies }} cells)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Observed Non-Zero Ratings:</b></td>
+                        <td><b>{{ summary_stats.total_ratings }} / {{ summary_stats.total_users * summary_stats.total_movies }}</b> (Sparsity: {{ summary_stats.sparsity_pct }}%)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Latent Feature Dimension (k):</b></td>
+                        <td><b>{{ summary_stats.k_factors }}</b> Factors</td>
+                    </tr>
+                    <tr>
+                        <td><b>SGD Training Epochs:</b></td>
+                        <td><b>{{ summary_stats.epochs }}</b> Epochs completed</td>
+                    </tr>
+                    <tr>
+                        <td><b>Initial MSE (Epoch 1):</b></td>
+                        <td><font color="#b91c1c"><b>{{ summary_stats.initial_mse }}</b></font></td>
+                    </tr>
+                    <tr>
+                        <td><b>Converged MSE (Epoch {{ summary_stats.epochs }}):</b></td>
+                        <td><font color="#15803d"><b>{{ summary_stats.final_mse }}</b></font></td>
+                    </tr>
+                    <tr>
+                        <td><b>Total Objective Loss Drop:</b></td>
+                        <td><b><font color="#15803d">&#9660; {{ summary_stats.loss_reduction }}%</font></b></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2: MOVIE CATALOG GRID (CLICKABLE ITEMS)                     -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left">
+                <font color="#ffffff" size="3">SECTION 2: COMPLETE MOVIES CATALOG &amp; INTERACTIVE RATING PORTAL (20 MOVIES)</font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <!-- Genre Filter Bar -->
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    <tr>
+                        <td valign="middle">
+                            <b><font color="#003366">Filter by Genre:</font></b>&nbsp;&nbsp;
+                            {% for g in all_genres %}
+                            <a href="javascript:void(0);" onclick="document.getElementById('filter_form_{{ loop.index }}').submit();" style="text-decoration: none;">
+                                <font style="padding: 4px 10px; margin: 2px; display: inline-block; border: 1px solid #003366; {% if filter_genre == g %}background-color: #003366; color: #ffffff; font-weight: bold;{% else %}background-color: #f0f4f8; color: #003366;{% endif %}">
+                                    {{ g }}
+                                </font>
+                            </a>
+                            <form id="filter_form_{{ loop.index }}" method="POST" action="/" style="display: none;">
+                                <input type="hidden" name="filter_genre" value="{{ g }}">
+                                <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                                <input type="hidden" name="epochs" value="{{ epochs }}">
+                                <input type="hidden" name="k_factors" value="{{ k_factors }}">
+                                <input type="hidden" name="learning_rate" value="{{ learning_rate }}">
+                                <input type="hidden" name="reg_param" value="{{ reg_param }}">
+                                <input type="hidden" name="inspected_movie_id" value="{{ inspected_movie['id'] }}">
+                            </form>
+                            {% endfor %}
+                        </td>
+                        <td align="right" valign="middle">
+                            <font size="2" color="#666666">Click any movie card to inspect SGD latent factor decomposition below.</font>
+                        </td>
+                    </tr>
+                </table>
+
+                <br>
+
+                <!-- Grid of 20 Clickable Movies (4 Columns x 5 Rows) -->
+                <table border="1" cellpadding="8" cellspacing="8" width="100%" bgcolor="#fbfbfb" style="border-collapse: separate; border-spacing: 10px;">
+                    {% for row in enriched_catalog | batch(4) %}
+                    <tr>
+                        {% for item in row %}
+                        {% set m = item.movie %}
+                        <td width="25%" valign="top" bgcolor="#ffffff" style="border: 2px solid {% if inspected_movie['id'] == m.id %}#003366{% else %}#dddddd{% endif %}; border-radius: 4px; padding: 10px; {% if not item.matches_genre %}opacity: 0.35;{% endif %}">
+                            
+                            <!-- Poster Placeholder Header -->
+                            <div style="background-color: {{ m.poster_bg }}; color: #ffffff; padding: 12px 8px; text-align: center; border-radius: 3px; margin-bottom: 8px;">
+                                <font size="5">{{ m.emoji }}</font><br>
+                                <b><font size="3" color="{{ m.poster_accent }}">{{ m.initials }}</font></b>
+                                &nbsp;&bull;&nbsp;
+                                <font size="2" color="#e2e8f0">{{ m.year }}</font>
+                            </div>
+
+                            <!-- Movie Title & IMDb Rating -->
+                            <b><font size="3" color="#003366">{{ m.title }}</font></b><br>
+                            <font size="2" color="#555555">IMDb: &#11088; {{ m.rating }}/10 &nbsp;|&nbsp; Dir: {{ m.director }}</font>
+                            <br><br>
+
+                            <!-- Genre Badges -->
+                            <div>
+                                {% for g in m.genres %}
+                                <span style="background-color: #e2e8f0; color: #1e293b; padding: 2px 6px; font-size: 8pt; border-radius: 3px; font-weight: bold; margin-right: 3px;">
+                                    {{ g }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <br>
+
+                            <!-- Active User Status -->
+                            <div style="background-color: {% if item.is_rated %}#f0fdf4{% else %}#fff7ed{% endif %}; border: 1px solid {% if item.is_rated %}#86efac{% else %}#fdba74{% endif %}; padding: 6px; border-radius: 3px;">
+                                {% if item.is_rated %}
+                                    <font size="2" color="#15803d">
+                                        <b>&#9733; Watched &amp; Rated:</b> {{ item.orig_rating }} / 5.0<br>
+                                        <small>(Observed ground truth rating)</small>
+                                    </font>
+                                {% else %}
+                                    <font size="2" color="#c2410c">
+                                        <b>&#9889; Unrated by User</b><br>
+                                        <b>SGD Predicted:</b> &#9733; {{ item.pred_rating }} / 5.0
+                                    </font>
+                                {% endif %}
+                            </div>
+                            <br>
+
+                            <!-- Quick Rating Form -->
+                            <form method="POST" action="/" style="margin: 0;">
+                                <input type="hidden" name="action" value="rate">
+                                <input type="hidden" name="movie_to_rate" value="{{ m.id }}">
+                                <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                                <input type="hidden" name="epochs" value="{{ epochs }}">
+                                <input type="hidden" name="k_factors" value="{{ k_factors }}">
+                                <input type="hidden" name="learning_rate" value="{{ learning_rate }}">
+                                <input type="hidden" name="reg_param" value="{{ reg_param }}">
+                                <input type="hidden" name="filter_genre" value="{{ filter_genre }}">
+                                
+                                <table border="0" cellpadding="2" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td>
+                                            <select name="new_rating" style="width: 100%; font-size: 9pt; padding: 3px;">
+                                                <option value="0" {% if item.orig_rating == 0 %}selected{% endif %}>0 (Unrated / Clear)</option>
+                                                <option value="1" {% if item.orig_rating == 1 %}selected{% endif %}>1 &#9733; (Poor)</option>
+                                                <option value="2" {% if item.orig_rating == 2 %}selected{% endif %}>2 &#9733; (Fair)</option>
+                                                <option value="3" {% if item.orig_rating == 3 %}selected{% endif %}>3 &#9733; (Good)</option>
+                                                <option value="4" {% if item.orig_rating == 4 %}selected{% endif %}>4 &#9733; (Very Good)</option>
+                                                <option value="5" {% if item.orig_rating == 5 %}selected{% endif %}>5 &#9733; (Masterpiece)</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="submit" value="Rate" style="font-size: 9pt; font-weight: bold; padding: 3px 8px; background-color: #003366; color: white; border: none; cursor: pointer;">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+
+                            <div style="margin-top: 6px; text-align: right;">
+                                <form method="POST" action="/" style="display: inline;">
+                                    <input type="hidden" name="inspected_movie_id" value="{{ m.id }}">
+                                    <input type="hidden" name="active_user_idx" value="{{ active_user_idx }}">
+                                    <input type="hidden" name="epochs" value="{{ epochs }}">
+                                    <input type="hidden" name="k_factors" value="{{ k_factors }}">
+                                    <input type="hidden" name="learning_rate" value="{{ learning_rate }}">
+                                    <input type="hidden" name="reg_param" value="{{ reg_param }}">
+                                    <input type="hidden" name="filter_genre" value="{{ filter_genre }}">
+                                    <input type="submit" value="Inspect Math &#187;" style="background: none; border: none; color: #0044cc; text-decoration: underline; font-size: 9pt; cursor: pointer; padding: 0;">
+                                </form>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3: INSPECTED MOVIE DETAILS & LATENT DECOMPOSITION           -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left">
+                <font color="#ffffff" size="3">SECTION 3: SELECTED MOVIE LATENT FACTOR DECOMPOSITION &amp; PREDICTION ARITHMETIC</font>
+            </th>
+        </tr>
+        <tr>
+            <td width="50%" valign="top">
+                <b><font size="4" color="#003366">{{ inspected_movie.emoji }} {{ inspected_movie.title }} ({{ inspected_movie.year }})</font></b><br>
+                <font color="#555555"><b>Director:</b> {{ inspected_movie.director }} &nbsp;|&nbsp; <b>Cast:</b> {{ inspected_movie.cast }}</font>
+                <br><br>
+                <b>Genres:</b>
+                {% for g in inspected_movie.genres %}
+                <span style="background-color: #003366; color: white; padding: 2px 7px; font-size: 9pt; border-radius: 3px;">{{ g }}</span>
+                {% endfor %}
+                <br><br>
+                <b>Synopsis:</b><br>
+                <font size="2" color="#333333">{{ inspected_movie.description }}</font>
+                <br><br>
+                <b>Plot Keywords:</b><br>
+                <font size="2" color="#666666"><i>{{ inspected_movie.plot_keywords }}</i></font>
+                <br><br>
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#f9fbfd">
+                    <tr bgcolor="#e6f0fa">
+                        <th><b>Status for {{ active_user.name }}</b></th>
+                        <th><b>Rating Value</b></th>
+                    </tr>
+                    <tr>
+                        <td><b>Ground Truth Observed Rating (R<sub>ui</sub>):</b></td>
+                        <td>
+                            {% if inspected_orig > 0 %}
+                            <font color="#15803d"><b>&#9733; {{ inspected_orig }} / 5.0</b> (Observed)</font>
+                            {% else %}
+                            <font color="#c2410c"><b>0.0 (Unrated / Unknown in Matrix)</b></font>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Reconstructed SGD Prediction (r&#770;<sub>ui</sub> = p<sub>u</sub> &middot; q<sub>i</sub><sup>T</sup>):</b></td>
+                        <td><b><font color="#003366" size="3">&#9733; {{ inspected_clipped }} / 5.0</font></b> (Raw dot product: {{ inspected_dot_prod }})</td>
+                    </tr>
+                </table>
+            </td>
+
+            <td width="50%" valign="top" bgcolor="#f8fafc">
+                <center><b><font color="#003366" size="3">Step-by-Step Dot Product Formulation</font></b></center>
+                <br>
+                <div style="background-color: #ffffff; border: 1px solid #cbd5e1; padding: 10px; font-family: monospace; font-size: 9.5pt;">
+                    <b>Hypothesis Formula:</b><br>
+                    r&#770;<sub>u,i</sub> = &sum;<sub>f=1..k</sub> ( p<sub>u,f</sub> &times; q<sub>i,f</sub> )<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 
+                    {% for t in inspected_terms %}
+                    ({{ t.p }} &times; {{ t.q }}){% if not loop.last %} + {% endif %}
+                    {% endfor %}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 
+                    {% for t in inspected_terms %}
+                    {{ t.prod }}{% if not loop.last %} + {% endif %}
+                    {% endfor %}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>{{ inspected_dot_prod }}</b> &rarr; <b>Clipped: {{ inspected_clipped }} &#9733;</b>
+                </div>
+                <br>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e6f0fa">
+                        <th>Latent Factor #</th>
+                        <th>User Weight (p<sub>u,f</sub>)</th>
+                        <th>Movie Weight (q<sub>i,f</sub>)</th>
+                        <th>Factor Contribution (p &times; q)</th>
+                    </tr>
+                    {% for t in inspected_terms %}
+                    <tr>
+                        <td align="center"><b>Factor {{ t.factor }}</b></td>
+                        <td align="center">{{ t.p }}</td>
+                        <td align="center">{{ t.q }}</td>
+                        <td align="center"><b>{{ t.prod }} &#9733;</b></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <font size="2" color="#555555">
+                    <b>Interpretation:</b> The Stochastic Gradient Descent optimizer independently adjusts user affinity weights and item feature weights so their vector dot product reconstructs true ratings and accurately interpolates missing entries.
+                </font>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 4: TOP PERSONALIZED RECOMMENDATIONS                         -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left">
+                <font color="#ffffff" size="3">SECTION 4: TOP-5 PERSONALIZED RECOMMENDATIONS FOR {{ active_user.name | upper }}</font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <p>
+                    These are the top unrated movies ranked strictly by their SGD-predicted rating <b>r&#770;<sub>ui</sub></b> for <b>{{ active_user.name }}</b>:
+                </p>
+                <table border="1" cellpadding="8" cellspacing="0" width="100%" bgcolor="#ffffff">
+                    <tr bgcolor="#e6f0fa">
+                        <th width="8%" align="center">Rank</th>
+                        <th width="28%">Recommended Movie</th>
+                        <th width="16%" align="center">SGD Predicted Rating</th>
+                        <th width="14%" align="center">IMDb Benchmark</th>
+                        <th width="34%">Collaborative Filtering Recommendation Reason</th>
+                    </tr>
+                    {% for rec in top_recommendations %}
+                    {% set rm = rec.movie %}
+                    <tr bgcolor="{% if loop.index == 1 %}#fefce8{% elif loop.index % 2 == 0 %}#f9fbfd{% else %}#ffffff{% endif %}">
+                        <td align="center">
+                            <b><font size="4" color="#003366">#{{ loop.index }}</font></b>
+                        </td>
+                        <td>
+                            <b><font size="3" color="#003366">{{ rm.emoji }} {{ rm.title }}</font></b> ({{ rm.year }})<br>
+                            <font size="2" color="#555555">
+                                {% for g in rm.genres %}
+                                <span style="background-color: #e2e8f0; color: #1e293b; padding: 1px 5px; font-size: 7.5pt; border-radius: 2px;">{{ g }}</span>
+                                {% endfor %}
+                                &bull; Dir: {{ rm.director }}
+                            </font>
+                        </td>
+                        <td align="center">
+                            <b><font size="3" color="#15803d">&#9733; {{ rec.pred_rating }} / 5.0</font></b><br>
+                            <font size="1" color="#666666">(Estimated Rating)</font>
+                        </td>
+                        <td align="center">
+                            &#11088; {{ rm.rating }} / 10
+                        </td>
+                        <td>
+                            <font size="2" color="#333333">{{ rec.reason }}</font>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 5: ALGORITHM INTERNALS VISUALIZATION (MATPLOTLIB)           -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2" align="left">
+                <font color="#ffffff" size="3">SECTION 5: STOCHASTIC GRADIENT DESCENT CONVERGENCE &amp; LATENT FACTOR PLOTS</font>
+            </th>
+        </tr>
+        <tr>
+            <!-- Plot 1: Loss Curve -->
+            <td width="50%" align="center" valign="top">
+                <b><font color="#003366">Plot 1: SGD Training Loss Decay Across Epochs</font></b><br>
+                <font size="2" color="#555555">Monotonic convergence of Mean Squared Error (MSE) and Total Loss J</font>
+                <br><br>
+                <img src="data:image/png;base64,{{ plots.loss_curve }}" width="96%" style="border: 1px solid #cccccc;" alt="SGD Loss Convergence Curve">
+            </td>
+            <!-- Plot 2: Latent Factor Space -->
+            <td width="50%" align="center" valign="top">
+                <b><font color="#003366">Plot 2: Learned Latent Space (Movies &amp; Users Embedding)</font></b><br>
+                <font size="2" color="#555555">2D projection of item vectors Q and user vectors P clustered by genre affinity</font>
+                <br><br>
+                <img src="data:image/png;base64,{{ plots.latent_space }}" width="96%" style="border: 1px solid #cccccc;" alt="Latent Factor Embedding Space">
+            </td>
+        </tr>
+        <tr>
+            <!-- Plot 3: Matrix Heatmaps -->
+            <td width="50%" align="center" valign="top">
+                <b><font color="#003366">Plot 3: Sparse Input R vs. Completed Reconstructed R&#770;</font></b><br>
+                <font size="2" color="#555555">Visual matrix completion: blank gray unknowns filled by SGD dot product</font>
+                <br><br>
+                <img src="data:image/png;base64,{{ plots.matrix_heatmaps }}" width="96%" style="border: 1px solid #cccccc;" alt="Original vs Reconstructed Heatmaps">
+            </td>
+            <!-- Plot 4: Latent Matrices Weights -->
+            <td width="50%" align="center" valign="top">
+                <b><font color="#003366">Plot 4: Numerical Latent Factor Matrices (P and Q<sup>T</sup>)</font></b><br>
+                <font size="2" color="#555555">Heatmap representation of learned user preferences P and movie features Q</font>
+                <br><br>
+                <img src="data:image/png;base64,{{ plots.latent_weights }}" width="96%" style="border: 1px solid #cccccc;" alt="Latent Weights Heatmap">
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 6: FULL USER-ITEM RATING MATRICES COMPARISON                -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left">
+                <font color="#ffffff" size="3">SECTION 6: USER-ITEM RATING MATRICES (OBSERVED RATINGS &amp; FILLED-IN UNKNOWNS)</font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <p>
+                    <font size="2">
+                        <b>Legend:</b> 
+                        <span style="background-color: #dcfce7; border: 1px solid #86efac; padding: 2px 6px; font-weight: bold; color: #15803d;">Green = Observed User Rating (Ground Truth)</span> &nbsp;&nbsp;
+                        <span style="background-color: #fef3c7; border: 1px solid #fde047; padding: 2px 6px; font-weight: bold; color: #b45309;">Yellow = Unknown Rating Filled by SGD (Predicted)</span>
+                    </font>
+                </p>
+                <table border="1" cellpadding="4" cellspacing="0" width="100%" bgcolor="#ffffff" style="font-size: 8pt; text-align: center;">
+                    <tr bgcolor="#003366">
+                        <th style="color: white; padding: 6px;">User Name</th>
+                        {% for m in movies %}
+                        <th style="color: white; padding: 4px;" title="{{ m.title }} ({{ m.year }})">
+                            {{ m.initials }}<br>
+                            <font size="1">{{ m.emoji }}</font>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    {% for row in matrix_table %}
+                    <tr {% if row.is_active %}style="outline: 2px solid #b91c1c; font-weight: bold;" bgcolor="#fef2f2"{% elif loop.index % 2 == 0 %}bgcolor="#f8fafc"{% endif %}>
+                        <td align="left" style="padding: 5px; white-space: nowrap;">
+                            {% if row.is_active %}<font color="#b91c1c">&#9658; <b>{{ row.user.name }}</b></font>{% else %}{{ row.user.name }}{% endif %}
+                        </td>
+                        {% for cell in row.entries %}
+                        <td {% if cell.is_known %}bgcolor="#dcfce7" style="color: #15803d;"{% else %}bgcolor="#fef3c7" style="color: #b45309;"{% endif %}>
+                            {% if cell.is_known %}
+                            <b>{{ cell.orig }}&#9733;</b>
+                            {% else %}
+                            <i>{{ cell.pred }}</i>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 7: EPOCH-BY-EPOCH SGD TRAINING CONVERGENCE LOG              -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left">
+                <font color="#ffffff" size="3">SECTION 7: EPOCH-BY-EPOCH SGD TRAINING METRICS LOG (&ge; 3 EPOCHS VERIFICATION)</font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <p>
+                    <font size="2" color="#555555">
+                        Verification of iterative optimization: Mean Squared Error (MSE), Root Mean Squared Error (RMSE), Frobenius penalty, and objective loss drop per epoch.
+                    </font>
+                </p>
+                <table border="1" cellpadding="5" cellspacing="0" width="100%" bgcolor="#ffffff" style="font-size: 9pt; text-align: center;">
+                    <tr bgcolor="#e6f0fa">
+                        <th>Epoch #</th>
+                        <th>Mean Squared Error (MSE)</th>
+                        <th>Root Mean Squared Error (RMSE)</th>
+                        <th>Frobenius Regularization Penalty</th>
+                        <th>Total Regularized Loss J(P, Q)</th>
+                        <th>Loss Reduction vs Epoch 1 (%)</th>
+                    </tr>
+                    {% for ep in loss_history %}
+                    <tr {% if ep.epoch == 1 %}bgcolor="#fef2f2"{% elif ep.epoch == epochs %}bgcolor="#f0fdf4"{% elif ep.epoch % 2 == 0 %}bgcolor="#f9fbfd"{% endif %}>
+                        <td><b>Epoch {{ ep.epoch }}</b></td>
+                        <td>{{ ep.mse }}</td>
+                        <td>{{ ep.rmse }}</td>
+                        <td>{{ ep.frob_penalty }}</td>
+                        <td><b>{{ ep.total_loss }}</b></td>
+                        <td>
+                            {% if ep.epoch == 1 %}
+                            <font color="#666666">0.0% (Baseline)</font>
+                            {% else %}
+                            <font color="#15803d"><b>&#9660; {{ ep.pct_drop }}%</b></font>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 8: SOURCE CODE & GITHUB ARTIFACTS                           -->
+    <!-- =================================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th align="left">
+                <font color="#ffffff" size="3">SECTION 8: CODE REPOSITORY &amp; ACADEMIC ARTIFACT LINKS</font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="6" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="30%"><b>Master GitHub Repository:</b></td>
+                        <td width="70%">
+                            <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366; font-weight: bold;">
+                                https://github.com/dSAxmonis/pars-lab
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Experiment 21 Flask Application:</b></td>
+                        <td>
+                            <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2021/app.py" target="_blank" style="color: #0044cc;">
+                                https://github.com/dSAxmonis/pars-lab/blob/main/exp 21/app.py
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>HTML Web Template:</b></td>
+                        <td>
+                            <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2021/templates/index.html" target="_blank" style="color: #0044cc;">
+                                https://github.com/dSAxmonis/pars-lab/blob/main/exp 21/templates/index.html
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Lab Practical File (Markdown):</b></td>
+                        <td>
+                            <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2021/LAB_PRACTICAL_FILE.md" target="_blank" style="color: #0044cc;">
+                                https://github.com/dSAxmonis/pars-lab/blob/main/exp 21/LAB_PRACTICAL_FILE.md
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Report for Printable PDF (HTML):</b></td>
+                        <td>
+                            <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2021/report_for_pdf.html" target="_blank" style="color: #0044cc;">
+                                https://github.com/dSAxmonis/pars-lab/blob/main/exp 21/report_for_pdf.html
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Requirements &amp; Dependencies:</b></td>
+                        <td>
+                            <a href="https://github.com/dSAxmonis/pars-lab/blob/main/exp%2021/requirements.txt" target="_blank" style="color: #0044cc;">
+                                https://github.com/dSAxmonis/pars-lab/blob/main/exp 21/requirements.txt
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- =================================================================== -->
+    <!-- FOOTER                                                              -->
+    <!-- =================================================================== -->
+    <center>
+        <hr width="92%" size="1" color="#cccccc">
+        <font size="2" color="#666666">
+            Netaji Subhas University of Technology (NSUT) &bull; Department of Information Technology &bull; PARS Lab Practical Session (2026-2027)<br>
+            Student: <b>Monis (Roll: 2023UIT3027)</b> &bull; Instructor: <b>Dr. Vishal Maheshkar</b>
+        </font>
+        <br><br>
+    </center>
+
+</body>
+</html>

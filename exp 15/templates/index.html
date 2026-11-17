@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment 15: User-Based Nearest Neighbor (kNN) Recommender System</title>
+    <style>
+        /* Lightweight styling to complement classic HTML tables */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f4f6f8;
+            color: #222222;
+        }
+        .movie-card {
+            background-color: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 10px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .movie-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: #003366;
+        }
+        .movie-card.rated-card {
+            border: 2px solid #16a34a;
+            background-color: #f0fdf4;
+        }
+        .poster-box {
+            width: 100%;
+            height: 110px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            margin-bottom: 8px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 8.5pt;
+            font-weight: bold;
+            border-radius: 3px;
+            margin-right: 3px;
+            margin-bottom: 3px;
+        }
+        .badge-scifi { background-color: #0284c7; color: white; }
+        .badge-action { background-color: #1e293b; color: white; }
+        .badge-drama { background-color: #475569; color: white; }
+        .badge-crime { background-color: #7f1d1d; color: white; }
+        .badge-comedy { background-color: #c2410c; color: white; }
+        .badge-romance { background-color: #be123c; color: white; }
+        .badge-horror { background-color: #15803d; color: white; }
+        .badge-thriller { background-color: #134e4a; color: white; }
+        
+        /* Modal for movie details */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 620px;
+            width: 90%;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-top: 6px solid #003366;
+        }
+        .btn-submit {
+            background-color: #003366;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 8px 18px;
+            border: 1px solid #002244;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11pt;
+        }
+        .btn-submit:hover {
+            background-color: #002244;
+        }
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #003366;
+            font-weight: bold;
+            padding: 6px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10pt;
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        .btn-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: bold;
+            padding: 6px 14px;
+            border: 1px solid #f87171;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body bgcolor="#f4f6f8" text="#222222">
+
+    <!-- ============================================================== -->
+    <!-- LAB PRACTICAL HEADER -->
+    <!-- ============================================================== -->
+    <center>
+        <h1><font color="#003366">LAB PRACTICAL - EXPERIMENT 15</font></h1>
+        <h3><font color="#555555">User-Based Nearest Neighbor (kNN) Collaborative Filtering Recommender System</font></h3>
+        <p>
+            <b>Subject:</b> Pattern Analysis and Recommender Systems (PARS) Lab &nbsp;|&nbsp;
+            <b>Framework:</b> Flask / Pure NumPy (No Inbuilt Toolboxes) &nbsp;|&nbsp;
+            <b>Port:</b> 5015
+        </p>
+        <hr width="92%" size="2" color="#003366">
+    </center>
+
+    <br>
+
+    <!-- ============================================================== -->
+    <!-- STUDENT & EXPERIMENT METADATA TABLE -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="4"><font color="#ffffff">ACADEMIC &amp; STUDENT PRACTICAL METADATA</font></th>
+        </tr>
+        <tr>
+            <td width="25%" bgcolor="#f1f5f9"><b>Student Name:</b></td>
+            <td width="25%"><b>Monis</b></td>
+            <td width="25%" bgcolor="#f1f5f9"><b>Roll Number:</b></td>
+            <td width="25%"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td bgcolor="#f1f5f9"><b>Institution:</b></td>
+            <td>Netaji Subhas University of Technology (NSUT)</td>
+            <td bgcolor="#f1f5f9"><b>Department:</b></td>
+            <td>Information Technology</td>
+        </tr>
+        <tr>
+            <td bgcolor="#f1f5f9"><b>Course / Session:</b></td>
+            <td>PARS Lab &bull; Academic Session 2026&ndash;2027</td>
+            <td bgcolor="#f1f5f9"><b>Lab Instructor:</b></td>
+            <td>Dr. Vishal Maheshkar</td>
+        </tr>
+        <tr>
+            <td bgcolor="#f1f5f9"><b>GitHub Repository:</b></td>
+            <td colspan="3">
+                <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color:#0044cc; font-weight:bold;">
+                    https://github.com/dSAxmonis/pars-lab
+                </a>
+                &nbsp;|&nbsp;
+                <a href="https://github.com/dSAxmonis/pars-lab/tree/main/exp%2015" target="_blank" style="color:#0044cc; font-weight:bold;">
+                    [`exp 15/` Source Code Directory]
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- AIM & THEORY SYNOPSIS -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th><font color="#ffffff">EXPERIMENT AIM &amp; ALGORITHMIC PRINCIPLES</font></th>
+        </tr>
+        <tr>
+            <td>
+                <b>AIM:</b>
+                To implement a <b>User-based Nearest Neighbor (kNN) Recommender System</b> from scratch in Python using pure NumPy (without <code>scikit-learn</code> or <code>Surprise</code>), deploy an interactive web portal using Flask with a 20-movie catalog across diverse genres, compute pairwise user similarity via Pearson Correlation / Cosine metrics, select $k$ nearest neighbors, predict ratings using the mean-centered deviation formula:
+                <br><br>
+                <center>
+                    <font size="3" color="#003366">
+                        $$\hat{r}_{a,j} = \bar{r}_a + \frac{\sum_{u \in N_{k}(a)} s(a, u) \cdot (r_{u,j} - \bar{r}_u)}{\sum_{u \in N_{k}(a)} |s(a, u)|}$$
+                    </font>
+                </center>
+                <br>
+                and visually inspect internal similarity matrices, neighbor selections, and predicted rating distributions via Matplotlib.
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- MAIN FORM: INTERACTIVE CONTROLS & PRESETS -->
+    <!-- ============================================================== -->
+    <form id="recommenderForm" method="POST" action="/">
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">SECTION 1: RECOMMENDER HYPERPARAMETERS &amp; USER PRESETS</font></th>
+        </tr>
+        <tr>
+            <td width="55%" valign="top">
+                <b>1. Quick Persona Presets (Load Taste Profiles):</b><br>
+                <font size="2" color="#555555">Select a simulated user archetype to instantly prefill ratings for movies:</font><br><br>
+                
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="30%"><b>Choose Persona:</b></td>
+                        <td>
+                            <select name="preset_key" id="presetSelect" style="padding: 6px 10px; font-size: 10pt; width: 320px;">
+                                {% for p_k, p_val in presets.items() %}
+                                <option value="{{ p_k }}" {% if preset_key == p_k %}selected{% endif %}>
+                                    {{ p_val.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            &nbsp;
+                            <button type="submit" name="action" value="load_preset" class="btn-secondary">
+                                Load Preset
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Active Profile Note:</b></td>
+                        <td><font size="2" color="#004d40"><i>{{ presets[preset_key].description }}</i></font></td>
+                    </tr>
+                </table>
+            </td>
+            
+            <td width="45%" valign="top" bgcolor="#f9fbfd">
+                <b>2. Mathematical Configuration:</b><br><br>
+                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="50%"><b>Similarity Metric $s(a,u)$:</b></td>
+                        <td>
+                            <select name="metric" style="padding: 6px 10px; font-size: 10pt; width: 160px;">
+                                <option value="pearson" {% if metric == 'pearson' %}selected{% endif %}>Pearson Correlation</option>
+                                <option value="cosine" {% if metric == 'cosine' %}selected{% endif %}>Cosine Similarity</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Neighborhood Size ($k$):</b></td>
+                        <td>
+                            <select name="k" style="padding: 6px 10px; font-size: 10pt; width: 160px;">
+                                <option value="1" {% if k == 1 %}selected{% endif %}>k = 1 Nearest Neighbor</option>
+                                <option value="2" {% if k == 2 %}selected{% endif %}>k = 2 Nearest Neighbors</option>
+                                <option value="3" {% if k == 3 %}selected{% endif %}>k = 3 Nearest Neighbors (Default)</option>
+                                <option value="4" {% if k == 4 %}selected{% endif %}>k = 4 Nearest Neighbors</option>
+                                <option value="5" {% if k == 5 %}selected{% endif %}>k = 5 Nearest Neighbors</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <br>
+                            <button type="submit" name="action" value="recommend" class="btn-submit">
+                                Calculate kNN Recommendations
+                            </button>
+                            &nbsp;&nbsp;
+                            <button type="submit" name="action" value="clear_all" class="btn-danger">
+                                Clear All Ratings
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" bgcolor="#e6f0fa">
+                <b>Session Status:</b>
+                You have rated <b>{{ rated_count }}</b> of 20 movies &nbsp;|&nbsp;
+                Your Mean Rating ($\bar{r}_a$): <b>{{ active_mean }} / 5.00</b> &nbsp;|&nbsp;
+                Unrated Candidate Movies: <b>{{ recommendations|length }}</b>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2: FULL MOVIE CATALOG (20 INTERACTIVE MOVIE CARDS) -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="4">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left"><font color="#ffffff" size="3"><b>SECTION 2: COMPLETE MOVIES CATALOG &amp; INTERACTIVE RATING GRID (20 MOVIES)</b></font></td>
+                        <td align="right"><font color="#ffffff" size="2">Click any movie card to inspect details &bull; Rate 1 to 5 stars</font></td>
+                    </tr>
+                </table>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="4" bgcolor="#f8fafc">
+                <p style="margin: 0 0 10px 0; font-size: 10pt; color: #475569;">
+                    <b>Interactive Instructions:</b> Click on any movie card to view full synopsis, director, cast, and keywords. Select your rating (1-5 stars) from the dropdown in each card to reflect your personal taste. Cards with green borders are currently rated by you.
+                </p>
+                
+                <!-- Grid of 20 Movie Cards (4 columns x 5 rows) -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;">
+                    {% for m in movies %}
+                    <div class="movie-card {% if m.is_rated %}rated-card{% endif %}" id="card-{{ m.id }}" onclick="openMovieModal({{ m.id }})">
+                        
+                        <!-- Poster Box with Emoji and Initials -->
+                        <div class="poster-box" style="background-color: {{ m.poster_color }};">
+                            <span style="font-size: 32pt; margin-bottom: 2px;">{{ m.poster_emoji }}</span>
+                            <span style="font-size: 11pt; letter-spacing: 0.5px;">{{ m.title[:18] }}{% if m.title|length > 18 %}...{% endif %}</span>
+                            <span style="font-size: 8.5pt; opacity: 0.85;">({{ m.year }})</span>
+                        </div>
+                        
+                        <!-- Title & Meta -->
+                        <div style="margin-bottom: 6px;">
+                            <b style="font-size: 11pt; color: #003366;">{{ m.title }}</b>
+                            <span style="float: right; font-size: 9pt; color: #b45309; font-weight: bold;">★ {{ m.imdb_rating }}</span>
+                        </div>
+                        
+                        <!-- Genre Badges -->
+                        <div style="margin-bottom: 8px; min-height: 22px;">
+                            {% for g in m.genres %}
+                            <span class="badge badge-{{ g|lower }}">{{ g }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Director & Snippet -->
+                        <div style="font-size: 8.5pt; color: #64748b; margin-bottom: 8px;">
+                            <b>Dir:</b> {{ m.director }}<br>
+                            <i>"{{ m.tagline }}"</i>
+                        </div>
+                        
+                        <!-- Rating Selector Controls -->
+                        <div style="border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 6px;" onclick="event.stopPropagation();">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td valign="middle" style="font-size: 9pt;">
+                                        <b>Your Rating:</b>
+                                    </td>
+                                    <td align="right">
+                                        <select name="rating_{{ m.id }}" id="rating_input_{{ m.id }}" onchange="markCardChanged({{ m.id }})" style="font-size: 9pt; padding: 3px 6px; border: 1px solid #94a3b8; border-radius: 3px;">
+                                            <option value="">(Not Rated)</option>
+                                            <option value="1.0" {% if m.user_rating == 1.0 %}selected{% endif %}>★ 1 (Poor)</option>
+                                            <option value="2.0" {% if m.user_rating == 2.0 %}selected{% endif %}>★★ 2 (Fair)</option>
+                                            <option value="3.0" {% if m.user_rating == 3.0 %}selected{% endif %}>★★★ 3 (Good)</option>
+                                            <option value="4.0" {% if m.user_rating == 4.0 %}selected{% endif %}>★★★★ 4 (Great)</option>
+                                            <option value="5.0" {% if m.user_rating == 5.0 %}selected{% endif %}>★★★★★ 5 (Masterpiece)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% if m.is_rated %}
+                            <div style="margin-top: 4px; font-size: 8.5pt; color: #16a34a; font-weight: bold;">
+                                ✓ Rated: {{ m.user_rating|int }} Star{% if m.user_rating > 1 %}s{% endif %}
+                            </div>
+                            {% else %}
+                            <div style="margin-top: 4px; font-size: 8.5pt; color: #94a3b8;">
+                                &bull; Unwatched / Candidate
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <br>
+                <center>
+                    <button type="submit" name="action" value="recommend" class="btn-submit" style="padding: 10px 28px; font-size: 12pt;">
+                        Update My Ratings &amp; Run kNN Recommender
+                    </button>
+                </center>
+            </td>
+        </tr>
+    </table>
+    </form>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 3: TOP-5 RECOMMENDED MOVIES FOR ACTIVE USER -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#004d40">
+            <th colspan="5"><font color="#ffffff">SECTION 3: TOP RECOMMENDED MOVIES FOR ACTIVE USER (PREDICTED VIA kNN)</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" align="center">
+            <th width="8%">Rank</th>
+            <th width="30%">Movie Details</th>
+            <th width="18%">Predicted Rating ($\hat{r}$)</th>
+            <th width="24%">Contributing Neighbors in $N_k$</th>
+            <th width="20%">Recommendation Reason</th>
+        </tr>
+        {% if top_recommendations %}
+            {% for rec in top_recommendations %}
+            <tr bgcolor="{% if loop.index0 % 2 == 0 %}#ffffff{% else %}#fcfcfc{% endif %}">
+                <td align="center" valign="middle">
+                    <span style="display:inline-block; width:28px; height:28px; line-height:28px; border-radius:50%; background-color:#004d40; color:white; font-weight:bold;">
+                        #{{ loop.index }}
+                    </span>
+                </td>
+                <td valign="top">
+                    <b style="font-size: 12pt; color: #003366;">{{ rec.title }}</b> ({{ rec.year }})<br>
+                    <div style="margin: 4px 0;">
+                        {% for g in rec.genres %}
+                        <span class="badge badge-{{ g|lower }}">{{ g }}</span>
+                        {% endfor %}
+                    </div>
+                    <font size="2" color="#555555">
+                        <b>Director:</b> {{ rec.director }}<br>
+                        <b>Cast:</b> {{ rec.cast }}<br>
+                        <b>IMDb Baseline:</b> ★ {{ rec.imdb_rating }}
+                    </font>
+                </td>
+                <td align="center" valign="middle">
+                    <font size="4" color="#004d40"><b>★ {{ rec.predicted_rating }}</b></font><br>
+                    <font size="3" color="#f59e0b">{{ rec.stars_display }}</font><br>
+                    <font size="2" color="#64748b">({{ rec.method }})</font>
+                </td>
+                <td valign="top" style="font-size: 9.5pt;">
+                    {% if rec.neighbor_contributors %}
+                        <ul style="margin: 0; padding-left: 18px;">
+                        {% for nc in rec.neighbor_contributors %}
+                            <li>
+                                <b>{{ nc.name.split()[0] }}</b>: rated <b>★ {{ nc.rating|int }}</b>
+                                <font color="#64748b">(sim: {{ nc.similarity|round(2) }})</font>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <font color="#64748b"><i>No neighbor in top-{{ k }} rated this; inferred via dataset baseline.</i></font>
+                    {% endif %}
+                </td>
+                <td valign="top" style="font-size: 9pt; color: #334155;">
+                    {% if rec.neighbor_contributors %}
+                        High positive alignment with {{ rec.neighbor_contributors|length }} nearest neighbor(s) who thoroughly enjoyed this movie.
+                    {% else %}
+                        High global critical consensus across the overall audience pool.
+                    {% endif %}
+                    <br><br>
+                    <i><b>Keywords:</b> {{ rec.plot_keywords }}</i>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" align="center">
+                    <b>No recommendations available. All catalog items have already been rated by you!</b>
+                </td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 4: STEP-BY-STEP MATHEMATICAL PREDICTION BREAKDOWN -->
+    <!-- ============================================================== -->
+    {% if explanation %}
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#1e293b">
+            <th>
+                <font color="#ffffff">
+                    SECTION 4: STEP-BY-STEP MATHEMATICAL DERIVATION (FOR TOP PICK: "{{ explanation.movie_title }}")
+                </font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <b>Rescaled Deviation-From-Mean Equation:</b>
+                <div style="background-color: #f8fafc; border-left: 4px solid #1e293b; padding: 10px 16px; margin: 8px 0; font-family: monospace; font-size: 11pt;">
+                    r&#770;<sub>a,j</sub> = r&#772;<sub>a</sub> + [ &sum;<sub>u &isin; N<sub>k</sub></sub> s(a,u) &times; (r<sub>u,j</sub> - r&#772;<sub>u</sub>) ] / [ &sum;<sub>u &isin; N<sub>k</sub></sub> |s(a,u)| ]
+                </div>
+                
+                <table border="1" cellpadding="6" cellspacing="0" width="100%" bgcolor="#ffffff" style="margin-top: 10px; font-size: 9.5pt;">
+                    <tr bgcolor="#f1f5f9" align="center">
+                        <th>Nearest Neighbor $u$</th>
+                        <th>Similarity $s(a, u)$</th>
+                        <th>Neighbor's Rating $r_{u,j}$</th>
+                        <th>Neighbor's Mean $\bar{r}_u$</th>
+                        <th>Deviation $(r_{u,j} - \bar{r}_u)$</th>
+                        <th>Weighted Contribution $s(a,u) \cdot \Delta$</th>
+                    </tr>
+                    {% for row in explanation.steps %}
+                    <tr align="center">
+                        <td align="left"><b>{{ row.neighbor_name }}</b></td>
+                        <td>{{ row.similarity }}</td>
+                        <td><b>{{ row.rating }}</b></td>
+                        <td>{{ row.user_mean }}</td>
+                        <td>{{ row.deviation }}</td>
+                        <td bgcolor="#f8fafc"><b>{{ row.weighted_dev }}</b></td>
+                    </tr>
+                    {% endfor %}
+                    <tr bgcolor="#e6f0fa">
+                        <td colspan="5" align="right"><b>Numerator Sum &sum; [s(a,u) &times; &Delta;]:</b></td>
+                        <td align="center"><b>{{ explanation.numer_sum }}</b></td>
+                    </tr>
+                    <tr bgcolor="#e6f0fa">
+                        <td colspan="5" align="right"><b>Denominator Sum &sum; |s(a,u)|:</b></td>
+                        <td align="center"><b>{{ explanation.denom_sum }}</b></td>
+                    </tr>
+                    <tr bgcolor="#dbeafe">
+                        <td colspan="5" align="right"><b>Adjusted Residual Offset [Numerator / Denominator]:</b></td>
+                        <td align="center"><b>{{ explanation.adjusted_deviation }}</b></td>
+                    </tr>
+                    <tr bgcolor="#bbf7d0">
+                        <td colspan="5" align="right"><b>Final Predicted Rating &bull; r&#772;<sub>a</sub> ({{ explanation.active_mean }}) + Offset ({{ explanation.adjusted_deviation }}):</b></td>
+                        <td align="center"><font size="3" color="#166534"><b>★ {{ explanation.final_predicted_rating }} / 5.0</b></font></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 5: NEIGHBOR SIMILARITY RANKING TABLE -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="8" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="7"><font color="#ffffff">SECTION 5: USER SIMILARITY SCORES WITH RESPECT TO ACTIVE USER ("YOU")</font></th>
+        </tr>
+        <tr bgcolor="#e6f0fa" align="center">
+            <th width="6%">Rank</th>
+            <th width="18%">Reference User</th>
+            <th width="22%">Taste Persona</th>
+            <th width="15%">Similarity Metric</th>
+            <th width="12%">Co-Rated Count</th>
+            <th width="15%">Chosen Neighbor?</th>
+            <th width="12%">User Mean $\bar{r}_u$</th>
+        </tr>
+        {% for u in similarity_results %}
+        <tr align="center" bgcolor="{% if u.is_neighbor %}#ecfdf5{% else %}#ffffff{% endif %}">
+            <td><b>#{{ u.rank }}</b></td>
+            <td align="left"><b>{{ u.name }}</b></td>
+            <td align="left"><font size="2" color="#475569">{{ u.persona }}</font></td>
+            <td>
+                <font size="2.5" color="{% if u.similarity >= 0 %}#16a34a{% else %}#dc2626{% endif %}">
+                    <b>{{ u.similarity }}</b> ({{ u.similarity_pct }}%)
+                </font>
+            </td>
+            <td>{{ u.co_rated_count }} shared</td>
+            <td>
+                {% if u.is_neighbor %}
+                    <span style="background-color: #16a34a; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 8.5pt;">
+                        Selected in N_{{ k }}
+                    </span>
+                {% else %}
+                    <font color="#94a3b8" size="2">Excluded (Outside k)</font>
+                {% endif %}
+            </td>
+            <td>{{ u.mean_rating }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 6: ALGORITHM VISUALIZATIONS (MATPLOTLIB BASE64) -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="10" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="2"><font color="#ffffff">SECTION 6: INTERNAL ALGORITHMIC VISUALIZATIONS &amp; DIAGNOSTIC PLOTS</font></th>
+        </tr>
+        <tr>
+            <td width="42%" align="center" valign="middle">
+                <b>User-User Pairwise Similarity Matrix (9 &times; 9 Heatmap)</b><br>
+                <font size="2" color="#64748b">Displays calculated pairwise {{ metric|upper }} correlations between all users.</font><br><br>
+                <img src="data:image/png;base64,{{ plot_heatmap_url }}" alt="User Similarity Heatmap" style="max-width: 100%; border: 1px solid #cbd5e1; border-radius: 4px;">
+            </td>
+            <td width="58%" align="center" valign="middle">
+                <b>Neighbor Selection Diagnostics &amp; Top-5 Predicted Ratings</b><br>
+                <font size="2" color="#64748b">Left: User similarity ranking ($k$ selected in green) | Right: Predicted scores for top candidates.</font><br><br>
+                <img src="data:image/png;base64,{{ plot_diagnostics_url }}" alt="Recommender Diagnostics" style="max-width: 100%; border: 1px solid #cbd5e1; border-radius: 4px;">
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 7: COMPLETE USER-ITEM RATING MATRIX TABLE -->
+    <!-- ============================================================== -->
+    <table border="1" cellpadding="6" cellspacing="0" width="92%" align="center" bgcolor="#ffffff">
+        <tr bgcolor="#003366">
+            <th colspan="{{ movies|length + 2 }}">
+                <font color="#ffffff">SECTION 7: COMPLETE USER-ITEM RATINGS MATRIX $R$ (9 USERS &times; 20 MOVIES)</font>
+            </th>
+        </tr>
+        <tr bgcolor="#f1f5f9" style="font-size: 8pt;" align="center">
+            <th align="left" width="12%">User \ Movie</th>
+            <th width="5%">Mean</th>
+            {% for m in movies %}
+            <th title="{{ m.title }} ({{ m.year }})" style="max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                {{ m.title[:4] }}..
+            </th>
+            {% endfor %}
+        </tr>
+        {% for row in matrix_rows %}
+        <tr align="center" style="font-size: 8.5pt;" bgcolor="{% if row.is_active %}#eff6ff{% elif loop.index0 % 2 == 0 %}#ffffff{% else %}#f8fafc{% endif %}">
+            <td align="left">
+                <b>{% if row.is_active %}<font color="#1d4ed8">&#9658; {{ row.name }}</font>{% else %}{{ row.name }}{% endif %}</b>
+            </td>
+            <td><b>{{ row.mean }}</b></td>
+            {% for r in row.ratings %}
+            <td bgcolor="{% if r > 0 %}{% if row.is_active %}#dbeafe{% else %}#e2e8f0{% endif %}{% else %}#ffffff{% endif %}">
+                {% if r > 0 %}
+                    <b>{{ r }}</b>
+                {% else %}
+                    <font color="#cbd5e1">-</font>
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+
+    <!-- ============================================================== -->
+    <!-- FOOTER -->
+    <!-- ============================================================== -->
+    <center>
+        <hr width="92%" size="1" color="#cbd5e1">
+        <p style="font-size: 10pt; color: #555555;">
+            <b>Pattern Analysis and Recommender Systems (PARS) Lab</b> &bull; Department of Information Technology<br>
+            Netaji Subhas University of Technology (NSUT), Dwarka, Sector-3, New Delhi - 110078<br>
+            <b>Student:</b> Monis &nbsp;|&nbsp; <b>Roll No:</b> 2023UIT3027 &nbsp;|&nbsp; <b>Lab Instructor:</b> Dr. Vishal Maheshkar &nbsp;|&nbsp; <b>Session:</b> 2026-2027<br>
+            <b>Repository:</b> <a href="https://github.com/dSAxmonis/pars-lab" target="_blank" style="color: #003366;">https://github.com/dSAxmonis/pars-lab</a>
+        </p>
+    </center>
+
+    <br>
+
+    <!-- ============================================================== -->
+    <!-- MODAL POPUP FOR MOVIE DETAILS INSPECTION -->
+    <!-- ============================================================== -->
+    <div id="movieModal" class="modal-overlay" onclick="closeMovieModal()">
+        <div class="modal-content" onclick="event.stopPropagation();">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                    <h2 id="modalTitle" style="margin: 0; color: #003366; font-size: 18pt;">Movie Title</h2>
+                    <span id="modalMeta" style="color: #64748b; font-size: 10pt;">Year &bull; Director</span>
+                </div>
+                <button onclick="closeMovieModal()" style="background: none; border: none; font-size: 20pt; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            
+            <div id="modalPoster" style="height: 100px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 40pt; margin-bottom: 14px; color: white;">
+                🌀
+            </div>
+            
+            <p><b>Genres:</b> <span id="modalGenres"></span></p>
+            <p><b>Director:</b> <span id="modalDirector"></span></p>
+            <p><b>Cast:</b> <span id="modalCast"></span></p>
+            <p><b>Critical Rating:</b> <span id="modalRating" style="font-weight: bold; color: #b45309;"></span></p>
+            <p><b>Keywords &amp; Narrative:</b> <span id="modalKeywords" style="font-style: italic; color: #334155;"></span></p>
+            
+            <hr color="#e2e8f0">
+            <div style="text-align: right; margin-top: 14px;">
+                <button onclick="closeMovieModal()" class="btn-secondary">Close Inspector</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT FOR MODAL & INTERACTIVE CARDS -->
+    <script>
+        const movieData = {{ movies|tojson }};
+        
+        function openMovieModal(movieId) {
+            const m = movieData.find(item => item.id === movieId);
+            if (!m) return;
+            
+            document.getElementById('modalTitle').innerText = m.title;
+            document.getElementById('modalMeta').innerText = m.year + ' • Directed by ' + m.director;
+            document.getElementById('modalPoster').style.backgroundColor = m.poster_color;
+            document.getElementById('modalPoster').innerText = m.poster_emoji;
+            document.getElementById('modalGenres').innerText = m.genres.join(', ');
+            document.getElementById('modalDirector').innerText = m.director;
+            document.getElementById('modalCast').innerText = m.cast;
+            document.getElementById('modalRating').innerText = '★ ' + m.imdb_rating + ' / 10 (IMDb Critic Benchmark)';
+            document.getElementById('modalKeywords').innerText = m.plot_keywords;
+            
+            document.getElementById('movieModal').style.display = 'flex';
+        }
+        
+        function closeMovieModal() {
+            document.getElementById('movieModal').style.display = 'none';
+        }
+        
+        function markCardChanged(movieId) {
+            const selectEl = document.getElementById('rating_input_' + movieId);
+            const cardEl = document.getElementById('card-' + movieId);
+            if (selectEl.value) {
+                cardEl.classList.add('rated-card');
+            } else {
+                cardEl.classList.remove('rated-card');
+            }
+        }
+    </script>
+</body>
+</html>

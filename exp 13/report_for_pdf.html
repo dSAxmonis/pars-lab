@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment 13 - PARS Lab Practical File</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm 12mm 14mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 8.5pt;
+                font-family: Arial, sans-serif;
+                color: #555555;
+            }
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.40;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-univ {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #003366;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+        .header-dept {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #333333;
+            text-align: center;
+            margin: 0 0 2px 0;
+        }
+        .header-sub {
+            font-size: 9pt;
+            color: #555555;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+        }
+        .meta-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 8px;
+            background-color: #f8fafc;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #003366;
+            width: 18%;
+        }
+        .meta-val {
+            color: #1e293b;
+            width: 32%;
+        }
+        h2 {
+            font-size: 11pt;
+            color: #003366;
+            border-bottom: 1.5px solid #003366;
+            padding-bottom: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        h3 {
+            font-size: 9.5pt;
+            color: #004d40;
+            margin-top: 7px;
+            margin-bottom: 3px;
+        }
+        p {
+            margin: 3px 0 5px 0;
+            text-align: justify;
+        }
+        ol, ul {
+            margin: 3px 0 5px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #003366;
+            padding: 7px 12px;
+            margin: 6px 0;
+            font-size: 8.5pt;
+            color: #0f172a;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .screenshot-container {
+            text-align: center;
+            margin: 8px 0 10px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .screenshot-container img {
+            max-width: 98%;
+            max-height: 380px;
+            height: auto;
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .screenshot-caption {
+            font-size: 8pt;
+            color: #475569;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ACADEMIC HEADER -->
+    <div class="header-univ">Netaji Subhas University of Technology</div>
+    <div class="header-dept">Department of Information Technology &bull; New Delhi</div>
+    <div class="header-sub">Pattern Analysis and Recommender Systems (PARS) Lab &bull; Practical Record</div>
+
+    <!-- METADATA TABLE -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label">Experiment No.:</td>
+            <td class="meta-val"><b>13 (Practical XI)</b></td>
+            <td class="meta-label">Student Name:</td>
+            <td class="meta-val"><b>Monis</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Course / Branch:</td>
+            <td class="meta-val">B.Tech Information Technology</td>
+            <td class="meta-label">Roll Number:</td>
+            <td class="meta-val"><b>2023UIT3027</b></td>
+        </tr>
+        <tr>
+            <td class="meta-label">Lab Instructor:</td>
+            <td class="meta-val">Dr. Vishal Maheshkar</td>
+            <td class="meta-label">Academic Session:</td>
+            <td class="meta-val">2026&ndash;2027</td>
+        </tr>
+    </table>
+
+    <h2>Practical Name</h2>
+    <p><b>Implementation of Collaborative Filtering Recommender System Using Flask</b></p>
+
+    <h2>Aim</h2>
+    <p>To formulate, derive, and implement a User-Based Collaborative Filtering Recommender System from scratch in Python using Flask. The system builds an 8-user by 20-movie rating matrix, computes pairwise user similarities using Pearson Correlation, predicts ratings via mean-centered weighted summation, and validates predictions against holdout test ratings.</p>
+
+    <h2>Definitions &amp; Core Concepts</h2>
+    <p>Collaborative Filtering (CF) operates on the principle of collective intelligence: users who agreed on movie ratings in the past are likely to agree on other movies in the future. Instead of analyzing movie genres or plot descriptions, Collaborative Filtering analyzes patterns of user ratings across the community to find like-minded peers and generate recommendations based on their consensus.</p>
+
+    <h2>Mathematical Formulations</h2>
+    <h3>1. User-Item Interaction Matrix</h3>
+<p>The community's preferences are structured as a matrix R where rows represent users, columns represent movies, and each entry is a star rating from 1 to 5:</p>
+<div class="formula-box"><b>User Rating Representation:</b>
+R<sub>u,i</sub> = Star rating given by User u to Movie i (1 to 5 stars, or 0 if unrated)
+
+<b>User Average Rating:</b>
+r̄<sub>u</sub> = ( 1 / |I<sub>u</sub>| ) &times; &sum;<sub>i &isin; I<sub>u</sub></sub> R<sub>u,i</sub>
+
+<b>Where:</b>
+• <b>I<sub>u</sub>:</b> Set of all movies rated by User u.
+• <b>r̄<sub>u</sub>:</b> Personal rating baseline (average) of User u, capturing whether the user is strict or generous.</div>
+<h3>2. Pearson Correlation Similarity Measure</h3>
+<p>To measure how closely two users agree in their movie tastes, the Pearson Correlation Coefficient is computed over movies that both users have watched. Subtracting each user's average rating removes individual rating bias:</p>
+<div class="formula-box"><b>Pearson Correlation Formula:</b>
+Similarity(u, v) = &sum;<sub>i &isin; I<sub>uv</sub></sub> [ ( R<sub>u,i</sub> - r̄<sub>u</sub> ) &times; ( R<sub>v,i</sub> - r̄<sub>v</sub> ) ] / [ &radic;( &sum;<sub>i &isin; I<sub>uv</sub></sub> ( R<sub>u,i</sub> - r̄<sub>u</sub> )<sup>2</sup> ) &times; &radic;( &sum;<sub>i &isin; I<sub>uv</sub></sub> ( R<sub>v,i</sub> - r̄<sub>v</sub> )<sup>2</sup> ) ]
+
+<b>Where:</b>
+• <b>I<sub>uv</sub>:</b> Set of movies co-rated by both User u and User v.
+• <b>Similarity(u, v):</b> Correlation value ranging from -1.0 (opposite tastes) to +1.0 (identical tastes).</div>
+<h3>3. Top-k Similar Peer Selection</h3>
+<p>For an active user u, the system searches all other users in the platform, filters for positive correlation (Similarity > 0), and selects the top k most similar peers who have watched the target movie j:</p>
+<div class="formula-box"><b>Neighbor Group:</b>
+Neighbors(u) = Top-k users v with highest positive Similarity(u, v) who rated movie j</div>
+<h3>4. Mean-Centered Rating Prediction Formula</h3>
+<p>The predicted rating for an unrated movie is computed by taking the active user's personal average rating and adding the similarity-weighted deviations of their nearest neighbors:</p>
+<div class="formula-box"><b>Predicted Rating Formula:</b>
+Predicted Rating(u, j) = r̄<sub>u</sub> + [ &sum;<sub>v &isin; Neighbors</sub> Similarity(u, v) &times; ( R<sub>v,j</sub> - r̄<sub>v</sub> ) ] / [ &sum;<sub>v &isin; Neighbors</sub> |Similarity(u, v)| ]
+
+<b>Where:</b>
+• <b>r̄<sub>u</sub>:</b> Baseline rating average of active User u.
+• <b>( R<sub>v,j</sub> - r̄<sub>v</sub> ):</b> How much neighbor v liked Movie j relative to their own average.
+• <b>Similarity(u, v):</b> Weight given to neighbor v's opinion based on taste similarity.</div>
+
+    <div class="page-break"></div>
+
+    <h2>Algorithmic Methodology &amp; Implementation Steps</h2>
+    <ol>
+        <li>Constructed an 8-user by 20-movie benchmark rating matrix capturing distinct cinematic taste personas (Sci-Fi fans, Drama buffs, Action lovers).</li>
+<li>Implemented the Pearson Correlation Coefficient algorithm in pure NumPy, handling missing entries and co-rated intersections.</li>
+<li>Engineered the k-nearest neighbor selection logic filtering positive correlations for any active user.</li>
+<li>Implemented the mean-centered weighted rating prediction formula to forecast ratings for all unrated movies.</li>
+<li>Built an interactive Flask web application on port 5013 allowing user profile switching, interactive rating, and live recommendation generation.</li>
+    </ol>
+
+    <h2>Experimental Results &amp; Visual Verification</h2>
+
+    <h3>Figure 13.1: Interactive Movie Catalog Grid</h3>
+    <p>Provides a comprehensive catalog browser displaying benchmark titles with genre tags, release years, IMDb ratings, and interactive selection triggers.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss1_catalog.png" alt="Figure 13.1: Movie Catalog Grid">
+        <div class="screenshot-caption">Figure 13.1: Interactive movie catalog grid displaying benchmark titles, poster initials, badges, and clickable interaction triggers.</div>
+    </div>
+
+    <h3>Figure 13.2: Algorithmic Recommendations &amp; Predictions</h3>
+    <p>Presents the top-ranked recommended items generated by the algorithm alongside predicted affinity scores, ranking progress, and contextual explanations.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss2_recommendations.png" alt="Figure 13.2: Recommendations">
+        <div class="screenshot-caption">Figure 13.2: Top algorithmic recommendations generated for the active user profile with predicted scores and rank justifications.</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h3>Figure 13.3: Algorithm Internals &amp; Diagnostic Visualizations</h3>
+    <p>Displays multi-panel algorithmic diagnostics rendered from first principles (including similarity heatmaps, convergence curves, and distribution plots).</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss3_visualizations.png" alt="Figure 13.3: Diagnostic Plots">
+        <div class="screenshot-caption">Figure 13.3: Internal diagnostic visualization plots generated via Matplotlib showing algorithmic convergence and similarity distributions.</div>
+    </div>
+
+    <h3>Figure 13.4: Data Matrix &amp; Numerical Calculation Audit</h3>
+    <p>Provides a direct inspection of the underlying mathematical interaction matrix, user profiles, or similarity index tables supporting the recommendation pipeline.</p>
+    <div class="screenshot-container">
+        <img src="screenshots/ss4_matrix.png" alt="Figure 13.4: Matrix Audit">
+        <div class="screenshot-caption">Figure 13.4: Calculation audit table displaying numerical ratings, similarity indices, or parameter weights supporting the model.</div>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>The User-Based Collaborative Filtering system was successfully implemented from scratch. Using the Pearson Correlation Coefficient normalized subjective differences in user rating scales, allowing accurate identification of genuine taste peers. The mean-centered weighted prediction formula provided reliable forecasts for unrated movies, confirming the validity of neighborhood-based collaborative modeling.</p>
+
+</body>
+</html>
